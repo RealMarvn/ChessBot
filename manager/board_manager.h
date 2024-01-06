@@ -12,28 +12,36 @@
 #include "./pieces/knight.h"
 #include <vector>
 
-enum player_type { WHITE, BLACK };
+enum Player_type { WHITE, BLACK };
 
-struct piece {
+struct Piece {
   char figure;
   bool moved;
+};
+
+struct Move {
+  int position;
+  int old_position;
+  Piece figure;
+  Piece capturedFigure;
 };
 
 class BoardManager {
 
 public:
-  player_type player;
-  piece board[65]{};
-  std::vector<piece[65]> timeline;
+  Player_type player;
+  Piece board[65]{};
+  std::vector<Move> moves;
 
   BoardManager();
   void movePiece(char fig, int x, int y, int move_x, int move_y, bool capture);
   bool popLastMove();
   void printCurrentBoard();
   static bool isPathClear(int startX, int startY, int endX, int endY,
-                          piece board[65]);
+                          Piece board[65]);
   static int calculatePosition(int x, int y);
 
 private:
-  bool canMove(char fig, int x, int y, int move_x, int move_y, bool caputre);
+  void saveMove(int movePosition, int position);
+  bool canMove(char fig, int x, int y, int move_x, int move_y, bool capture);
 };

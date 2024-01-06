@@ -8,7 +8,7 @@
 
 BoardManager::BoardManager() {
   player = WHITE;
-  piece piece{};
+  Piece piece{};
   piece.figure = ' ';
   piece.moved = false;
   board[0] = piece;
@@ -68,6 +68,27 @@ BoardManager::BoardManager() {
   board[64] = piece;
 }
 
+bool BoardManager::popLastMove() {
+  if (moves.empty()) {
+    return false;
+  }
+  Move last_move = moves.back();
+  moves.pop_back();
+  board[last_move.position] = last_move.capturedFigure;
+  board[last_move.old_position] = last_move.figure;
+  player = player == WHITE ? BLACK : WHITE;
+  return true;
+}
+
+void BoardManager::saveMove(int movePosition, int position) {
+  Move move{};
+  move.capturedFigure = board[movePosition];
+  move.figure = board[position];
+  move.position = movePosition;
+  move.old_position = position;
+  moves.push_back(move);
+}
+
 void BoardManager::movePiece(char fig, int x, int y, int move_x, int move_y,
                              bool capture) {
 
@@ -77,17 +98,18 @@ void BoardManager::movePiece(char fig, int x, int y, int move_x, int move_y,
   }
 
   int position = calculatePosition(x, y);
-  int move = calculatePosition(move_x, move_y);
+  int movePosition = calculatePosition(move_x, move_y);
 
-  // timeline.push_back(board);
+  saveMove(movePosition, position);
+
   board[position].moved = true;
-  board[move] = board[position];
+  board[movePosition] = board[position];
   board[position].figure = ' ';
   player = player == WHITE ? BLACK : WHITE;
 }
 
 bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
-                           bool caputre) {
+                           bool capture) {
 
   int position = calculatePosition(x, y);
   int move = calculatePosition(move_x, move_y);
@@ -103,12 +125,12 @@ bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
   }
 
   // Check if capture an empty field or a field without a capture
-  if (board[move].figure != ' ' && !caputre ||
-      caputre && board[move].figure == ' ') {
+  if (board[move].figure != ' ' && !capture ||
+      capture && board[move].figure == ' ') {
     return false;
   }
 
-  if (caputre) {
+  if (capture) {
     // Check if you try to capture your own team.
     if (isupper(board[position].figure) && isupper(board[move].figure) ||
         islower(board[position].figure) && islower(board[move].figure)) {
@@ -119,7 +141,7 @@ bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
   switch (tolower(fig)) {
   case 'p':
     if (isPathClear(x, y, move_x, move_y, board)) {
-      return canPawnMove(x, y, move_x, move_y, caputre,
+      return canPawnMove(x, y, move_x, move_y, capture,
                          board[calculatePosition(x, y)].moved, player == WHITE);
     }
     break;
@@ -149,7 +171,7 @@ bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
 }
 
 bool BoardManager::isPathClear(int startX, int startY, int endX, int endY,
-                               piece board[65]) {
+                               Piece board[65]) {
   int dx = std::abs(endX - startX);
   int dy = std::abs(endY - startY);
   int x = startX;

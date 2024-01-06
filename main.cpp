@@ -7,6 +7,12 @@ int main() {
   std::string input;
   while (getline(std::cin, input)) {
 
+    if (input == "undo") {
+      board->popLastMove();
+      board->printCurrentBoard();
+      continue;
+    }
+
     if (input.length() < 5) {
       std::cout << "invalid" << std::endl;
       continue;
