@@ -145,15 +145,15 @@ bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
   }
 
   // Check if capture an empty field or a field without a capture
-  if (board[move].figure != ' ' && !capture ||
-      capture && board[move].figure == ' ') {
+  if ((board[move].figure != ' ' && !capture) ||
+      (capture && board[move].figure == ' ')) {
     return false;
   }
 
   if (capture) {
     // Check if you try to capture your own team.
-    if (isupper(board[position].figure) && isupper(board[move].figure) ||
-        islower(board[position].figure) && islower(board[move].figure)) {
+    if ((isupper(board[position].figure) && isupper(board[move].figure)) ||
+        (islower(board[position].figure) && islower(board[move].figure))) {
       return false;
     }
   }
@@ -237,10 +237,10 @@ bool BoardManager::isPathClear(int startX, int startY, int endX, int endY,
 }
 
 bool BoardManager::isKingInDanger(bool justReadIn) {
-  int whiteKingPositionX;
-  int whiteKingPositionY;
-  int blackKingPositionX;
-  int blackKingPositionY;
+  int whiteKingPositionX = 0;
+  int whiteKingPositionY = 0;
+  int blackKingPositionX = 0;
+  int blackKingPositionY = 0;
 
   // Get King position
   for (int y = 8; y >= 1; y--) {
@@ -261,13 +261,14 @@ bool BoardManager::isKingInDanger(bool justReadIn) {
       char figure = board[calculatePosition(x, y)].figure;
       if (islower(figure)) {
         if (figure == 'r') {
-
         }
-        if (canMove(figure, x, y, whiteKingPositionX, whiteKingPositionY, true)) {
+        if (canMove(figure, x, y, whiteKingPositionX, whiteKingPositionY,
+                    true)) {
           return true;
         }
       } else if (isupper(figure) && !justReadIn) {
-        if (canMove(figure, x, y, blackKingPositionX, blackKingPositionY, true)) {
+        if (canMove(figure, x, y, blackKingPositionX, blackKingPositionY,
+                    true)) {
           return true;
         }
       }
@@ -289,7 +290,6 @@ void BoardManager::readInBoard(std::string input) {
         inputIndex++;
       }
     }
-
 
     if (isKingInDanger(true)) {
       std::cout << "yes" << std::endl;

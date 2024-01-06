@@ -11,7 +11,7 @@ bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
 
   if (rowDiff > 0) {
 
-    if (isWhite && move_y < y || !isWhite && move_y > y) {
+    if ((isWhite && move_y < y) || (!isWhite && move_y > y)) {
       return false;
     }
 
@@ -33,7 +33,7 @@ bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
 
 bool canPawnPromote(bool isWhite, char promotion_figure, int movePosition) {
   if ((movePosition >= 56 && movePosition <= 64) || (movePosition >= 1 && movePosition <= 8)) {
-    if (isWhite && isupper(promotion_figure) || !isWhite && islower(promotion_figure)) {
+    if ((isWhite && isupper(promotion_figure)) || (!isWhite && islower(promotion_figure))) {
       if (tolower(promotion_figure) != 'k' && tolower(promotion_figure) != 'p') {
         return true;
       }
