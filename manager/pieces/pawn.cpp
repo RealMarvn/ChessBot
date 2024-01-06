@@ -10,7 +10,6 @@ bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
   int colDiff = std::abs(move_x - x);
 
   if (rowDiff > 0) {
-
     if ((isWhite && move_y < y) || (!isWhite && move_y > y)) {
       return false;
     }
@@ -19,8 +18,10 @@ bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
       return true;
     }
 
-    if (colDiff == 0 && rowDiff == 2 && !hasMoved) {
-      return true;
+    if (colDiff == 0 && rowDiff == 2 && !hasMoved && !capture) {
+      if (isWhite && y == 2 || !isWhite && y == 7) {
+        return true;
+      }
     }
 
     if (colDiff == 1 && rowDiff == 1 && capture) {
@@ -38,9 +39,12 @@ bool canPawnPromote(bool isWhite, char fig, char promotion_figure,
         (movePosition >= 1 && movePosition <= 8)) {
       if ((isWhite && isupper(promotion_figure)) ||
           (!isWhite && islower(promotion_figure))) {
-        if (tolower(promotion_figure) != 'k' &&
-            tolower(promotion_figure) != 'p') {
-          return true;
+        switch (islower(promotion_figure)) {
+          case 'r':
+          case 'n':
+          case 'q':
+          case 'b':
+            return true;
         }
       }
     }

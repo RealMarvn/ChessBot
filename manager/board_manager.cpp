@@ -90,6 +90,11 @@ void BoardManager::saveMove(int movePosition, int position) {
 bool BoardManager::movePiece(char fig, int x, int y, int move_x, int move_y,
                              bool capture, char promotion_figure) {
 
+  if ((player == BLACK && isupper(fig)) || (player == WHITE && islower(fig))) {
+    std::cout << "invalid" << std::endl;
+    return false;
+  }
+
   if (!canMove(fig, x, y, move_x, move_y, capture)) {
     std::cout << "invalid" << std::endl;
     return false;
@@ -123,6 +128,7 @@ bool BoardManager::movePiece(char fig, int x, int y, int move_x, int move_y,
   } else {
     std::cout << "no" << std::endl;
   }
+
   return true;
 }
 
@@ -160,7 +166,7 @@ bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
   case 'p':
     if (isPathClear(x, y, move_x, move_y, board)) {
       return canPawnMove(x, y, move_x, move_y, capture,
-                         board[calculatePosition(x, y)].moved, player == WHITE);
+                         board[calculatePosition(x, y)].moved, isupper(fig));
     }
     break;
   case 'k':
@@ -177,14 +183,15 @@ bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
     if (isPathClear(x, y, move_x, move_y, board)) {
       return canRookMove(x, y, move_x, move_y);
     }
+    break;
   case 'q':
     if (isPathClear(x, y, move_x, move_y, board)) {
       return canQueenMove(x, y, move_x, move_y);
     }
+    break;
   case 'n':
     return canKnightMove(x, y, move_x, move_y);
   }
-
   return false;
 }
 
@@ -258,8 +265,6 @@ bool BoardManager::isKingInDanger(bool justReadIn) {
     for (int x = 1; x <= 8; x++) {
       char figure = board[calculatePosition(x, y)].figure;
       if (islower(figure)) {
-        if (figure == 'r') {
-        }
         if (canMove(figure, x, y, whiteKingPositionX, whiteKingPositionY,
                     true)) {
           return true;

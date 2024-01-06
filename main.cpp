@@ -49,10 +49,10 @@ int main(int argc, char *argv[]) {
     }
 
     if (debug) {
-
       if (input[0] == 'B') {
         auto test = input.substr(1, 64);
         board->readInBoard(input.substr(1, 64));
+        //board->printCurrentBoard(false);
         continue;
       } else {
         figure = input[1];
