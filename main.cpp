@@ -76,7 +76,6 @@ int main(int argc, char *argv[]) {
       }
     }
 
-
     board->movePiece(figure, col, row, move_col, move_row, capture,
                      promotion_figure);
 

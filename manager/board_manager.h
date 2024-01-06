@@ -11,6 +11,8 @@
 #include "./pieces/queen.h"
 #include "./pieces/rook.h"
 #include <vector>
+#include <memory>
+#include <string>
 
 enum Player_type { WHITE, BLACK };
 
