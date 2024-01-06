@@ -4,8 +4,6 @@
 
 #include "board_manager.h"
 
-#include <iostream>
-
 BoardManager::BoardManager() {
   player = WHITE;
   Piece piece{};
@@ -102,7 +100,7 @@ bool BoardManager::movePiece(char fig, int x, int y, int move_x, int move_y,
   int movePosition = calculatePosition(move_x, move_y);
 
   if (promotion_figure != ' ') {
-    if (!canPawnPromote(player == WHITE, promotion_figure, movePosition)) {
+    if (!canPawnPromote(player == WHITE, fig, promotion_figure, movePosition)) {
       std::cout << "invalid" << std::endl;
       return false;
     }

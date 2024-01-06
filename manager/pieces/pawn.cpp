@@ -31,11 +31,17 @@ bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
   return false;
 }
 
-bool canPawnPromote(bool isWhite, char promotion_figure, int movePosition) {
-  if ((movePosition >= 56 && movePosition <= 64) || (movePosition >= 1 && movePosition <= 8)) {
-    if ((isWhite && isupper(promotion_figure)) || (!isWhite && islower(promotion_figure))) {
-      if (tolower(promotion_figure) != 'k' && tolower(promotion_figure) != 'p') {
-        return true;
+bool canPawnPromote(bool isWhite, char fig, char promotion_figure,
+                    int movePosition) {
+  if (tolower(fig) == 'p') {
+    if ((movePosition >= 56 && movePosition <= 64) ||
+        (movePosition >= 1 && movePosition <= 8)) {
+      if ((isWhite && isupper(promotion_figure)) ||
+          (!isWhite && islower(promotion_figure))) {
+        if (tolower(promotion_figure) != 'k' &&
+            tolower(promotion_figure) != 'p') {
+          return true;
+        }
       }
     }
   }

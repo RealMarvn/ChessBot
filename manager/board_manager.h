@@ -10,6 +10,7 @@
 #include "./pieces/pawn.h"
 #include "./pieces/queen.h"
 #include "./pieces/rook.h"
+#include <iostream>
 #include <vector>
 #include <memory>
 #include <string>
