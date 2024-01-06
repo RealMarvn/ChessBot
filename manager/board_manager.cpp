@@ -119,6 +119,12 @@ bool BoardManager::movePiece(char fig, int x, int y, int move_x, int move_y,
   if (promotion) {
     board[movePosition].figure = promotion_figure;
   }
+
+  if (isKingInDanger(false)) {
+    std::cout << "yes" << std::endl;
+  } else {
+    std::cout << "no" << std::endl;
+  }
   return true;
 }
 
@@ -230,16 +236,71 @@ bool BoardManager::isPathClear(int startX, int startY, int endX, int endY,
   return true; // Der Pfad ist klar
 }
 
+bool BoardManager::isKingInDanger(bool justReadIn) {
+  int whiteKingPositionX;
+  int whiteKingPositionY;
+  int blackKingPositionX;
+  int blackKingPositionY;
+
+  // Get King position
+  for (int y = 8; y >= 1; y--) {
+    for (int x = 1; x <= 8; x++) {
+      char figure = board[calculatePosition(x, y)].figure;
+      if (figure == 'k') {
+        blackKingPositionX = x;
+        blackKingPositionY = y;
+      } else if (figure == 'K') {
+        whiteKingPositionX = x;
+        whiteKingPositionY = y;
+      }
+    }
+  }
+
+  for (int y = 8; y >= 1; y--) {
+    for (int x = 1; x <= 8; x++) {
+      char figure = board[calculatePosition(x, y)].figure;
+      if (islower(figure)) {
+        if (figure == 'r') {
+
+        }
+        if (canMove(figure, x, y, whiteKingPositionX, whiteKingPositionY, true)) {
+          return true;
+        }
+      } else if (isupper(figure) && !justReadIn) {
+        if (canMove(figure, x, y, blackKingPositionX, blackKingPositionY, true)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
 int BoardManager::calculatePosition(int x, int y) { return (y - 1) * 8 + x; }
 
-void BoardManager::printCurrentBoard(bool legacy) {
-  if (legacy) {
-    for (int column = 8; column >= 1; column--) {
-      for (int row = 1; row <= 8; row++) {
-        std::cout << board[calculatePosition(row, column)].figure;
+void BoardManager::readInBoard(std::string input) {
+  if (input.length() == 64) {
+    player = WHITE;
+
+    int inputIndex = 0;
+    for (int y = 8; y > 0; y--) {
+      for (int x = 1; x < 9; x++) {
+        board[calculatePosition(x, y)].figure = input[inputIndex];
+        inputIndex++;
       }
-      std::cout << std::endl;
     }
+
+
+    if (isKingInDanger(true)) {
+      std::cout << "yes" << std::endl;
+    } else {
+      std::cout << "no" << std::endl;
+    }
+  }
+}
+
+void BoardManager::printCurrentBoard(bool debug) {
+  if (debug) {
     return;
   }
 
@@ -251,10 +312,10 @@ void BoardManager::printCurrentBoard(bool legacy) {
               << "Black" << std::endl;
   }
 
-  for (int column = 8; column >= 1; column--) {
-    std::cout << column << " | ";
-    for (int row = 1; row <= 8; row++) {
-      std::cout << "[" << board[calculatePosition(row, column)].figure << "]";
+  for (int y = 8; y >= 1; y--) {
+    std::cout << y << " | ";
+    for (int x = 1; x <= 8; x++) {
+      std::cout << "[" << board[calculatePosition(x, y)].figure << "]";
     }
     std::cout << std::endl;
   }

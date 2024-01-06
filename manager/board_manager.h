@@ -36,7 +36,9 @@ public:
   BoardManager();
   bool movePiece(char fig, int x, int y, int move_x, int move_y, bool capture, char promotion_figure);
   bool popLastMove();
-  void printCurrentBoard(bool legacy);
+  void printCurrentBoard(bool debug);
+  void readInBoard(std::string input);
+  bool isKingInDanger(bool justReadIn);
 
 private:
   void saveMove(int movePosition, int position);
