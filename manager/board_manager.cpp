@@ -89,16 +89,25 @@ void BoardManager::saveMove(int movePosition, int position) {
   moves.push_back(move);
 }
 
-void BoardManager::movePiece(char fig, int x, int y, int move_x, int move_y,
-                             bool capture) {
+bool BoardManager::movePiece(char fig, int x, int y, int move_x, int move_y,
+                             bool capture, char promotion_figure) {
 
   if (!canMove(fig, x, y, move_x, move_y, capture)) {
     std::cout << "invalid" << std::endl;
-    return;
+    return false;
   }
 
+  bool promotion = false;
   int position = calculatePosition(x, y);
   int movePosition = calculatePosition(move_x, move_y);
+
+  if (promotion_figure != ' ') {
+    if (!canPawnPromote(player == WHITE, promotion_figure, movePosition)) {
+      std::cout << "invalid" << std::endl;
+      return false;
+    }
+    promotion = true;
+  }
 
   saveMove(movePosition, position);
 
@@ -106,6 +115,11 @@ void BoardManager::movePiece(char fig, int x, int y, int move_x, int move_y,
   board[movePosition] = board[position];
   board[position].figure = ' ';
   player = player == WHITE ? BLACK : WHITE;
+
+  if (promotion) {
+    board[movePosition].figure = promotion_figure;
+  }
+  return true;
 }
 
 bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
@@ -218,7 +232,17 @@ bool BoardManager::isPathClear(int startX, int startY, int endX, int endY,
 
 int BoardManager::calculatePosition(int x, int y) { return (y - 1) * 8 + x; }
 
-void BoardManager::printCurrentBoard() {
+void BoardManager::printCurrentBoard(bool legacy) {
+  if (legacy) {
+    for (int column = 8; column >= 1; column--) {
+      for (int row = 1; row <= 8; row++) {
+        std::cout << board[calculatePosition(row, column)].figure;
+      }
+      std::cout << std::endl;
+    }
+    return;
+  }
+
   if (player == WHITE) {
     std::cout << "Current turn: "
               << "White" << std::endl;

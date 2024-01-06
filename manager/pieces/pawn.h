@@ -8,3 +8,5 @@
 
 bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
                  bool hasMoved, bool isWhite);
+
+bool canPawnPromote(bool isWhite, char promotion_figure, int movePosition);
