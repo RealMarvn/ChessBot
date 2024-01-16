@@ -4,9 +4,17 @@
 
 #include "board_manager.h"
 
-BoardManager::BoardManager() {
+BoardManager::BoardManager(chess_game game) {
   player = WHITE;
-  readFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+  gameType = game;
+  switch (game) {
+    case IMMORTAL:
+      readFen("rnbqkbnr/pppppppp/m6m/8/8/M6M/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+      break;
+    default:
+      readFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+      break;
+  }
 }
 
 bool BoardManager::popLastMove() {

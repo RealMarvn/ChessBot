@@ -11,14 +11,24 @@
 #include <vector>
 
 #include "./pieces/bishop.h"
-#include "./pieces/immortal.h"
+#include "./pieces/immortal.h"  //TODO DUCK CHESS
 #include "./pieces/king.h"
 #include "./pieces/knight.h"
+#include "./pieces/mimic.h"  //TODO MIMIC CHESS
 #include "./pieces/pawn.h"
 #include "./pieces/queen.h"
 #include "./pieces/rook.h"
 
 enum player_type { WHITE, BLACK };
+enum chess_game {
+  DEFAULT,
+  ATOM,
+  IMMORTAL,
+  MIMIC,
+  INVISIBLE,
+  MIRROR,
+  PUZZLE_QUEEN
+};
 
 struct Piece {
   char figure;
@@ -34,11 +44,12 @@ struct Move {
 
 class BoardManager {
  public:
+  chess_game gameType;
   player_type player;
   Piece board[65]{};
   std::vector<Move> moves;
 
-  BoardManager();
+  explicit BoardManager(chess_game game);
   bool movePiece(char fig, int x, int y, int move_x, int move_y, bool capture,
                  char promotion_figure);
   bool popLastMove();

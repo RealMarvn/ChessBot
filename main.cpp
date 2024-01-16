@@ -3,7 +3,7 @@
 #include <iostream>
 
 int main() {
-  const auto board = std::make_unique<BoardManager>();
+  const auto board = std::make_unique<BoardManager>(DEFAULT);
   std::string input;
 
   while (getline(std::cin, input)) {
