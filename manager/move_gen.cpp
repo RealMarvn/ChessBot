@@ -9,15 +9,16 @@
 //   return possibleMoves;
 // }
 
+// TODO pass by reference
 std::vector<Move> getAllPossibleRookMoves(std::pair<int, int> startPos,
                                           piece board[65]) {
   int old_position = calculatePosition(startPos.first, startPos.second);
-  bool isWhite = isWhitePiece(board[old_position]);
+  bool pieceColor = isWhitePiece(board[old_position]);
   std::vector<Move> possibleMoves{};
 
   Move move{};
   move.old_position = old_position;
-  move.figure = isWhite ? WR : BR;
+  move.figure = pieceColor ? WR : BR;
 
   std::pair<int, int> directions[4] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
@@ -28,15 +29,15 @@ std::vector<Move> getAllPossibleRookMoves(std::pair<int, int> startPos,
     while (x > 0 && y > 0 && x < 9 && y < 9) {
       int position = calculatePosition(x, y);
       move.position = position;
+      move.capturedFigure = board[position];
+
       if (board[position] == EMPTY) {
-        move.capturedFigure = EMPTY;
         possibleMoves.push_back(move);
       } else if (board[position] != EMPTY) {
-        if ((isWhite && isWhitePiece(board[position])) ||
-            (!isWhite && !isWhitePiece(board[position]))) {
+        if ((pieceColor && isWhitePiece(board[position])) ||
+            (!pieceColor && !isWhitePiece(board[position]))) {
           break;
         }
-        move.capturedFigure = board[position];
         possibleMoves.push_back(move);
         break;
       } else {
@@ -45,6 +46,40 @@ std::vector<Move> getAllPossibleRookMoves(std::pair<int, int> startPos,
 
       x += dir.first;
       y += dir.second;
+    }
+  }
+  return possibleMoves;
+}
+
+std::vector<Move> getAllPossibleKnightMoves(std::pair<int, int> startPos,
+                                            piece board[65]) {
+  int old_position = calculatePosition(startPos.first, startPos.second);
+  bool pieceColor = isWhitePiece(board[old_position]);
+  std::vector<Move> possibleMoves{};
+
+  Move move{};
+  move.old_position = old_position;
+  move.figure = pieceColor ? WN : BN;
+
+  std::pair<int, int> directions[8] = {{-2, -1}, {-1, -2}, {1, -2}, {2, -1},
+                                       {2, 1},   {1, 2},   {-1, 2}, {-2, 1}};
+
+  for (const auto& dir : directions) {
+    int x = startPos.first + dir.first;
+    int y = startPos.second + dir.second;
+    int position = calculatePosition(x, y);
+
+    piece piece = board[calculatePosition(x, y)];
+    if (x > 0 && y > 0 && x < 9 && y < 9) {
+      if (piece != EMPTY) {
+        if ((pieceColor && isWhitePiece(piece)) ||
+            ((!pieceColor) && (!isWhitePiece(piece)))) {
+          continue;
+        }
+      }
+      move.position = position;
+      move.capturedFigure = board[position];
+      possibleMoves.push_back(move);
     }
   }
   return possibleMoves;

@@ -16,6 +16,9 @@
 std::vector<Move> getAllPossibleRookMoves(std::pair<int, int> startPos,
                                           piece board[65]);
 
+std::vector<Move> getAllPossibleKnightMoves(std::pair<int, int> startPos,
+                                          piece board[65]);
+
 bool canRookMove(int x, int y, int move_x, int move_y);
 bool canQueenMove(int x, int y, int move_x, int move_y);
 bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
