@@ -4,17 +4,8 @@
 
 #include "board_manager.h"
 
-BoardManager::BoardManager(chess_game game) {
-  player = WHITE;
-  gameType = game;
-  switch (game) {
-    case IMMORTAL:
-      readFen("rnbqkbnr/pppppppp/m6m/8/8/M6M/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-      break;
-    default:
-      readFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-      break;
-  }
+BoardManager::BoardManager() : player(WHITE) {
+  readFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
 
 bool BoardManager::popLastMove() {
@@ -29,27 +20,28 @@ bool BoardManager::popLastMove() {
   return true;
 }
 
-// TODO: Work in Progress
-bool BoardManager::canCastle(int x, int y, int move_x, int move_y) {
-  Piece piece = board[calculatePosition(x, y)];
-  Piece movePiece = board[calculatePosition(move_x, move_y)];
+void BoardManager::makeMove(Move move) {
+  board[move.position] = board[move.old_position];
+  board[move.old_position] = EMPTY;
+  moves.push_back(move);
+}
 
-  if (piece.moved || movePiece.moved) {
-    return true;
-  }
-
-  if (x < move_x) {
-    if ((board[calculatePosition(x + 1, y)].figure == ' ') &&
-        (board[calculatePosition(x + 2, y)].figure == ' ')) {
+bool BoardManager::isCheckMate(bool isWhite) {
+  for (int row = 8; row >= 1; row--) {
+    for (int column = 1; column <= 8; column++) {
+      if (isWhite && isWhitePiece(board[calculatePosition(column, row)])) {
+        if (getPossibleMoves(column, row) > 0) {
+          return false;
+        }
+      }
+      if (!isWhite && (!isWhitePiece(board[calculatePosition(column, row)]))) {
+        if (getPossibleMoves(column, row) > 0) {
+          return false;
+        }
+      }
     }
   }
-
-  if (x > move_x) {
-    if ((board[calculatePosition(x - 1, y)].figure == ' ') &&
-        (board[calculatePosition(x - 2, y)].figure == ' ')) {
-    }
-  }
-  return false;
+  return true;
 }
 
 void BoardManager::saveMove(int movePosition, int position) {
@@ -87,16 +79,15 @@ bool BoardManager::movePiece(char fig, int x, int y, int move_x, int move_y,
 
   saveMove(movePosition, position);
 
-  board[position].moved = true;
   board[movePosition] = board[position];
-  board[position].figure = ' ';
+  board[position] = EMPTY;
   player = player == WHITE ? BLACK : WHITE;
 
   if (promotion) {
-    board[movePosition].figure = promotion_figure;
+    board[movePosition] = findKeyByValue(promotion_figure);
   }
 
-  if (isKingInDanger(false)) {
+  if (isKingInCheck(player == WHITE)) {
     std::cout << "King is in check" << std::endl;
   } else {
     std::cout << "No one is in check" << std::endl;
@@ -116,7 +107,7 @@ bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
   }
 
   // Check if figure is really that figure.
-  if (board[position].figure != fig) {
+  if (pieceToCharMap[board[position]] != fig) {
     return false;
   }
 
@@ -125,15 +116,14 @@ bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
   //  }
 
   // Check if capture an empty field or a field without a capture
-  if ((board[move].figure != ' ' && !capture) ||
-      (capture && board[move].figure == ' ')) {
+  if ((board[move] != EMPTY && !capture) || (capture && board[move] == EMPTY)) {
     return false;
   }
 
   if (capture) {
     // Check if you try to capture your own team.
-    if ((isupper(board[position].figure) && isupper(board[move].figure)) ||
-        (islower(board[position].figure) && islower(board[move].figure))) {
+    if ((isWhitePiece(board[position]) && isWhitePiece(board[move])) ||
+        ((!isWhitePiece(board[position])) && (!isWhitePiece(board[move])))) {
       return false;
     }
   }
@@ -141,8 +131,7 @@ bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
   switch (tolower(fig)) {
     case 'p':
       if (isPathClear(x, y, move_x, move_y, board)) {
-        return canPawnMove(x, y, move_x, move_y, capture,
-                           board[calculatePosition(x, y)].moved, isupper(fig));
+        return canPawnMove(x, y, move_x, move_y, capture, isupper(fig));
       }
       break;
     case 'k':
@@ -172,7 +161,7 @@ bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
 }
 
 bool BoardManager::isPathClear(int startX, int startY, int endX, int endY,
-                               Piece board[65]) {
+                               const piece board[65]) {
   int dx = std::abs(endX - startX);
   int dy = std::abs(endY - startY);
   int x = startX;
@@ -191,7 +180,7 @@ bool BoardManager::isPathClear(int startX, int startY, int endX, int endY,
       p += 2 * dy;
 
       if (x != endX || y != endY) {
-        if (board[calculatePosition(x, y)].figure != ' ') {
+        if (board[calculatePosition(x, y)] != EMPTY) {
           return false;
         }
       }
@@ -207,14 +196,14 @@ bool BoardManager::isPathClear(int startX, int startY, int endX, int endY,
       p += 2 * dx;
 
       if (x != endX || y != endY) {
-        if (board[calculatePosition(x, y)].figure != ' ') {
+        if (board[calculatePosition(x, y)] != EMPTY) {
           return false;
         }
       }
     }
   }
 
-  return true;  // Der Pfad ist klar
+  return true;
 }
 
 bool BoardManager::isWhiteKingInDanger() {
@@ -224,8 +213,7 @@ bool BoardManager::isWhiteKingInDanger() {
   // Get King position
   for (int y = 8; y >= 1; y--) {
     for (int x = 1; x <= 8; x++) {
-      char figure = board[calculatePosition(x, y)].figure;
-      if (figure == 'K') {
+      if (board[calculatePosition(x, y)] == WK) {
         whiteKingPositionX = x;
         whiteKingPositionY = y;
       }
@@ -234,9 +222,9 @@ bool BoardManager::isWhiteKingInDanger() {
 
   for (int y = 8; y >= 1; y--) {
     for (int x = 1; x <= 8; x++) {
-      char figure = board[calculatePosition(x, y)].figure;
-      if (islower(figure)) {
-        if (canMove(figure, x, y, whiteKingPositionX, whiteKingPositionY,
+      piece figure = board[calculatePosition(x, y)];
+      if (!isWhitePiece(figure)) {
+        if (canMove(pieceToCharMap[figure], x, y, whiteKingPositionX, whiteKingPositionY,
                     true)) {
           return true;
         }
@@ -254,19 +242,19 @@ bool BoardManager::isBlackKingInDanger() {
   // Get King position
   for (int y = 8; y >= 1; y--) {
     for (int x = 1; x <= 8; x++) {
-      char figure = board[calculatePosition(x, y)].figure;
-      if (figure == 'k') {
+      if (board[calculatePosition(x, y)] == BK) {
         blackKingPositionX = x;
         blackKingPositionY = y;
+        break;
       }
     }
   }
 
   for (int y = 8; y >= 1; y--) {
     for (int x = 1; x <= 8; x++) {
-      char figure = board[calculatePosition(x, y)].figure;
-      if (isupper(figure)) {
-        if (canMove(figure, x, y, blackKingPositionX, blackKingPositionY,
+      piece figure = board[calculatePosition(x, y)];
+      if (isWhitePiece(figure)) {
+        if (canMove(pieceToCharMap[figure], x, y, blackKingPositionX, blackKingPositionY,
                     true)) {
           return true;
         }
@@ -277,59 +265,25 @@ bool BoardManager::isBlackKingInDanger() {
   return false;
 }
 
-// TODO: Can be improved
-bool BoardManager::isKingInDanger(bool justReadIn) {
-  int whiteKingPositionX = 0;
-  int whiteKingPositionY = 0;
-  int blackKingPositionX = 0;
-  int blackKingPositionY = 0;
-
-  // Get King position
-  for (int y = 8; y >= 1; y--) {
-    for (int x = 1; x <= 8; x++) {
-      char figure = board[calculatePosition(x, y)].figure;
-      if (figure == 'k') {
-        blackKingPositionX = x;
-        blackKingPositionY = y;
-      } else if (figure == 'K') {
-        whiteKingPositionX = x;
-        whiteKingPositionY = y;
-      }
-    }
+bool BoardManager::isKingInCheck(bool isWhite) {
+  if (isWhite && isWhiteKingInDanger()) {
+    return isCheckMate(isWhite);
   }
-
-  for (int y = 8; y >= 1; y--) {
-    for (int x = 1; x <= 8; x++) {
-      char figure = board[calculatePosition(x, y)].figure;
-      if (islower(figure)) {
-        if (canMove(figure, x, y, whiteKingPositionX, whiteKingPositionY,
-                    true)) {
-          return true;
-        }
-      } else if (isupper(figure) && !justReadIn) {
-        if (canMove(figure, x, y, blackKingPositionX, blackKingPositionY,
-                    true)) {
-          return true;
-        }
-      }
-    }
+  if (!isWhite && isBlackKingInDanger()) {
+    return isCheckMate(isWhite);
   }
   return false;
 }
 
-int BoardManager::calculatePosition(int x, int y) { return (y - 1) * 8 + x; }
+int calculatePosition(int x, int y) { return (y - 1) * 8 + x; }
 
 void BoardManager::readFen(std::string input) {
   std::vector<std::string> fenSettings;
 
   std::istringstream iss(input);
   for (std::string s; iss >> s;) fenSettings.push_back(s);
-
   player = WHITE;
-  Piece piece{};
-  piece.figure = ' ';
-  piece.moved = false;
-  board[0] = piece;
+  board[0] = EMPTY;
 
   int inputIndex = 0;
   int x = 1;
@@ -343,25 +297,60 @@ void BoardManager::readFen(std::string input) {
       case '/':
         y--;
         break;
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
+      case 'k':
+        board[calculatePosition(x, y)] = BK;
+        x++;
+        break;
+      case 'K':
+        board[calculatePosition(x, y)] = WK;
+        x++;
+        break;
+      case 'q':
+        board[calculatePosition(x, y)] = BQ;
+        x++;
+        break;
+      case 'Q':
+        board[calculatePosition(x, y)] = WQ;
+        x++;
+        break;
+      case 'r':
+        board[calculatePosition(x, y)] = BR;
+        x++;
+        break;
+      case 'R':
+        board[calculatePosition(x, y)] = WR;
+        x++;
+        break;
+      case 'b':
+        board[calculatePosition(x, y)] = BB;
+        x++;
+        break;
+      case 'B':
+        board[calculatePosition(x, y)] = WB;
+        x++;
+        break;
+      case 'n':
+        board[calculatePosition(x, y)] = BN;
+        x++;
+        break;
+      case 'N':
+        board[calculatePosition(x, y)] = WN;
+        x++;
+        break;
+      case 'p':
+        board[calculatePosition(x, y)] = BP;
+        x++;
+        break;
+      case 'P':
+        board[calculatePosition(x, y)] = WP;
+        x++;
+        break;
+      default:
         for (int i = input[inputIndex] - '0'; i > 0; --i) {
-          piece.figure = ' ';
-          board[calculatePosition(x, y)] = piece;
+          board[calculatePosition(x, y)] = EMPTY;
           x++;
         }
         break;
-      default:
-        piece.figure = input[inputIndex];
-        board[calculatePosition(x, y)] = piece;
-        piece.moved = false;
-        x++;
     }
     inputIndex++;
   }
@@ -373,20 +362,54 @@ void BoardManager::readFen(std::string input) {
   printCurrentBoard();
 }
 
+int BoardManager::getPossibleMoves(int x, int y) {
+  piece saveBoard[65];
+  std::memcpy(saveBoard, board, sizeof(board));
+  piece piece = board[calculatePosition(x, y)];
+  int possibleMoves = 0;
+  for (int row = 8; row >= 1; row--) {
+    for (int column = 1; column <= 8; column++) {
+      if (board[calculatePosition(column, row)] == EMPTY &&
+          canMove(piece, x, y, column, row, false)) {
+        // Mach den Move!
+        board[calculatePosition(column, row)] = piece;
+        board[calculatePosition(x, y)] = EMPTY;
+        if ((isWhitePiece(piece) && !isWhiteKingInDanger()) ||
+            ((!isWhitePiece(piece)) && !isBlackKingInDanger())) {
+          possibleMoves++;
+        }
+        std::memcpy(board, saveBoard, sizeof(saveBoard));
+        continue;
+      }
+      if (canMove(piece, x, y, column, row, true)) {
+        // Mach den Move!
+        board[calculatePosition(column, row)] = piece;
+        board[calculatePosition(x, y)] = EMPTY;
+        if ((isWhitePiece(piece) && !isWhiteKingInDanger()) ||
+            ((!isWhitePiece(piece)) && !isBlackKingInDanger())) {
+          possibleMoves++;
+        }
+        std::memcpy(board, saveBoard, sizeof(saveBoard));
+        continue;
+      }
+    }
+  }
+  return possibleMoves;
+}
+
 // TODO: refactor this function to improve efficiency
 void BoardManager::printPossibleMoves(char fig, int x, int y) {
-  Piece saveBoard[65];
+  piece saveBoard[65];
   std::memcpy(saveBoard, board, sizeof(board));
-  Piece piece = board[calculatePosition(x, y)];
+  piece figure = board[calculatePosition(x, y)];
 
   for (int row = 8; row >= 1; row--) {
     for (int column = 1; column <= 8; column++) {
-      if (board[calculatePosition(column, row)].figure == ' ' &&
+      if (board[calculatePosition(column, row)] == EMPTY &&
           canMove(fig, x, y, column, row, false)) {
         // Mach den Move!
-        piece.moved = true;
-        board[calculatePosition(column, row)] = piece;
-        board[calculatePosition(x, y)].figure = ' ';
+        board[calculatePosition(column, row)] = figure;
+        board[calculatePosition(x, y)] = EMPTY;
         if ((isupper(fig) && !isWhiteKingInDanger()) ||
             (islower(fig) && !isBlackKingInDanger())) {
           std::cout << "[o]";
@@ -397,9 +420,8 @@ void BoardManager::printPossibleMoves(char fig, int x, int y) {
       }
       if (canMove(fig, x, y, column, row, true)) {
         // Mach den Move!
-        piece.moved = true;
-        board[calculatePosition(column, row)] = piece;
-        board[calculatePosition(x, y)].figure = ' ';
+        board[calculatePosition(column, row)] = figure;
+        board[calculatePosition(x, y)] = EMPTY;
         if ((isupper(fig) && !isWhiteKingInDanger()) ||
             (islower(fig) && !isBlackKingInDanger())) {
           std::cout << "[x]";
@@ -408,7 +430,7 @@ void BoardManager::printPossibleMoves(char fig, int x, int y) {
         }
         std::memcpy(board, saveBoard, sizeof(saveBoard));
       }
-      std::cout << "[" << board[calculatePosition(column, row)].figure << "]";
+      std::cout << "[" << pieceToCharMap[board[calculatePosition(x, y)]] << "]";
       std::memcpy(board, saveBoard, sizeof(saveBoard));
     }
     std::cout << std::endl;
@@ -428,7 +450,7 @@ void BoardManager::printCurrentBoard() {
   for (int y = 8; y >= 1; y--) {
     std::cout << y << " | ";
     for (int x = 1; x <= 8; x++) {
-      std::cout << "[" << board[calculatePosition(x, y)].figure << "]";
+      std::cout << "[" << pieceToCharMap[board[calculatePosition(x, y)]] << "]";
     }
     std::cout << std::endl;
   }
@@ -437,4 +459,26 @@ void BoardManager::printCurrentBoard() {
     std::cout << "  " << char(i + 96);
   }
   std::cout << std::endl;
+}
+
+bool BoardManager::isWhitePiece(piece piece) {
+  switch (piece) {
+    case WP:
+    case WN:
+    case WB:
+    case WR:
+    case WQ:
+    case WK:
+      return true;
+    default:
+      return false;
+  }
+}
+
+piece BoardManager::findKeyByValue(char value) {
+  for (auto& pair : pieceToCharMap) {
+    if (pair.second == value) return pair.first;
+  }
+
+  return EMPTY;
 }
