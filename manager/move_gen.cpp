@@ -3,20 +3,52 @@
 //
 #include "./move_gen.h"
 
+// std::array<Move, 27> getPossiblePieceMoves(int x, int y, std::array<piece,
+// 65> board) {
+//   std::array<Move, 27> possibleMoves;
+//   return possibleMoves;
+// }
 
-//std::array<Move, 27> getPossiblePieceMoves(int x, int y, std::array<piece, 65> board) {
-//  std::array<Move, 27> possibleMoves;
-//  return possibleMoves;
-//}
+std::vector<Move> getAllPossibleRookMoves(std::pair<int, int> startPos,
+                                          piece board[65]) {
+  int old_position = calculatePosition(startPos.first, startPos.second);
+  bool isWhite = isWhitePiece(board[old_position]);
+  std::vector<Move> possibleMoves{};
 
-std::array<Move, 27> getAllPossibleRookMoves(int x, int y, std::array<piece, 65> board) {
-  std::array<Move, 27> possibleMoves;
-  for (int column = x; x < 9; x++) {
+  Move move{};
+  move.old_position = old_position;
+  move.figure = isWhite ? WR : BR;
 
+  std::pair<int, int> directions[4] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+
+  for (const auto& dir : directions) {
+    int x = startPos.first + dir.first;
+    int y = startPos.second + dir.second;
+
+    while (x > 0 && y > 0 && x < 9 && y < 9) {
+      int position = calculatePosition(x, y);
+      move.position = position;
+      if (board[position] == EMPTY) {
+        move.capturedFigure = EMPTY;
+        possibleMoves.push_back(move);
+      } else if (board[position] != EMPTY) {
+        if ((isWhite && isWhitePiece(board[position])) ||
+            (!isWhite && !isWhitePiece(board[position]))) {
+          break;
+        }
+        move.capturedFigure = board[position];
+        possibleMoves.push_back(move);
+        break;
+      } else {
+        break;
+      }
+
+      x += dir.first;
+      y += dir.second;
+    }
   }
   return possibleMoves;
 }
-
 
 // ################### PIECE MOVES ###################
 
@@ -34,8 +66,8 @@ bool canQueenMove(int x, int y, int move_x, int move_y) {
   return false;
 }
 
-bool canPawnMove(int x, int y, int move_x, int move_y,
-                               bool capture, bool isWhite) {
+bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
+                 bool isWhite) {
   int rowDiff = std::abs(move_y - y);
   int colDiff = std::abs(move_x - x);
 
@@ -63,7 +95,7 @@ bool canPawnMove(int x, int y, int move_x, int move_y,
 }
 
 bool canPawnPromote(bool isWhite, char fig, char promotion_figure,
-                                  int movePosition) {
+                    int movePosition) {
   if (tolower(fig) == 'p') {
     if ((movePosition >= 56 && movePosition <= 64) ||
         (movePosition >= 1 && movePosition <= 8)) {
