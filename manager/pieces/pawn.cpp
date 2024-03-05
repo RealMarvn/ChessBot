@@ -4,8 +4,7 @@
 
 #include "./pawn.h"
 
-bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
-                 bool hasMoved, bool isWhite) {
+bool canPawnMove(int x, int y, int move_x, int move_y, bool capture, bool isWhite) {
   int rowDiff = std::abs(move_y - y);
   int colDiff = std::abs(move_x - x);
 
@@ -18,7 +17,7 @@ bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
       return true;
     }
 
-    if (colDiff == 0 && rowDiff == 2 && !hasMoved && !capture) {
+    if (colDiff == 0 && rowDiff == 2 && !capture) {
       if (isWhite && y == 2 || !isWhite && y == 7) {
         return true;
       }
@@ -39,7 +38,7 @@ bool canPawnPromote(bool isWhite, char fig, char promotion_figure,
         (movePosition >= 1 && movePosition <= 8)) {
       if ((isWhite && isupper(promotion_figure)) ||
           (!isWhite && islower(promotion_figure))) {
-        switch (islower(promotion_figure)) {
+        switch (tolower(promotion_figure)) {
           case 'r':
           case 'n':
           case 'q':

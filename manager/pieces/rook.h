@@ -7,3 +7,4 @@
 #include "../board_manager.h"
 
 bool canRookMove(int x, int y, int move_x, int move_y);
+std::vector<Move> getPossibleRookMoves(int x, int y);
