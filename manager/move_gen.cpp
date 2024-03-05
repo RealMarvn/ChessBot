@@ -4,7 +4,18 @@
 #include "./move_gen.h"
 
 
+//std::array<Move, 27> getPossiblePieceMoves(int x, int y, std::array<piece, 65> board) {
+//  std::array<Move, 27> possibleMoves;
+//  return possibleMoves;
+//}
 
+std::array<Move, 27> getAllPossibleRookMoves(int x, int y, std::array<piece, 65> board) {
+  std::array<Move, 27> possibleMoves;
+  for (int column = x; x < 9; x++) {
+
+  }
+  return possibleMoves;
+}
 
 
 // ################### PIECE MOVES ###################

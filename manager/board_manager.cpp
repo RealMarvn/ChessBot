@@ -275,8 +275,6 @@ bool BoardManager::isKingInCheck(bool isWhite) {
   return false;
 }
 
-int calculatePosition(int x, int y) { return (y - 1) * 8 + x; }
-
 void BoardManager::readFen(std::string input) {
   std::vector<std::string> fenSettings;
 
@@ -459,18 +457,4 @@ void BoardManager::printCurrentBoard() {
     std::cout << "  " << char(i + 96);
   }
   std::cout << std::endl;
-}
-
-bool BoardManager::isWhitePiece(piece piece) {
-  switch (piece) {
-    case WP:
-    case WN:
-    case WB:
-    case WR:
-    case WQ:
-    case WK:
-      return true;
-    default:
-      return false;
-  }
 }

@@ -4,13 +4,19 @@
 
 #pragma once
 #include <array>
+#include "./misc/move.h"
+#include "./misc/piece.h"
 
-static bool canRookMove(int x, int y, int move_x, int move_y);
-static bool canQueenMove(int x, int y, int move_x, int move_y);
-static bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
+//std::array<Move, 27> getPossiblePieceMoves(int x, int y, std::array<piece, 65> board);
+
+std::array<Move, 27> getAllPossibleRookMoves(int x, int y, std::array<piece, 65> board);
+
+bool canRookMove(int x, int y, int move_x, int move_y);
+bool canQueenMove(int x, int y, int move_x, int move_y);
+bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
                         bool isWhite);
-static bool canPawnPromote(bool isWhite, char figure, char promotion_figure,
+bool canPawnPromote(bool isWhite, char figure, char promotion_figure,
                            int movePosition);
-static bool canKnightMove(int x, int y, int move_x, int move_y);
-static bool canKingMove(int x, int y, int move_x, int move_y);
-static bool canBishopMove(int x, int y, int move_x, int move_y);
+bool canKnightMove(int x, int y, int move_x, int move_y);
+bool canKingMove(int x, int y, int move_x, int move_y);
+bool canBishopMove(int x, int y, int move_x, int move_y);

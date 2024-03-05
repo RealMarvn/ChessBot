@@ -11,12 +11,11 @@
 #include <string>
 #include <vector>
 
-#include "./move.h"
-#include "./piece.h"
 #include "./move_gen.h"
+#include "misc/move.h"
+#include "misc/piece.h"
 
 enum player_type { WHITE, BLACK };
-static int calculatePosition(int x, int y);
 
 class BoardManager {
  public:
@@ -39,7 +38,6 @@ class BoardManager {
   bool isCheckMate(bool isWhite);
   bool isWhiteKingInDanger();
   bool isBlackKingInDanger();
-  static bool isWhitePiece(piece piece);
   void saveMove(int movePosition, int position);
   bool canMove(char fig, int x, int y, int move_x, int move_y, bool capture);
   static bool isPathClear(int startX, int startY, int endX, int endY,
