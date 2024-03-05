@@ -224,8 +224,8 @@ bool BoardManager::isWhiteKingInDanger() {
     for (int x = 1; x <= 8; x++) {
       piece figure = board[calculatePosition(x, y)];
       if (!isWhitePiece(figure)) {
-        if (canMove(pieceToCharMap[figure], x, y, whiteKingPositionX, whiteKingPositionY,
-                    true)) {
+        if (canMove(pieceToCharMap[figure], x, y, whiteKingPositionX,
+                    whiteKingPositionY, true)) {
           return true;
         }
       }
@@ -254,8 +254,8 @@ bool BoardManager::isBlackKingInDanger() {
     for (int x = 1; x <= 8; x++) {
       piece figure = board[calculatePosition(x, y)];
       if (isWhitePiece(figure)) {
-        if (canMove(pieceToCharMap[figure], x, y, blackKingPositionX, blackKingPositionY,
-                    true)) {
+        if (canMove(pieceToCharMap[figure], x, y, blackKingPositionX,
+                    blackKingPositionY, true)) {
           return true;
         }
       }
@@ -473,12 +473,4 @@ bool BoardManager::isWhitePiece(piece piece) {
     default:
       return false;
   }
-}
-
-piece BoardManager::findKeyByValue(char value) {
-  for (auto& pair : pieceToCharMap) {
-    if (pair.second == value) return pair.first;
-  }
-
-  return EMPTY;
 }
