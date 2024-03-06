@@ -6,9 +6,9 @@
 
 #include "../manager/board_manager.h"
 
-std::pair<int, Move> miniMaxWithAlphaBetaCut(piece board[65], int depth, int alpha, int beta, bool isMaximisingPlayer);
+std::pair<int, Move> miniMaxWithAlphaBetaCut(std::array<piece, 65> board, int depth, int alpha, int beta, bool isMaximisingPlayer);
 
 int getPieceValue(piece piece);
 
-int evaluateMaterialValue(piece board[65]);
+int evaluateMaterialValue(std::array<piece, 65> board);
 

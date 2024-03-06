@@ -3,42 +3,166 @@
 //
 #include "./move_gen.h"
 
-// std::array<Move, 27> getPossiblePieceMoves(int x, int y, std::array<piece,
-// 65> board) {
-//   std::array<Move, 27> possibleMoves;
-//   return possibleMoves;
-// }
+AllPseudoMoves getAllPseudoLegalMoves(std::array<piece, 65>& board,
+                                      bool player) {
+  AllPseudoMoves allPseudoMoves;
+  for (int y = 1; y < 9; y++) {
+    for (int x = 1; x < 9; x++) {
+      piece piece = board[calculatePosition(x, y)];
+      if (piece != EMPTY) {
+        if ((isWhitePiece(piece) && player) ||
+            (!isWhitePiece(piece) && !player)) {
+          switch (piece) {
+            case BP:
+            case WP:
+              getAllPossiblePawnMoves({x, y}, board, allPseudoMoves);
+              break;
+            case BN:
+            case WN:
+              getAllPossibleKnightMoves({x, y}, board, allPseudoMoves);
+              break;
+            case BB:
+            case WB:
+              getAllPossibleBishopMoves({x, y}, board, allPseudoMoves);
+              break;
+            case BR:
+            case WR:
+              getAllPossibleRookMoves({x, y}, board, allPseudoMoves);
+              break;
+            case BQ:
+            case WQ:
+              getAllPossibleQueenMoves({x, y}, board, allPseudoMoves);
+              break;
+            case BK:
+            case WK:
+              getAllPossibleKingMoves({x, y}, board, allPseudoMoves);
+              break;
+            case EMPTY:
+              break;
+          }
+        }
+      }
+    }
+  }
+  return allPseudoMoves;
+}
 
-// TODO pass by reference
-std::vector<Move> getAllPossibleRookMoves(std::pair<int, int> startPos,
-                                          piece board[65]) {
-  int old_position = calculatePosition(startPos.first, startPos.second);
+bool isKingInCheck(bool pieceColor, std::array<piece, 65>& board) {
+  int kingSquareX = 0;
+  int kingSquareY = 0;
+  AllPseudoMoves allKnightMoves;
+  AllPseudoMoves allPawnMoves;
+  AllPseudoMoves allBishopMoves;
+  AllPseudoMoves allRookMoves;
+
+  // Get King moved_position
+  for (int y = 8; y >= 1; y--) {
+    for (int x = 1; x <= 8; x++) {
+      if (board[calculatePosition(x, y)] == (pieceColor ? WK : BK)) {
+        kingSquareX = x;
+        kingSquareY = y;
+        break;
+      }
+    }
+  }
+  getAllPossibleKnightMoves({kingSquareX, kingSquareY}, board, allKnightMoves);
+  for (int i = 0; i < allKnightMoves.index; i++) {
+    if (allKnightMoves.move_list[i].capturedPiece == WN ||
+        allKnightMoves.move_list[i].capturedPiece == BN) {
+      return true;
+    }
+  }
+
+  //  for (const Move& move :
+  //       getAllPossibleKnightMoves({kingSquareX, kingSquareY}, board)) {
+  //    if (move.capturedPiece == WK || move.capturedPiece == BK) {
+  //      return true;
+  //    }
+  //  }
+
+  getAllPossiblePawnMoves({kingSquareX, kingSquareY}, board, allPawnMoves);
+  for (int i = 0; i < allPawnMoves.index; i++) {
+    if (allPawnMoves.move_list[i].capturedPiece == WP ||
+        allPawnMoves.move_list[i].capturedPiece == BP) {
+      return true;
+    }
+  }
+
+  //  for (const Move& move :
+  //       getAllPossiblePawnMoves({kingSquareX, kingSquareY}, board)) {
+  //    if (move.capturedPiece == WP || move.capturedPiece == BP) {
+  //      return true;
+  //    }
+  //  }
+
+  getAllPossibleBishopMoves({kingSquareX, kingSquareY}, board, allBishopMoves);
+  for (int i = 0; i < allBishopMoves.index; i++) {
+    if (allBishopMoves.move_list[i].capturedPiece == WB ||
+        allBishopMoves.move_list[i].capturedPiece == BB ||
+        allBishopMoves.move_list[i].capturedPiece == WQ ||
+        allBishopMoves.move_list[i].capturedPiece == BQ) {
+      return true;
+    }
+  }
+
+  //  for (const Move& move :
+  //       getAllPossibleBishopMoves({kingSquareX, kingSquareY}, board)) {
+  //    if (move.capturedPiece == WB || move.capturedPiece == BB ||
+  //        move.capturedPiece == WQ || move.capturedPiece == BQ) {
+  //      return true;
+  //    }
+  //  }
+
+  getAllPossibleRookMoves({kingSquareX, kingSquareY}, board, allRookMoves);
+  for (int i = 0; i < allBishopMoves.index; i++) {
+    if (allRookMoves.move_list[i].capturedPiece == WR ||
+        allRookMoves.move_list[i].capturedPiece == BR ||
+        allRookMoves.move_list[i].capturedPiece == WQ ||
+        allRookMoves.move_list[i].capturedPiece == BQ) {
+      return true;
+    }
+  }
+
+  //  for (const Move& move :
+  //       getAllPossibleRookMoves({kingSquareX, kingSquareY}, board)) {
+  //    if (move.capturedPiece == WR || move.capturedPiece == BR ||
+  //        move.capturedPiece == WQ || move.capturedPiece == BQ) {
+  //      return true;
+  //    }
+  //  }
+
+  return false;
+}
+
+void getAllPossibleRookMoves(std::pair<int, int> startSquare,
+                             std::array<piece, 65>& board,
+                             AllPseudoMoves& allPseudoMoves) {
+  int old_position = calculatePosition(startSquare.first, startSquare.second);
   bool pieceColor = isWhitePiece(board[old_position]);
-  std::vector<Move> possibleMoves{};
 
   Move move{};
-  move.old_position = old_position;
-  move.figure = pieceColor ? WR : BR;
+  move.original_position = old_position;
+  move.movedPiece = pieceColor ? WR : BR;
 
   std::pair<int, int> directions[4] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
 
   for (const auto& dir : directions) {
-    int x = startPos.first + dir.first;
-    int y = startPos.second + dir.second;
+    int x = startSquare.first + dir.first;
+    int y = startSquare.second + dir.second;
 
     while (x > 0 && y > 0 && x < 9 && y < 9) {
       int position = calculatePosition(x, y);
-      move.position = position;
-      move.capturedFigure = board[position];
+      move.moved_position = position;
+      move.capturedPiece = board[position];
 
       if (board[position] == EMPTY) {
-        possibleMoves.push_back(move);
+        allPseudoMoves.push_back(move);
       } else if (board[position] != EMPTY) {
         if ((pieceColor && isWhitePiece(board[position])) ||
             (!pieceColor && !isWhitePiece(board[position]))) {
           break;
         }
-        possibleMoves.push_back(move);
+        allPseudoMoves.push_back(move);
         break;
       } else {
         break;
@@ -48,38 +172,37 @@ std::vector<Move> getAllPossibleRookMoves(std::pair<int, int> startPos,
       y += dir.second;
     }
   }
-  return possibleMoves;
 }
 
-std::vector<Move> getAllPossibleBishopMoves(std::pair<int, int> startPos,
-                                            piece board[65]) {
-  int old_position = calculatePosition(startPos.first, startPos.second);
+void getAllPossibleBishopMoves(std::pair<int, int> startSquare,
+                               std::array<piece, 65>& board,
+                               AllPseudoMoves& allPseudoMoves) {
+  int old_position = calculatePosition(startSquare.first, startSquare.second);
   bool pieceColor = isWhitePiece(board[old_position]);
-  std::vector<Move> possibleMoves{};
 
   Move move{};
-  move.old_position = old_position;
-  move.figure = pieceColor ? WB : BB;
+  move.original_position = old_position;
+  move.movedPiece = pieceColor ? WB : BB;
 
   std::pair<int, int> directions[4] = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 
   for (const auto& dir : directions) {
-    int x = startPos.first + dir.first;
-    int y = startPos.second + dir.second;
+    int x = startSquare.first + dir.first;
+    int y = startSquare.second + dir.second;
 
     while (x > 0 && y > 0 && x < 9 && y < 9) {
       int position = calculatePosition(x, y);
-      move.position = position;
-      move.capturedFigure = board[position];
+      move.moved_position = position;
+      move.capturedPiece = board[position];
 
       if (board[position] == EMPTY) {
-        possibleMoves.push_back(move);
+        allPseudoMoves.push_back(move);
       } else if (board[position] != EMPTY) {
         if ((pieceColor && isWhitePiece(board[position])) ||
             (!pieceColor && !isWhitePiece(board[position]))) {
           break;
         }
-        possibleMoves.push_back(move);
+        allPseudoMoves.push_back(move);
         break;
       } else {
         break;
@@ -89,39 +212,38 @@ std::vector<Move> getAllPossibleBishopMoves(std::pair<int, int> startPos,
       y += dir.second;
     }
   }
-  return possibleMoves;
 }
 
-std::vector<Move> getAllPossibleQueenMoves(std::pair<int, int> startPos,
-                                           piece board[65]) {
-  int old_position = calculatePosition(startPos.first, startPos.second);
+void getAllPossibleQueenMoves(std::pair<int, int> startSquare,
+                              std::array<piece, 65>& board,
+                              AllPseudoMoves& allPseudoMoves) {
+  int old_position = calculatePosition(startSquare.first, startSquare.second);
   bool pieceColor = isWhitePiece(board[old_position]);
-  std::vector<Move> possibleMoves{};
 
   Move move{};
-  move.old_position = old_position;
-  move.figure = pieceColor ? WQ : BQ;
+  move.original_position = old_position;
+  move.movedPiece = pieceColor ? WQ : BQ;
 
   std::pair<int, int> directions[8] = {{-1, 0},  {1, 0},  {0, -1}, {0, 1},
                                        {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 
   for (const auto& dir : directions) {
-    int x = startPos.first + dir.first;
-    int y = startPos.second + dir.second;
+    int x = startSquare.first + dir.first;
+    int y = startSquare.second + dir.second;
 
     while (x > 0 && y > 0 && x < 9 && y < 9) {
       int position = calculatePosition(x, y);
-      move.position = position;
-      move.capturedFigure = board[position];
+      move.moved_position = position;
+      move.capturedPiece = board[position];
 
       if (board[position] == EMPTY) {
-        possibleMoves.push_back(move);
+        allPseudoMoves.push_back(move);
       } else if (board[position] != EMPTY) {
         if ((pieceColor && isWhitePiece(board[position])) ||
             (!pieceColor && !isWhitePiece(board[position]))) {
           break;
         }
-        possibleMoves.push_back(move);
+        allPseudoMoves.push_back(move);
         break;
       } else {
         break;
@@ -131,25 +253,24 @@ std::vector<Move> getAllPossibleQueenMoves(std::pair<int, int> startPos,
       y += dir.second;
     }
   }
-  return possibleMoves;
 }
 
-std::vector<Move> getAllPossibleKingMoves(std::pair<int, int> startPos,
-                                          piece board[65]) {
-  int old_position = calculatePosition(startPos.first, startPos.second);
+void getAllPossibleKingMoves(std::pair<int, int> startSquare,
+                             std::array<piece, 65>& board,
+                             AllPseudoMoves& allPseudoMoves) {
+  int old_position = calculatePosition(startSquare.first, startSquare.second);
   bool pieceColor = isWhitePiece(board[old_position]);
-  std::vector<Move> possibleMoves{};
 
   Move move{};
-  move.old_position = old_position;
-  move.figure = pieceColor ? WK : BK;
+  move.original_position = old_position;
+  move.movedPiece = pieceColor ? WK : BK;
 
   std::pair<int, int> directions[8] = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1},
                                        {0, 1},   {1, -1}, {1, 0},  {1, 1}};
 
   for (const auto& dir : directions) {
-    int x = startPos.first + dir.first;
-    int y = startPos.second + dir.second;
+    int x = startSquare.first + dir.first;
+    int y = startSquare.second + dir.second;
     int position = calculatePosition(x, y);
 
     piece piece = board[calculatePosition(x, y)];
@@ -160,30 +281,29 @@ std::vector<Move> getAllPossibleKingMoves(std::pair<int, int> startPos,
           continue;
         }
       }
-      move.position = position;
-      move.capturedFigure = board[position];
-      possibleMoves.push_back(move);
+      move.moved_position = position;
+      move.capturedPiece = board[position];
+      allPseudoMoves.push_back(move);
     }
   }
-  return possibleMoves;
 }
 
-std::vector<Move> getAllPossibleKnightMoves(std::pair<int, int> startPos,
-                                            piece board[65]) {
-  int old_position = calculatePosition(startPos.first, startPos.second);
+void getAllPossibleKnightMoves(std::pair<int, int> startSquare,
+                               std::array<piece, 65>& board,
+                               AllPseudoMoves& allPseudoMoves) {
+  int old_position = calculatePosition(startSquare.first, startSquare.second);
   bool pieceColor = isWhitePiece(board[old_position]);
-  std::vector<Move> possibleMoves{};
 
   Move move{};
-  move.old_position = old_position;
-  move.figure = pieceColor ? WN : BN;
+  move.original_position = old_position;
+  move.movedPiece = pieceColor ? WN : BN;
 
   std::pair<int, int> directions[8] = {{-2, -1}, {-1, -2}, {1, -2}, {2, -1},
                                        {2, 1},   {1, 2},   {-1, 2}, {-2, 1}};
 
   for (const auto& dir : directions) {
-    int x = startPos.first + dir.first;
-    int y = startPos.second + dir.second;
+    int x = startSquare.first + dir.first;
+    int y = startSquare.second + dir.second;
     int position = calculatePosition(x, y);
 
     piece piece = board[calculatePosition(x, y)];
@@ -194,33 +314,32 @@ std::vector<Move> getAllPossibleKnightMoves(std::pair<int, int> startPos,
           continue;
         }
       }
-      move.position = position;
-      move.capturedFigure = board[position];
-      possibleMoves.push_back(move);
+      move.moved_position = position;
+      move.capturedPiece = board[position];
+      allPseudoMoves.push_back(move);
     }
   }
-  return possibleMoves;
 }
 
-std::vector<Move> getAllPossiblePawnMoves(std::pair<int, int> startPos,
-                                          piece board[65]) {
-  int old_position = calculatePosition(startPos.first, startPos.second);
+void getAllPossiblePawnMoves(std::pair<int, int> startSquare,
+                             std::array<piece, 65>& board,
+                             AllPseudoMoves& allPseudoMoves) {
+  int old_position = calculatePosition(startSquare.first, startSquare.second);
   bool pieceColor = isWhitePiece(board[old_position]);
-  std::vector<Move> possibleMoves{};
 
   Move move{};
-  move.old_position = old_position;
-  move.figure = pieceColor ? WP : BP;
+  move.original_position = old_position;
+  move.movedPiece = pieceColor ? WP : BP;
 
   std::pair<int, int> directions[4] = {{0, 1}, {-1, 1}, {1, 1}, {0, 2}};
 
   for (const auto& dir : directions) {
-    int x = startPos.first + dir.first;
-    int y = startPos.second + dir.second;
+    int x = startSquare.first + dir.first;
+    int y = startSquare.second + dir.second;
 
     if (!pieceColor) {
-      x = startPos.first - dir.first;
-      y = startPos.second - dir.second;
+      x = startSquare.first - dir.first;
+      y = startSquare.second - dir.second;
     }
 
     int position = calculatePosition(x, y);
@@ -232,21 +351,26 @@ std::vector<Move> getAllPossiblePawnMoves(std::pair<int, int> startPos,
             ((!pieceColor) && (!isWhitePiece(piece)))) {
           continue;
         }
-        move.position = position;
-        move.capturedFigure = board[position];
-        possibleMoves.push_back(move);
+        move.moved_position = position;
+        move.capturedPiece = board[position];
+        allPseudoMoves.push_back(move);
       } else if (dir.first == 0 && dir.second != 0 && piece == EMPTY) {
-        if (((pieceColor && y == 2) || (!pieceColor && y == 7)) &&
-            dir.second != 2) {
-          continue;
+        if (dir.second == 2) {
+          if ((pieceColor && startSquare.second == 2) || (!pieceColor && startSquare.second == 7)) {
+            if (board[calculatePosition(x, startSquare.second + (pieceColor ? 1 : -1))] == EMPTY) {
+              move.moved_position = position;
+              move.capturedPiece = board[position];
+              allPseudoMoves.push_back(move);
+            }
+            }
+            continue;
         }
-        move.position = position;
-        move.capturedFigure = board[position];
-        possibleMoves.push_back(move);
+        move.moved_position = position;
+        move.capturedPiece = board[position];
+        allPseudoMoves.push_back(move);
       }
     }
   }
-  return possibleMoves;
 }
 
 // ################### PIECE MOVES ###################

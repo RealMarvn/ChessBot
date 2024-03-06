@@ -2,8 +2,58 @@
 
 #include "./manager/board_manager.h"
 
+uint64_t perft(BoardManager& boardManager, int depth, bool player) {
+  if (depth == 0) {
+    return 1;
+  }
+
+  uint64_t nodes = 0;
+  auto moves = getAllPseudoLegalMoves(boardManager.board, player);
+  for (int i = 0; i < moves.index; i++) {
+    boardManager.makeMove(moves.move_list[i]);
+
+    if (isKingInCheck(player, boardManager.board)) {
+      boardManager.popLastMove();
+      continue;
+    }
+    nodes += perft(boardManager, depth - 1, !player);
+    boardManager.popLastMove();
+  }
+
+  return nodes;
+}
+
+int split_perft(BoardManager& boardManager, int depth, bool player) {
+  if (depth == 0) {
+    return 0;
+  }
+
+  int number = 0;
+
+  // Generiere die Züge für die aktuelle Position
+  auto moves = getAllPseudoLegalMoves(boardManager.board, player);
+  for (int i = 0; i < moves.index; i++) {
+    boardManager.makeMove(moves.move_list[i]);
+
+    if (isKingInCheck(player, boardManager.board)) {
+      boardManager.popLastMove();
+      continue;
+    }
+
+    uint64_t child_nodes = perft(boardManager, depth - 1, !player);
+
+    number += child_nodes;
+    std::cout << moves.move_list[i].convertToXandY() << " - " << child_nodes
+              << std::endl;
+    boardManager.popLastMove();
+  }
+  return number;
+}
+
 int main() {
   const auto board = std::make_unique<BoardManager>();
+//  auto split_num = split_perft(*board, 1, board->player == WHITE);
+//  auto perft_num = perft(*board, 4, board->player == WHITE);
   std::string input;
 
   while (getline(std::cin, input)) {

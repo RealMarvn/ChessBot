@@ -10,23 +10,34 @@
 #include "./misc/move.h"
 #include "./misc/piece.h"
 
-std::vector<Move> getAllPossibleRookMoves(std::pair<int, int> startPos,
-                                          piece board[65]);
+bool isKingInCheck(bool pieceColor, std::array<piece, 65>& board);
 
-std::vector<Move> getAllPossiblePawnMoves(std::pair<int, int> startPos,
-                                          piece board[65]);
+AllPseudoMoves getAllPseudoLegalMoves(std::array<piece, 65>& board,
+                                      bool player);
 
-std::vector<Move> getAllPossibleQueenMoves(std::pair<int, int> startPos,
-                                           piece board[65]);
+void getAllPossibleRookMoves(std::pair<int, int> startSquare,
+                             std::array<piece, 65>& board,
+                             AllPseudoMoves& allPseudoMoves);
 
-std::vector<Move> getAllPossibleKingMoves(std::pair<int, int> startPos,
-                                          piece board[65]);
+void getAllPossiblePawnMoves(std::pair<int, int> startSquare,
+                             std::array<piece, 65>& board,
+                             AllPseudoMoves& allPseudoMoves);
 
-std::vector<Move> getAllPossibleKnightMoves(std::pair<int, int> startPos,
-                                            piece board[65]);
+void getAllPossibleQueenMoves(std::pair<int, int> startSquare,
+                              std::array<piece, 65>& board,
+                              AllPseudoMoves& allPseudoMoves);
 
-std::vector<Move> getAllPossibleBishopMoves(std::pair<int, int> startPos,
-                                            piece board[65]);
+void getAllPossibleKingMoves(std::pair<int, int> startSquare,
+                             std::array<piece, 65>& board,
+                             AllPseudoMoves& allPseudoMoves);
+
+void getAllPossibleKnightMoves(std::pair<int, int> startSquare,
+                               std::array<piece, 65>& board,
+                               AllPseudoMoves& allPseudoMoves);
+
+void getAllPossibleBishopMoves(std::pair<int, int> startSquare,
+                               std::array<piece, 65>& board,
+                               AllPseudoMoves& allPseudoMoves);
 
 bool canRookMove(int x, int y, int move_x, int move_y);
 bool canQueenMove(int x, int y, int move_x, int move_y);

@@ -37,7 +37,7 @@ bool isWhitePiece(piece piece) {
   }
 }
 
-int evaluateMaterialValue(piece board[65]) {
+int evaluateMaterialValue(std::array<piece, 65> board) {
   int value = 0;
   for (int y = 1; y < 8; y++) {
     for (int x = 1; x < 8; x++) {

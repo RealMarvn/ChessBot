@@ -12,18 +12,20 @@ bool BoardManager::popLastMove() {
   if (moves.empty()) {
     return false;
   }
+
   Move last_move = moves.back();
   moves.pop_back();
-  board[last_move.position] = last_move.capturedFigure;
-  board[last_move.old_position] = last_move.figure;
+  board[last_move.moved_position] = last_move.capturedPiece;
+  board[last_move.original_position] = last_move.movedPiece;
   player = player == WHITE ? BLACK : WHITE;
   return true;
 }
 
 void BoardManager::makeMove(Move move) {
-  board[move.position] = board[move.old_position];
-  board[move.old_position] = EMPTY;
+  board[move.moved_position] = board[move.original_position];
+  board[move.original_position] = EMPTY;
   moves.push_back(move);
+  player = player == WHITE ? BLACK : WHITE;
 }
 
 bool BoardManager::isCheckMate(bool isWhite) {
@@ -46,10 +48,10 @@ bool BoardManager::isCheckMate(bool isWhite) {
 
 void BoardManager::saveMove(int movePosition, int position) {
   Move move{};
-  move.capturedFigure = board[movePosition];
-  move.figure = board[position];
-  move.position = movePosition;
-  move.old_position = position;
+  move.capturedPiece = board[movePosition];
+  move.movedPiece = board[position];
+  move.moved_position = movePosition;
+  move.original_position = position;
   moves.push_back(move);
 }
 
@@ -101,12 +103,12 @@ bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
   int position = calculatePosition(x, y);
   int move = calculatePosition(move_x, move_y);
 
-  // Check if position is out of bounds!
+  // Check if moved_position is out of bounds!
   if (position < 1 || position > 64 || move < 1 || move > 64) {
     return false;
   }
 
-  // Check if figure is really that figure.
+  // Check if movedPiece is really that movedPiece.
   if (pieceToCharMap[board[position]] != fig) {
     return false;
   }
@@ -161,7 +163,7 @@ bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
 }
 
 bool BoardManager::isPathClear(int startX, int startY, int endX, int endY,
-                               const piece board[65]) {
+                               const std::array<piece, 65> board) {
   int dx = std::abs(endX - startX);
   int dy = std::abs(endY - startY);
   int x = startX;
@@ -210,7 +212,7 @@ bool BoardManager::isWhiteKingInDanger() {
   int whiteKingPositionX = 0;
   int whiteKingPositionY = 0;
 
-  // Get King position
+  // Get King moved_position
   for (int y = 8; y >= 1; y--) {
     for (int x = 1; x <= 8; x++) {
       if (board[calculatePosition(x, y)] == WK) {
@@ -239,7 +241,7 @@ bool BoardManager::isBlackKingInDanger() {
   int blackKingPositionX = 0;
   int blackKingPositionY = 0;
 
-  // Get King position
+  // Get King moved_position
   for (int y = 8; y >= 1; y--) {
     for (int x = 1; x <= 8; x++) {
       if (board[calculatePosition(x, y)] == BK) {
@@ -361,8 +363,9 @@ void BoardManager::readFen(std::string input) {
 }
 
 int BoardManager::getPossibleMoves(int x, int y) {
-  piece saveBoard[65];
-  std::memcpy(saveBoard, board, sizeof(board));
+  std::array<piece, 65> saveBoard{};
+  saveBoard = board;
+  //  std::memcpy(saveBoard, board, sizeof(board));
   piece piece = board[calculatePosition(x, y)];
   int possibleMoves = 0;
   for (int row = 8; row >= 1; row--) {
@@ -376,7 +379,8 @@ int BoardManager::getPossibleMoves(int x, int y) {
             ((!isWhitePiece(piece)) && !isBlackKingInDanger())) {
           possibleMoves++;
         }
-        std::memcpy(board, saveBoard, sizeof(saveBoard));
+        board = saveBoard;
+        //        std::memcpy(board, saveBoard, sizeof(saveBoard));
         continue;
       }
       if (canMove(piece, x, y, column, row, true)) {
@@ -387,7 +391,8 @@ int BoardManager::getPossibleMoves(int x, int y) {
             ((!isWhitePiece(piece)) && !isBlackKingInDanger())) {
           possibleMoves++;
         }
-        std::memcpy(board, saveBoard, sizeof(saveBoard));
+        board = saveBoard;
+        //        std::memcpy(board, saveBoard, sizeof(saveBoard));
         continue;
       }
     }
@@ -395,10 +400,10 @@ int BoardManager::getPossibleMoves(int x, int y) {
   return possibleMoves;
 }
 
-// TODO: refactor this function to improve efficiency
 void BoardManager::printPossibleMoves(char fig, int x, int y) {
-  piece saveBoard[65];
-  std::memcpy(saveBoard, board, sizeof(board));
+  std::array<piece, 65> saveBoard{};
+  saveBoard = board;
+  //  std::memcpy(saveBoard, board, sizeof(board));
   piece figure = board[calculatePosition(x, y)];
 
   for (int row = 8; row >= 1; row--) {
@@ -411,10 +416,12 @@ void BoardManager::printPossibleMoves(char fig, int x, int y) {
         if ((isupper(fig) && !isWhiteKingInDanger()) ||
             (islower(fig) && !isBlackKingInDanger())) {
           std::cout << "[o]";
-          std::memcpy(board, saveBoard, sizeof(saveBoard));
+          board = saveBoard;
+          //          std::memcpy(board, saveBoard, sizeof(saveBoard));
           continue;
         }
-        std::memcpy(board, saveBoard, sizeof(saveBoard));
+        board = saveBoard;
+        //        std::memcpy(board, saveBoard, sizeof(saveBoard));
       }
       if (canMove(fig, x, y, column, row, true)) {
         // Mach den Move!
@@ -423,17 +430,21 @@ void BoardManager::printPossibleMoves(char fig, int x, int y) {
         if ((isupper(fig) && !isWhiteKingInDanger()) ||
             (islower(fig) && !isBlackKingInDanger())) {
           std::cout << "[x]";
-          std::memcpy(board, saveBoard, sizeof(saveBoard));
+          board = saveBoard;
+          //          std::memcpy(board, saveBoard, sizeof(saveBoard));
           continue;
         }
-        std::memcpy(board, saveBoard, sizeof(saveBoard));
+        board = saveBoard;
+        //        std::memcpy(board, saveBoard, sizeof(saveBoard));
       }
       std::cout << "[" << pieceToCharMap[board[calculatePosition(x, y)]] << "]";
-      std::memcpy(board, saveBoard, sizeof(saveBoard));
+      board = saveBoard;
+      //      std::memcpy(board, saveBoard, sizeof(saveBoard));
     }
     std::cout << std::endl;
   }
-  std::memcpy(board, saveBoard, sizeof(saveBoard));
+  board = saveBoard;
+  //  std::memcpy(board, saveBoard, sizeof(saveBoard));
 }
 
 void BoardManager::printCurrentBoard() {

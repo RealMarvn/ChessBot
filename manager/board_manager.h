@@ -20,7 +20,7 @@ enum player_type { WHITE, BLACK };
 class BoardManager {
  public:
   player_type player;
-  piece board[65]{};
+  std::array<piece, 65> board{};
   std::vector<Move> moves;
 
   explicit BoardManager();
@@ -41,5 +41,5 @@ class BoardManager {
   void saveMove(int movePosition, int position);
   bool canMove(char fig, int x, int y, int move_x, int move_y, bool capture);
   static bool isPathClear(int startX, int startY, int endX, int endY,
-                          const piece board[65]);
+                          const std::array<piece, 65> board);
 };
