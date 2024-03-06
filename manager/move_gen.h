@@ -10,14 +10,23 @@
 #include "./misc/move.h"
 #include "./misc/piece.h"
 
-// std::array<Move, 27> getPossiblePieceMoves(int x, int y, std::array<piece,
-// 65> board);
-
 std::vector<Move> getAllPossibleRookMoves(std::pair<int, int> startPos,
                                           piece board[65]);
 
-std::vector<Move> getAllPossibleKnightMoves(std::pair<int, int> startPos,
+std::vector<Move> getAllPossiblePawnMoves(std::pair<int, int> startPos,
                                           piece board[65]);
+
+std::vector<Move> getAllPossibleQueenMoves(std::pair<int, int> startPos,
+                                           piece board[65]);
+
+std::vector<Move> getAllPossibleKingMoves(std::pair<int, int> startPos,
+                                          piece board[65]);
+
+std::vector<Move> getAllPossibleKnightMoves(std::pair<int, int> startPos,
+                                            piece board[65]);
+
+std::vector<Move> getAllPossibleBishopMoves(std::pair<int, int> startPos,
+                                            piece board[65]);
 
 bool canRookMove(int x, int y, int move_x, int move_y);
 bool canQueenMove(int x, int y, int move_x, int move_y);

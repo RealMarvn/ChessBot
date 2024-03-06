@@ -1,13 +1,12 @@
-#include "./manager/board_manager.h"
-
 #include <iostream>
+
+#include "./manager/board_manager.h"
 
 int main() {
   const auto board = std::make_unique<BoardManager>();
   std::string input;
 
   while (getline(std::cin, input)) {
-
     if (input[0] == 'B') {
       board->readFen(input.substr(1, input.length()));
       continue;
