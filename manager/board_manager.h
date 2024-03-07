@@ -11,22 +11,30 @@
 #include <string>
 #include <vector>
 
-#include "./move_gen.h"
+#include "./piece_movements.h"
 #include "misc/move.h"
 #include "misc/piece.h"
 
 enum player_type { WHITE, BLACK };
+
+struct board_setting {
+  int epSquare{100};
+};
 
 class BoardManager {
  public:
   player_type player;
   std::array<piece, 65> board{};
   std::vector<Move> moves;
+  std::vector<board_setting> history;
+  int epSquare{100};
 
   explicit BoardManager();
   bool movePiece(char fig, int x, int y, int move_x, int move_y, bool capture,
                  char promotion_figure);
   void makeMove(Move move);
+  Move generateMove(int position, int moveToPosition, piece promotionPiece,
+                    MoveType moveType);
   bool popLastMove();
   void printCurrentBoard();
   void readFen(std::string input);
@@ -41,5 +49,5 @@ class BoardManager {
   void saveMove(int movePosition, int position);
   bool canMove(char fig, int x, int y, int move_x, int move_y, bool capture);
   static bool isPathClear(int startX, int startY, int endX, int endY,
-                          const std::array<piece, 65> board);
+                          std::array<piece, 65> board);
 };

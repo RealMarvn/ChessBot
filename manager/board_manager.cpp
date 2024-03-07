@@ -9,22 +9,50 @@ BoardManager::BoardManager() : player(WHITE) {
 }
 
 bool BoardManager::popLastMove() {
-  if (moves.empty()) {
+  if (moves.empty() || history.empty()) {
     return false;
   }
 
   Move last_move = moves.back();
   moves.pop_back();
-  board[last_move.moved_position] = last_move.capturedPiece;
-  board[last_move.original_position] = last_move.movedPiece;
+  history.pop_back();
+  board[last_move.moveSquare] = last_move.capturedPiece;
+  board[last_move.square] = last_move.movingPiece;
+
+  if (last_move.moveType == EN_PASSANT) {
+    int enPassantSquare =
+        last_move.moveSquare + (isWhitePiece(last_move.movingPiece) ? -8 : +8);
+    board[enPassantSquare] = (isWhitePiece(last_move.movingPiece) ? BP : WP);
+  }
+
   player = player == WHITE ? BLACK : WHITE;
+
+  epSquare = history.back().epSquare;
   return true;
 }
 
 void BoardManager::makeMove(Move move) {
-  board[move.moved_position] = board[move.original_position];
-  board[move.original_position] = EMPTY;
+  board[move.moveSquare] = board[move.square];
+  board[move.square] = EMPTY;
+  epSquare = 100;
+
+  if (move.moveType == PROMOTION) {
+    board[move.moveSquare] = move.promotionPiece;
+  }
+
+  if (move.moveType == EN_PASSANT) {
+    int enPassantSquare = move.moveSquare + (move.movingPiece == WP ? -8 : +8);
+    board[enPassantSquare] = EMPTY;
+  }
+
+  if (move.movingPiece == WP || move.movingPiece == BP) {
+    if (std::abs(move.square - move.moveSquare) == 16) {
+      epSquare = move.moveSquare + (isWhitePiece(move.movingPiece) ? -8 : + 8);
+    }
+  }
+
   moves.push_back(move);
+  history.push_back(board_setting{epSquare});
   player = player == WHITE ? BLACK : WHITE;
 }
 
@@ -49,9 +77,9 @@ bool BoardManager::isCheckMate(bool isWhite) {
 void BoardManager::saveMove(int movePosition, int position) {
   Move move{};
   move.capturedPiece = board[movePosition];
-  move.movedPiece = board[position];
-  move.moved_position = movePosition;
-  move.original_position = position;
+  move.movingPiece = board[position];
+  move.moveSquare = movePosition;
+  move.square = position;
   moves.push_back(move);
 }
 
@@ -79,15 +107,19 @@ bool BoardManager::movePiece(char fig, int x, int y, int move_x, int move_y,
     promotion = true;
   }
 
-  saveMove(movePosition, position);
-
-  board[movePosition] = board[position];
-  board[position] = EMPTY;
-  player = player == WHITE ? BLACK : WHITE;
-
-  if (promotion) {
-    board[movePosition] = findKeyByValue(promotion_figure);
-  }
+  Move move =
+      generateMove(position, movePosition, findKeyByValue(promotion_figure),
+                   promotion ? PROMOTION : NORMAL);
+  makeMove(move);
+  //  moves.push_back(move);
+  //
+  //  board[movePosition] = board[position];
+  //  board[position] = EMPTY;
+  //  player = player == WHITE ? BLACK : WHITE;
+  //
+  //  if (promotion) {
+  //    board[movePosition] = findKeyByValue(promotion_figure);
+  //  }
 
   if (isKingInCheck(player == WHITE)) {
     std::cout << "King is in check" << std::endl;
@@ -103,12 +135,12 @@ bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
   int position = calculatePosition(x, y);
   int move = calculatePosition(move_x, move_y);
 
-  // Check if moved_position is out of bounds!
+  // Check if moveSquare is out of bounds!
   if (position < 1 || position > 64 || move < 1 || move > 64) {
     return false;
   }
 
-  // Check if movedPiece is really that movedPiece.
+  // Check if movingPiece is really that movingPiece.
   if (pieceToCharMap[board[position]] != fig) {
     return false;
   }
@@ -212,7 +244,7 @@ bool BoardManager::isWhiteKingInDanger() {
   int whiteKingPositionX = 0;
   int whiteKingPositionY = 0;
 
-  // Get King moved_position
+  // Get King moveSquare
   for (int y = 8; y >= 1; y--) {
     for (int x = 1; x <= 8; x++) {
       if (board[calculatePosition(x, y)] == WK) {
@@ -241,7 +273,7 @@ bool BoardManager::isBlackKingInDanger() {
   int blackKingPositionX = 0;
   int blackKingPositionY = 0;
 
-  // Get King moved_position
+  // Get King moveSquare
   for (int y = 8; y >= 1; y--) {
     for (int x = 1; x <= 8; x++) {
       if (board[calculatePosition(x, y)] == BK) {
@@ -468,4 +500,16 @@ void BoardManager::printCurrentBoard() {
     std::cout << "  " << char(i + 96);
   }
   std::cout << std::endl;
+}
+
+Move BoardManager::generateMove(int position, int moveToPosition,
+                                piece promotionPiece, MoveType moveType) {
+  Move move{};
+  move.moveSquare = moveToPosition;
+  move.square = position;
+  move.movingPiece = board[position];
+  move.capturedPiece = board[moveToPosition];
+  move.promotionPiece = promotionPiece;
+  move.moveType = moveType;
+  return move;
 }

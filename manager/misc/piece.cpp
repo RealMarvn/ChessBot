@@ -14,7 +14,6 @@ piece findKeyByValue(char value) {
   for (auto& pair : pieceToCharMap) {
     if (pair.second == value) return pair.first;
   }
-
   return EMPTY;
 }
 
