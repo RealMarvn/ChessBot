@@ -14,27 +14,33 @@ AllPseudoMoves getAllPseudoLegalMoves(BoardManager& boardManager, bool player) {
           switch (piece) {
             case BP:
             case WP:
-              getAllPossiblePawnMoves({x, y}, boardManager, allPseudoMoves);
+              getAllPossiblePawnMoves({x, y}, boardManager, allPseudoMoves,
+                                      player);
               break;
             case BN:
             case WN:
-              getAllPossibleKnightMoves({x, y}, boardManager, allPseudoMoves);
+              getAllPossibleKnightMoves({x, y}, boardManager, allPseudoMoves,
+                                        player);
               break;
             case BB:
             case WB:
-              getAllPossibleBishopMoves({x, y}, boardManager, allPseudoMoves);
+              getAllPossibleBishopMoves({x, y}, boardManager, allPseudoMoves,
+                                        player);
               break;
             case BR:
             case WR:
-              getAllPossibleRookMoves({x, y}, boardManager, allPseudoMoves);
+              getAllPossibleRookMoves({x, y}, boardManager, allPseudoMoves,
+                                      player);
               break;
             case BQ:
             case WQ:
-              getAllPossibleQueenMoves({x, y}, boardManager, allPseudoMoves);
+              getAllPossibleQueenMoves({x, y}, boardManager, allPseudoMoves,
+                                       player);
               break;
             case BK:
             case WK:
-              getAllPossibleKingMoves({x, y}, boardManager, allPseudoMoves);
+              getAllPossibleKingMoves({x, y}, boardManager, allPseudoMoves,
+                                      player);
               break;
             case EMPTY:
               break;
@@ -47,27 +53,27 @@ AllPseudoMoves getAllPseudoLegalMoves(BoardManager& boardManager, bool player) {
 }
 
 bool isKingInCheck(bool pieceColor, BoardManager& boardManager) {
-  int kingSquareX = 0;
-  int kingSquareY = 0;
-  AllPseudoMoves allKnightMoves;
-  AllPseudoMoves allPawnMoves;
-  AllPseudoMoves allBishopMoves;
-  AllPseudoMoves allRookMoves;
-
   // Get King moveSquare
   for (int y = 8; y >= 1; y--) {
     for (int x = 1; x <= 8; x++) {
       if (boardManager.board[calculatePosition(x, y)] ==
           (pieceColor ? WK : BK)) {
-        kingSquareX = x;
-        kingSquareY = y;
-        break;
+        return isSquareAttacked({x, y}, boardManager, pieceColor);
       }
     }
   }
 
-  getAllPossibleKnightMoves({kingSquareX, kingSquareY}, boardManager,
-                            allKnightMoves);
+  return false;
+}
+
+bool isSquareAttacked(std::pair<int, int> square, BoardManager& boardManager,
+                      bool pieceColor) {
+  AllPseudoMoves allKnightMoves;
+  AllPseudoMoves allPawnMoves;
+  AllPseudoMoves allBishopMoves;
+  AllPseudoMoves allRookMoves;
+
+  getAllPossibleKnightMoves(square, boardManager, allKnightMoves, pieceColor);
   for (int i = 0; i < allKnightMoves.index; i++) {
     if (allKnightMoves.move_list[i].capturedPiece == WN ||
         allKnightMoves.move_list[i].capturedPiece == BN) {
@@ -75,8 +81,7 @@ bool isKingInCheck(bool pieceColor, BoardManager& boardManager) {
     }
   }
 
-  getAllPossiblePawnMoves({kingSquareX, kingSquareY}, boardManager,
-                          allPawnMoves);
+  getAllPossiblePawnMoves(square, boardManager, allPawnMoves, pieceColor);
   for (int i = 0; i < allPawnMoves.index; i++) {
     if (allPawnMoves.move_list[i].capturedPiece == WP ||
         allPawnMoves.move_list[i].capturedPiece == BP) {
@@ -84,8 +89,7 @@ bool isKingInCheck(bool pieceColor, BoardManager& boardManager) {
     }
   }
 
-  getAllPossibleBishopMoves({kingSquareX, kingSquareY}, boardManager,
-                            allBishopMoves);
+  getAllPossibleBishopMoves(square, boardManager, allBishopMoves, pieceColor);
   for (int i = 0; i < allBishopMoves.index; i++) {
     if (allBishopMoves.move_list[i].capturedPiece == WB ||
         allBishopMoves.move_list[i].capturedPiece == BB ||
@@ -95,8 +99,7 @@ bool isKingInCheck(bool pieceColor, BoardManager& boardManager) {
     }
   }
 
-  getAllPossibleRookMoves({kingSquareX, kingSquareY}, boardManager,
-                          allRookMoves);
+  getAllPossibleRookMoves(square, boardManager, allRookMoves, pieceColor);
   for (int i = 0; i < allRookMoves.index; i++) {
     if (allRookMoves.move_list[i].capturedPiece == WR ||
         allRookMoves.move_list[i].capturedPiece == BR ||
@@ -111,9 +114,8 @@ bool isKingInCheck(bool pieceColor, BoardManager& boardManager) {
 
 void getAllPossibleRookMoves(std::pair<int, int> startSquare,
                              BoardManager& boardManager,
-                             AllPseudoMoves& allPseudoMoves) {
+                             AllPseudoMoves& allPseudoMoves, bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
-  bool pieceColor = isWhitePiece(boardManager.board[old_position]);
 
   Move move{};
   move.square = old_position;
@@ -151,9 +153,9 @@ void getAllPossibleRookMoves(std::pair<int, int> startSquare,
 
 void getAllPossibleBishopMoves(std::pair<int, int> startSquare,
                                BoardManager& boardManager,
-                               AllPseudoMoves& allPseudoMoves) {
+                               AllPseudoMoves& allPseudoMoves,
+                               bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
-  bool pieceColor = isWhitePiece(boardManager.board[old_position]);
 
   Move move{};
   move.square = old_position;
@@ -191,9 +193,8 @@ void getAllPossibleBishopMoves(std::pair<int, int> startSquare,
 
 void getAllPossibleQueenMoves(std::pair<int, int> startSquare,
                               BoardManager& boardManager,
-                              AllPseudoMoves& allPseudoMoves) {
+                              AllPseudoMoves& allPseudoMoves, bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
-  bool pieceColor = isWhitePiece(boardManager.board[old_position]);
 
   Move move{};
   move.square = old_position;
@@ -232,9 +233,8 @@ void getAllPossibleQueenMoves(std::pair<int, int> startSquare,
 
 void getAllPossibleKingMoves(std::pair<int, int> startSquare,
                              BoardManager& boardManager,
-                             AllPseudoMoves& allPseudoMoves) {
+                             AllPseudoMoves& allPseudoMoves, bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
-  bool pieceColor = isWhitePiece(boardManager.board[old_position]);
 
   Move move{};
   move.square = old_position;
@@ -261,13 +261,70 @@ void getAllPossibleKingMoves(std::pair<int, int> startSquare,
       allPseudoMoves.push_back(move);
     }
   }
+
+  if (!isKingInCheck(pieceColor, boardManager)) {
+    move.capturedPiece = EMPTY;
+    move.moveType = CASTELING;
+
+    // KINGSIDE
+    if ((pieceColor && boardManager.boardSettings.whiteKingSide) ||
+        (!pieceColor && boardManager.boardSettings.blackKingSide)) {
+      int x = startSquare.first;
+      int y = startSquare.second;
+      bool canCastle = true;
+
+      for (int i = 1; i < 3; i++) {
+        int position = calculatePosition(x + i, y);
+
+        if (boardManager.board[position] != EMPTY ||
+            isSquareAttacked({x + i, y}, boardManager, pieceColor)) {
+          canCastle = false;
+          break;
+        }
+      }
+
+      if (canCastle) {
+        move.moveSquare = calculatePosition(x + 2, y);
+        allPseudoMoves.push_back(move);
+      }
+    }
+
+    // QUEENSIDE
+    if ((pieceColor && boardManager.boardSettings.whiteQueenSide) ||
+        (!pieceColor && boardManager.boardSettings.blackQueenSide)) {
+      int x = startSquare.first;
+      int y = startSquare.second;
+      bool canCastle = true;
+
+      for (int i = 1; i < 4; i++) {
+        int position = calculatePosition(x - i, y);
+
+        if (boardManager.board[position] != EMPTY) {
+          canCastle = false;
+          break;
+        }
+
+        if (i < 3) {
+          if (isSquareAttacked({x - i, y}, boardManager, pieceColor)) {
+            canCastle = false;
+            break;
+          }
+        }
+      }
+
+      if (canCastle) {
+        move.moveSquare = calculatePosition(x - 2, y);
+        allPseudoMoves.push_back(move);
+      }
+    }
+  }
 }
 
 void getAllPossibleKnightMoves(std::pair<int, int> startSquare,
                                BoardManager& boardManager,
-                               AllPseudoMoves& allPseudoMoves) {
+                               AllPseudoMoves& allPseudoMoves,
+                               bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
-  bool pieceColor = isWhitePiece(boardManager.board[old_position]);
 
   Move move{};
   move.square = old_position;
@@ -298,9 +355,8 @@ void getAllPossibleKnightMoves(std::pair<int, int> startSquare,
 
 void getAllPossiblePawnMoves(std::pair<int, int> startSquare,
                              BoardManager& boardManager,
-                             AllPseudoMoves& allPseudoMoves) {
+                             AllPseudoMoves& allPseudoMoves, bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
-  bool pieceColor = isWhitePiece(boardManager.board[old_position]);
 
   std::pair<int, int> directions[4] = {{0, 1}, {-1, 1}, {1, 1}, {0, 2}};
 
@@ -345,8 +401,8 @@ void getAllPossiblePawnMoves(std::pair<int, int> startSquare,
           move.capturedPiece = boardManager.board[position];
           allPseudoMoves.push_back(move);
         } else {
-          if (boardManager.epSquare != 100 &&
-              calculatePosition(x, y) == boardManager.epSquare) {
+          if (boardManager.boardSettings.epSquare != 100 &&
+              calculatePosition(x, y) == boardManager.boardSettings.epSquare) {
             move.moveType = EN_PASSANT;
             move.moveSquare = position;
             move.capturedPiece = boardManager.board[position];

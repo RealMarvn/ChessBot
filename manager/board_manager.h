@@ -19,6 +19,10 @@ enum player_type { WHITE, BLACK };
 
 struct board_setting {
   int epSquare{100};
+  bool whiteQueenSide{false};
+  bool whiteKingSide{false};
+  bool blackQueenSide{false};
+  bool blackKingSide{false};
 };
 
 class BoardManager {
@@ -27,7 +31,8 @@ class BoardManager {
   std::array<piece, 65> board{};
   std::vector<Move> moves;
   std::vector<board_setting> history;
-  int epSquare{100};
+
+  board_setting boardSettings;
 
   explicit BoardManager();
   bool movePiece(char fig, int x, int y, int move_x, int move_y, bool capture,
@@ -42,11 +47,11 @@ class BoardManager {
   void printPossibleMoves(char fig, int x, int y);
 
  private:
+  void handleCastelingPermissions(Move& move);
   int getPossibleMoves(int x, int y);
   bool isCheckMate(bool isWhite);
   bool isWhiteKingInDanger();
   bool isBlackKingInDanger();
-  void saveMove(int movePosition, int position);
   bool canMove(char fig, int x, int y, int move_x, int move_y, bool capture);
   static bool isPathClear(int startX, int startY, int endX, int endY,
                           std::array<piece, 65> board);

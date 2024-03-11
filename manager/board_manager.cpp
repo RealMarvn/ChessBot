@@ -25,16 +25,35 @@ bool BoardManager::popLastMove() {
     board[enPassantSquare] = (isWhitePiece(last_move.movingPiece) ? BP : WP);
   }
 
+  if (last_move.moveType == CASTELING) {
+    if (last_move.moveSquare == 7) {
+      board[8] = WR;
+      board[6] = EMPTY;
+    }
+    if (last_move.moveSquare == 3) {
+      board[1] = WR;
+      board[4] = EMPTY;
+    }
+    if (last_move.moveSquare == 63) {
+      board[64] = BR;
+      board[62] = EMPTY;
+    }
+    if (last_move.moveSquare == 59) {
+      board[57] = BR;
+      board[60] = EMPTY;
+    }
+  }
+
   player = player == WHITE ? BLACK : WHITE;
 
-  epSquare = history.back().epSquare;
+  boardSettings = history.back();
   return true;
 }
 
 void BoardManager::makeMove(Move move) {
   board[move.moveSquare] = board[move.square];
   board[move.square] = EMPTY;
-  epSquare = 100;
+  boardSettings.epSquare = 100;
 
   if (move.moveType == PROMOTION) {
     board[move.moveSquare] = move.promotionPiece;
@@ -45,15 +64,80 @@ void BoardManager::makeMove(Move move) {
     board[enPassantSquare] = EMPTY;
   }
 
-  if (move.movingPiece == WP || move.movingPiece == BP) {
-    if (std::abs(move.square - move.moveSquare) == 16) {
-      epSquare = move.moveSquare + (isWhitePiece(move.movingPiece) ? -8 : + 8);
+  if (move.moveType == CASTELING) {
+    if (move.moveSquare == 7) {
+      board[8] = EMPTY;
+      board[6] = WR;
+    }
+    if (move.moveSquare == 3) {
+      board[1] = EMPTY;
+      board[4] = WR;
+    }
+    if (move.moveSquare == 63) {
+      board[64] = EMPTY;
+      board[62] = BR;
+    }
+    if (move.moveSquare == 59) {
+      board[57] = EMPTY;
+      board[60] = BR;
     }
   }
 
+  if (move.movingPiece == WP || move.movingPiece == BP) {
+    if (std::abs(move.square - move.moveSquare) == 16) {
+      boardSettings.epSquare =
+          move.moveSquare + (isWhitePiece(move.movingPiece) ? -8 : +8);
+    }
+  }
+
+  handleCastelingPermissions(move);
+
   moves.push_back(move);
-  history.push_back(board_setting{epSquare});
+  history.push_back(boardSettings);
   player = player == WHITE ? BLACK : WHITE;
+}
+
+void BoardManager::handleCastelingPermissions(Move &move) {
+  if (move.movingPiece == WK) {
+    boardSettings.whiteQueenSide = false;
+    boardSettings.whiteKingSide = false;
+  } else if (move.movingPiece == BK) {
+    boardSettings.blackQueenSide = false;
+    boardSettings.blackKingSide = false;
+  }
+
+  if (move.movingPiece == WR) {
+    if (move.square == 1) {
+      boardSettings.whiteQueenSide = false;
+    }
+    if (move.square == 8) {
+      boardSettings.whiteKingSide = false;
+    }
+  } else if (move.movingPiece == BR) {
+    if (move.square == 57) {
+      boardSettings.blackQueenSide = false;
+    }
+
+    if (move.square == 64) {
+      boardSettings.blackKingSide = false;
+    }
+  }
+
+  if (move.capturedPiece == WR) {
+    if (move.moveSquare == 1) {
+      boardSettings.whiteQueenSide = false;
+    }
+    if (move.moveSquare == 8) {
+      boardSettings.whiteKingSide = false;
+    }
+  } else if (move.capturedPiece == BR) {
+    if (move.moveSquare == 57) {
+      boardSettings.blackQueenSide = false;
+    }
+    if (move.moveSquare == 64) {
+      boardSettings.blackKingSide = false;
+    }
+  }
 }
 
 bool BoardManager::isCheckMate(bool isWhite) {
@@ -72,15 +156,6 @@ bool BoardManager::isCheckMate(bool isWhite) {
     }
   }
   return true;
-}
-
-void BoardManager::saveMove(int movePosition, int position) {
-  Move move{};
-  move.capturedPiece = board[movePosition];
-  move.movingPiece = board[position];
-  move.moveSquare = movePosition;
-  move.square = position;
-  moves.push_back(move);
 }
 
 bool BoardManager::movePiece(char fig, int x, int y, int move_x, int move_y,
@@ -391,6 +466,24 @@ void BoardManager::readFen(std::string input) {
     player = BLACK;
   }
 
+  if (fenSettings[2].contains('K')) {
+    boardSettings.whiteKingSide = true;
+  }
+  if (fenSettings[2].contains('Q')) {
+    boardSettings.whiteQueenSide = true;
+  }
+  if (fenSettings[2].contains('k')) {
+    boardSettings.blackKingSide = true;
+  }
+  if (fenSettings[2].contains('q')) {
+    boardSettings.blackQueenSide = true;
+  }
+
+  if (fenSettings[3] != "-") {
+    // TODO POSSIBLE EP
+  }
+
+  history.push_back(boardSettings);
   printCurrentBoard();
 }
 

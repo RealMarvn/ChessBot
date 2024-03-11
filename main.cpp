@@ -1,7 +1,6 @@
 #include <iostream>
 
-#include "./manager/board_manager.h"
-#include "./manager/move_gen.h"
+#include "./engine/chess_bot.h"
 
 uint64_t perft(BoardManager& boardManager, int depth, bool player) {
   if (depth == 0) {
@@ -53,9 +52,13 @@ int split_perft(BoardManager& boardManager, int depth, bool player) {
 
 int main() {
   const auto board = std::make_unique<BoardManager>();
-  auto perft_num = perft(*board, 3, board->player == WHITE);
+  //auto perft_num = perft(*board, 5, board->player == WHITE);
+//  AllPseudoMoves moves;
+//  getAllPossibleBishopMoves({5, 2}, *board, moves, true);
+//  board->makeMove(moves.move_list[3]);
+//  board->printCurrentBoard();
   std::string input;
-  int depth = 4;
+  int depth = 1;
   while (getline(std::cin, input)) {
     if (input[0] == 'B') {
       board->readFen(input.substr(1, input.length()));
@@ -99,6 +102,8 @@ int main() {
     board->movePiece(figure, col, row, move_col, move_row, capture,
                      promotion_figure);
 
+    auto move = searchBestNextMove(*board, 3);
+    board->makeMove(move);
     board->printCurrentBoard();
   }
   return EXIT_SUCCESS;

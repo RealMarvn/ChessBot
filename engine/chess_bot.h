@@ -4,11 +4,12 @@
 
 #pragma once
 
-#include "../manager/board_manager.h"
+#include ".././manager/move_gen.h"
 
-std::pair<int, Move> miniMaxWithAlphaBetaCut(std::array<piece, 65> board, int depth, int alpha, int beta, bool isMaximisingPlayer);
+extern int pieceValue[6];
 
-int getPieceValue(piece piece);
+int search(BoardManager& boardManager, int depth, int ply, Move& bestMove);
 
-int evaluateMaterialValue(std::array<piece, 65> board);
+int eval(const BoardManager& boardManager);
 
+Move searchBestNextMove(BoardManager& boardManager, int depth);

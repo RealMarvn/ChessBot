@@ -13,7 +13,7 @@
 
 #define MAX_MOVES 218
 
-enum MoveType { NORMAL, EN_PASSANT, PROMOTION };
+enum MoveType { NORMAL, EN_PASSANT, PROMOTION, CASTELING };
 
 struct Move {
   int moveSquare{0};
