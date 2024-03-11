@@ -102,7 +102,7 @@ int main() {
     board->movePiece(figure, col, row, move_col, move_row, capture,
                      promotion_figure);
 
-    auto move = searchBestNextMove(*board, 3);
+    auto move = searchBestNextMove(*board, 5);
     board->makeMove(move);
     board->printCurrentBoard();
   }

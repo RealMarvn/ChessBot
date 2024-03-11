@@ -14,7 +14,7 @@ int eval(const BoardManager& boardManager) {
   return number;
 }
 
-int search(BoardManager& boardManager, int depth, int ply, Move& bestMove) {
+int search(BoardManager& boardManager, int depth, int alpha, int beta, int ply, Move& bestMove) {
   if (depth <= 0) {
     return eval(boardManager);
   }
@@ -31,7 +31,7 @@ int search(BoardManager& boardManager, int depth, int ply, Move& bestMove) {
     boardManager.makeMove(moveList.move_list[i]);
 
     if (!isKingInCheck(boardManager.player != WHITE, boardManager)) {
-      score = -search(boardManager, depth - 1, ply + 1, bestMove);
+      score = -search(boardManager, depth - 1, -beta, -alpha, ply + 1, bestMove);
       legalMoves++;
     }
     boardManager.popLastMove();
@@ -49,6 +49,14 @@ int search(BoardManager& boardManager, int depth, int ply, Move& bestMove) {
           bestMove = moveList.move_list[i];
         }
       }
+
+      if (bestScore > alpha){
+        alpha = bestScore;
+      }
+
+      if (alpha >= beta){
+        break;  // beta killen
+      }
     }
   }
 
@@ -57,6 +65,6 @@ int search(BoardManager& boardManager, int depth, int ply, Move& bestMove) {
 
 Move searchBestNextMove(BoardManager& boardManager, int depth) {
   Move move;
-  search(boardManager, depth, 0, move);
+  search(boardManager, depth, -INT_MAX, INT_MAX, 0, move);
   return move;
 }
