@@ -51,8 +51,8 @@ bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
 bool canPawnPromote(bool isWhite, char fig, char promotion_figure,
                     int movePosition) {
   if (tolower(fig) == 'p') {
-    if ((movePosition >= 56 && movePosition <= 64) ||
-        (movePosition >= 1 && movePosition <= 8)) {
+    if ((movePosition >= 55 && movePosition <= 63) ||
+        (movePosition >= 0 && movePosition <= 7)) {
       if ((isWhite && isupper(promotion_figure)) ||
           (!isWhite && islower(promotion_figure))) {
         switch (tolower(promotion_figure)) {

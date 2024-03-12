@@ -9,18 +9,18 @@
 #include <string>
 #include <utility>
 
-#include "./piece.h"
+#include "./PieceType.h"
 
 #define MAX_MOVES 218
 
-enum MoveType { NORMAL, EN_PASSANT, PROMOTION, CASTELING };
+enum MoveType { NORMAL, EN_PASSANT, PROMOTION, CASTLING };
 
 struct Move {
   int moveSquare{0};
   int square{0};
-  piece movingPiece{EMPTY};
-  piece capturedPiece{EMPTY};
-  piece promotionPiece{EMPTY};
+  Piece movingPiece;
+  Piece capturedPiece;
+  Piece promotionPiece;
   MoveType moveType{NORMAL};
 
   [[nodiscard]] std::string convertToXandY() const {

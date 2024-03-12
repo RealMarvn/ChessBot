@@ -1,20 +1,16 @@
 #include "./chess_bot.h"
 
-
-int pieceValue[6] = {100, 300, 350, 500, 900, 1000};
-
 int eval(const BoardManager& boardManager) {
   int number = 0;
   for (int i = 1; i < 65; i++) {
-    piece piece = boardManager.board[i];
-    if (piece != EMPTY) {
-      number += (isWhitePiece(piece) ? 1 : -1) * pieceValue[piece % 7];
-    }
+    Piece piece = boardManager.board[i];
+    number += piece.getMaterialValue();
   }
   return number;
 }
 
-int search(BoardManager& boardManager, int depth, int alpha, int beta, int ply, Move& bestMove) {
+int search(BoardManager& boardManager, int depth, int alpha, int beta, int ply,
+           Move& bestMove) {
   if (depth <= 0) {
     return eval(boardManager);
   }
@@ -31,7 +27,8 @@ int search(BoardManager& boardManager, int depth, int alpha, int beta, int ply, 
     boardManager.makeMove(moveList.move_list[i]);
 
     if (!isKingInCheck(boardManager.player != WHITE, boardManager)) {
-      score = -search(boardManager, depth - 1, -beta, -alpha, ply + 1, bestMove);
+      score =
+          -search(boardManager, depth - 1, -beta, -alpha, ply + 1, bestMove);
       legalMoves++;
     }
     boardManager.popLastMove();
@@ -50,11 +47,11 @@ int search(BoardManager& boardManager, int depth, int alpha, int beta, int ply, 
         }
       }
 
-      if (bestScore > alpha){
+      if (bestScore > alpha) {
         alpha = bestScore;
       }
 
-      if (alpha >= beta){
+      if (alpha >= beta) {
         break;  // beta killen
       }
     }

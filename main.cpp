@@ -52,18 +52,12 @@ int split_perft(BoardManager& boardManager, int depth, bool player) {
 
 int main() {
   const auto board = std::make_unique<BoardManager>();
-  //auto perft_num = perft(*board, 5, board->player == WHITE);
-//  AllPseudoMoves moves;
-//  getAllPossibleBishopMoves({5, 2}, *board, moves, true);
-//  board->makeMove(moves.move_list[3]);
-//  board->printCurrentBoard();
   std::string input;
-  int depth = 1;
   while (getline(std::cin, input)) {
     if (input[0] == 'B') {
       board->readFen(input.substr(1, input.length()));
-      auto split_num = split_perft(*board, depth, board->player == WHITE);
-      depth--;
+      std::cout << "Perft: " << perft(*board, 5, board->player == WHITE) << std::endl;
+      // auto split_num = split_perft(*board, depth, board->player == WHITE);
       continue;
     }
 
