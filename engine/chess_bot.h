@@ -10,6 +10,6 @@ extern int pieceValue[6];
 
 int search(BoardManager& boardManager, int depth, int ply, Move& bestMove);
 
-int eval(const BoardManager& boardManager);
+int eval(BoardManager& boardManager);
 
 Move searchBestNextMove(BoardManager& boardManager, int depth);

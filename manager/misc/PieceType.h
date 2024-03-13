@@ -5,25 +5,29 @@
 #pragma once
 #include <map>
 
-enum PieceType { WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, EMPTY = 14 };
+enum PieceType { WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, EMPTY };
 
 class Piece {
-
  public:
-  Piece(PieceType piece);
-  Piece();
-  PieceType pieceType;
-  bool isWhite() const;
-  char toChar() const;
-  int getMaterialValue() const;
+  explicit Piece(PieceType piece) : pieceType{piece} {};
+  Piece() : pieceType{EMPTY} {};
+  PieceType pieceType{EMPTY};
+  [[nodiscard]] inline bool isWhite() const { return (pieceType < BP); };
+  [[nodiscard]] inline char toChar() const {
+    return pieceToChar[pieceType];
+  };
+  [[nodiscard]] int getMaterialValue() const {
+    if (pieceType == EMPTY) return 0;
+    return ((isWhite() ? 1 : -1) * pieceValue[pieceType]);
+  };
 
  private:
-  static std::map<PieceType, char> pieceToCharMap;
   static int pieceValue[6];
+  static char pieceToChar[13];
 };
 
 extern std::map<PieceType, char> pieceToCharMap;
 
 Piece findKeyByValue(char value);
 
-int calculatePosition(int x, int y);
+inline int calculatePosition(int x, int y) { return ((y - 1) * 8 + x) - 1; }

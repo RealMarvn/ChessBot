@@ -26,13 +26,20 @@ struct board_setting {
 };
 
 class BoardManager {
+
+ private:
+  std::array<Piece, 64> board;
+
  public:
   player_type player;
-  std::array<Piece, 64> board;
   std::vector<Move> moves;
   std::vector<board_setting> history;
 
   board_setting boardSettings;
+
+  Piece& operator[](int index) {
+    return board[index];
+  }
 
   explicit BoardManager();
   bool movePiece(char fig, int x, int y, int move_x, int move_y, bool capture,

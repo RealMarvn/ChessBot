@@ -1,9 +1,9 @@
 #include "./chess_bot.h"
 
-int eval(const BoardManager& boardManager) {
+int eval(BoardManager& boardManager) {
   int number = 0;
   for (int i = 1; i < 65; i++) {
-    Piece piece = boardManager.board[i];
+    Piece piece = boardManager[i];
     number += piece.getMaterialValue();
   }
   return number;
