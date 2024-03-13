@@ -9,8 +9,8 @@
 
 #include "./board_manager.h"
 
-const std::array<piece, 4> whitePawnPossiblePromotions = {WQ, WR, WN, WB};
-const std::array<piece, 4> blackPawnPossiblePromotions = {BQ, BR, BN, BB};
+const std::array<PieceType, 4> whitePawnPossiblePromotions = {WQ, WR, WN, WB};
+const std::array<PieceType, 4> blackPawnPossiblePromotions = {BQ, BR, BN, BB};
 
 
 bool isKingInCheck(bool pieceColor, BoardManager& boardManager);
