@@ -35,6 +35,7 @@ void getAllPossibleKingMoves(std::pair<int, int> startSquare,
                              Board& boardManager,
                              AllPseudoMoves& allPseudoMoves, bool pieceColor);
 
+
 void getAllPossibleKnightMoves(std::pair<int, int> startSquare,
                                Board& boardManager,
                                AllPseudoMoves& allPseudoMoves, bool pieceColor);

@@ -12,8 +12,8 @@
 #include <vector>
 
 #include "./movement/piece_movements.h"
-#include "misc/PieceType.h"
 #include "misc/move.h"
+#include "misc/piece.h"
 
 enum player_type { WHITE, BLACK };
 

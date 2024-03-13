@@ -52,13 +52,13 @@ int split_perft(Board& boardManager, int depth, bool player) {
 
 int main() {
   const auto board = std::make_unique<Board>();
+  board->printCurrentBoard();
   std::string input;
-  std::cout << "Perft: " << perft(*board, 5, board->player == WHITE) << std::endl;
   while (getline(std::cin, input)) {
     if (input[0] == 'B') {
       board->readFen(input.substr(1, input.length()));
-      std::cout << "Perft: " << perft(*board, 4, board->player == WHITE) << std::endl;
-      // auto split_num = split_perft(*board, depth, board->player == WHITE);
+      board->printCurrentBoard();
+      split_perft(*board, 1, true);
       continue;
     }
 

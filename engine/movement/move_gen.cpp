@@ -9,8 +9,7 @@ AllPseudoMoves getAllPseudoLegalMoves(Board& boardManager, bool player) {
     for (int x = 1; x < 9; x++) {
       Piece piece = boardManager[calculatePosition(x, y)];
       if (piece.pieceType != EMPTY) {
-        if ((piece.isWhite() && player) ||
-            (!piece.isWhite() && !player)) {
+        if ((piece.isWhite() && player) || (!piece.isWhite() && !player)) {
           switch (piece.pieceType) {
             case BP:
             case WP:
@@ -106,6 +105,21 @@ bool isSquareAttacked(std::pair<int, int> square, Board& boardManager,
         allRookMoves.move_list[i].capturedPiece.pieceType == WQ ||
         allRookMoves.move_list[i].capturedPiece.pieceType == BQ) {
       return true;
+    }
+  }
+
+
+  std::pair<int, int> directions[8] = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1},
+                                       {0, 1},   {1, -1}, {1, 0},  {1, 1}};
+
+  for (const auto& dir : directions) {
+    int x = square.first + dir.first;
+    int y = square.second + dir.second;
+    if (x > 0 && y > 0 && x < 9 && y < 9) {
+      if (boardManager[calculatePosition(x, y)].pieceType ==
+          (pieceColor ? BK : WK)) {
+        return true;
+      }
     }
   }
 
@@ -248,7 +262,6 @@ void getAllPossibleKingMoves(std::pair<int, int> startSquare,
     int y = startSquare.second + dir.second;
     int position = calculatePosition(x, y);
 
-
     if (x > 0 && y > 0 && x < 9 && y < 9) {
       Piece piece = boardManager[position];
       if (piece.pieceType != EMPTY) {
@@ -256,9 +269,13 @@ void getAllPossibleKingMoves(std::pair<int, int> startSquare,
             ((!pieceColor) && (!piece.isWhite()))) {
           continue;
         }
+
+        if (piece.pieceType == (pieceColor ? BK : WK)) {
+          continue;
+        }
       }
       move.moveSquare = position;
-      move.capturedPiece = boardManager[position];
+      move.capturedPiece = piece;
       allPseudoMoves.push_back(move);
     }
   }
@@ -409,12 +426,14 @@ void getAllPossiblePawnMoves(std::pair<int, int> startSquare,
             allPseudoMoves.push_back(move);
           }
         }
-      } else if (dir.first == 0 && dir.second != 0 && piece.pieceType == EMPTY) {
+      } else if (dir.first == 0 && dir.second != 0 &&
+                 piece.pieceType == EMPTY) {
         if (dir.second == 2) {
           if ((pieceColor && startSquare.second == 2) ||
               (!pieceColor && startSquare.second == 7)) {
             if (boardManager[calculatePosition(
-                    x, startSquare.second + (pieceColor ? 1 : -1))].pieceType == EMPTY) {
+                                 x, startSquare.second + (pieceColor ? 1 : -1))]
+                    .pieceType == EMPTY) {
               move.moveSquare = position;
               move.capturedPiece = boardManager[position];
               allPseudoMoves.push_back(move);

@@ -2,7 +2,7 @@
 // Created by Marvin Becker on 05.03.24.
 //
 
-#include "./PieceType.h"
+#include "./piece.h"
 
 int Piece::pieceValue[6] = {100, 300, 350, 500, 900, 1000};
 char Piece::pieceToChar[13] = {'P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k', ' '};
