@@ -269,10 +269,6 @@ void getAllPossibleKingMoves(std::pair<int, int> startSquare,
             ((!pieceColor) && (!piece.isWhite()))) {
           continue;
         }
-
-        if (piece.pieceType == (pieceColor ? BK : WK)) {
-          continue;
-        }
       }
       move.moveSquare = position;
       move.capturedPiece = piece;
