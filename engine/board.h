@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include "./piece_movements.h"
+#include "./movement/piece_movements.h"
 #include "misc/PieceType.h"
 #include "misc/move.h"
 

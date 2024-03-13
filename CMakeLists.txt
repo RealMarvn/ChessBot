@@ -4,18 +4,21 @@ project(pk1_pruefung)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
+enable_testing()
+
 add_executable(pk1_pruefung main.cpp
-        manager/board.cpp
-        manager/board.h
-        manager/move_gen.cpp
-        manager/move_gen.h
-        manager/piece_movements.h
-        manager/piece_movements.cpp
-        manager/misc/move.h
-        manager/misc/PieceType.h
-        manager/misc/PieceType.cpp
+        engine/board.cpp
+        engine/board.h
+        engine/movement/move_gen.cpp
+        engine/movement/move_gen.h
+        engine/movement/piece_movements.h
+        engine/movement/piece_movements.cpp
+        engine/misc/move.h
+        engine/misc/PieceType.h
+        engine/misc/PieceType.cpp
         engine/chess_bot.cpp
         engine/chess_bot.h
+        tests/perft.cpp
 )
 
 include(FetchContent)

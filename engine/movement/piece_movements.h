@@ -3,8 +3,8 @@
 //
 
 #pragma once
-#include "./misc/PieceType.h"
-#include "./misc/move.h"
+#include "../misc/PieceType.h"
+#include "../misc/move.h"
 
 bool canRookMove(int x, int y, int move_x, int move_y);
 bool canQueenMove(int x, int y, int move_x, int move_y);

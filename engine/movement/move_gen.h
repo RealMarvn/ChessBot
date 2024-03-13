@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include "./board.h"
+#include "../board.h"
 
 const std::array<PieceType, 4> whitePawnPossiblePromotions = {WQ, WR, WN, WB};
 const std::array<PieceType, 4> blackPawnPossiblePromotions = {BQ, BR, BN, BB};
