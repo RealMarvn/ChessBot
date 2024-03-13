@@ -29,5 +29,3 @@ class Piece {
 extern std::map<PieceType, char> pieceToCharMap;
 
 Piece findKeyByValue(char value);
-
-inline int calculatePosition(int x, int y) { return ((y - 1) * 8 + x) - 1; }

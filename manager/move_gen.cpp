@@ -3,7 +3,7 @@
 //
 #include "./move_gen.h"
 
-AllPseudoMoves getAllPseudoLegalMoves(BoardManager& boardManager, bool player) {
+AllPseudoMoves getAllPseudoLegalMoves(Board& boardManager, bool player) {
   AllPseudoMoves allPseudoMoves;
   for (int y = 1; y < 9; y++) {
     for (int x = 1; x < 9; x++) {
@@ -52,7 +52,7 @@ AllPseudoMoves getAllPseudoLegalMoves(BoardManager& boardManager, bool player) {
   return allPseudoMoves;
 }
 
-bool isKingInCheck(bool pieceColor, BoardManager& boardManager) {
+bool isKingInCheck(bool pieceColor, Board& boardManager) {
   // Get King moveSquare
   for (int y = 8; y >= 1; y--) {
     for (int x = 1; x <= 8; x++) {
@@ -66,7 +66,7 @@ bool isKingInCheck(bool pieceColor, BoardManager& boardManager) {
   return false;
 }
 
-bool isSquareAttacked(std::pair<int, int> square, BoardManager& boardManager,
+bool isSquareAttacked(std::pair<int, int> square, Board& boardManager,
                       bool pieceColor) {
   AllPseudoMoves allKnightMoves;
   AllPseudoMoves allPawnMoves;
@@ -113,7 +113,7 @@ bool isSquareAttacked(std::pair<int, int> square, BoardManager& boardManager,
 }
 
 void getAllPossibleRookMoves(std::pair<int, int> startSquare,
-                             BoardManager& boardManager,
+                             Board& boardManager,
                              AllPseudoMoves& allPseudoMoves, bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
 
@@ -152,7 +152,7 @@ void getAllPossibleRookMoves(std::pair<int, int> startSquare,
 }
 
 void getAllPossibleBishopMoves(std::pair<int, int> startSquare,
-                               BoardManager& boardManager,
+                               Board& boardManager,
                                AllPseudoMoves& allPseudoMoves,
                                bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
@@ -192,7 +192,7 @@ void getAllPossibleBishopMoves(std::pair<int, int> startSquare,
 }
 
 void getAllPossibleQueenMoves(std::pair<int, int> startSquare,
-                              BoardManager& boardManager,
+                              Board& boardManager,
                               AllPseudoMoves& allPseudoMoves, bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
 
@@ -232,7 +232,7 @@ void getAllPossibleQueenMoves(std::pair<int, int> startSquare,
 }
 
 void getAllPossibleKingMoves(std::pair<int, int> startSquare,
-                             BoardManager& boardManager,
+                             Board& boardManager,
                              AllPseudoMoves& allPseudoMoves, bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
 
@@ -322,7 +322,7 @@ void getAllPossibleKingMoves(std::pair<int, int> startSquare,
 }
 
 void getAllPossibleKnightMoves(std::pair<int, int> startSquare,
-                               BoardManager& boardManager,
+                               Board& boardManager,
                                AllPseudoMoves& allPseudoMoves,
                                bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
@@ -355,7 +355,7 @@ void getAllPossibleKnightMoves(std::pair<int, int> startSquare,
 }
 
 void getAllPossiblePawnMoves(std::pair<int, int> startSquare,
-                             BoardManager& boardManager,
+                             Board& boardManager,
                              AllPseudoMoves& allPseudoMoves, bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
 

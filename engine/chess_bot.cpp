@@ -1,6 +1,6 @@
 #include "./chess_bot.h"
 
-int eval(BoardManager& boardManager) {
+int eval(Board& boardManager) {
   int number = 0;
   for (int i = 1; i < 65; i++) {
     Piece piece = boardManager[i];
@@ -9,7 +9,7 @@ int eval(BoardManager& boardManager) {
   return number;
 }
 
-int search(BoardManager& boardManager, int depth, int alpha, int beta, int ply,
+int search(Board& boardManager, int depth, int alpha, int beta, int ply,
            Move& bestMove) {
   if (depth <= 0) {
     return eval(boardManager);
@@ -60,7 +60,7 @@ int search(BoardManager& boardManager, int depth, int alpha, int beta, int ply,
   return bestScore;
 }
 
-Move searchBestNextMove(BoardManager& boardManager, int depth) {
+Move searchBestNextMove(Board& boardManager, int depth) {
   Move move;
   search(boardManager, depth, -INT_MAX, INT_MAX, 0, move);
   return move;

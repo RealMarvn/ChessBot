@@ -2,7 +2,7 @@
 
 #include "./engine/chess_bot.h"
 
-uint64_t perft(BoardManager& boardManager, int depth, bool player) {
+uint64_t perft(Board& boardManager, int depth, bool player) {
   if (depth == 0) {
     return 1;
   }
@@ -23,7 +23,7 @@ uint64_t perft(BoardManager& boardManager, int depth, bool player) {
   return nodes;
 }
 
-int split_perft(BoardManager& boardManager, int depth, bool player) {
+int split_perft(Board& boardManager, int depth, bool player) {
   if (depth == 0) {
     return 0;
   }
@@ -51,7 +51,7 @@ int split_perft(BoardManager& boardManager, int depth, bool player) {
 }
 
 int main() {
-  const auto board = std::make_unique<BoardManager>();
+  const auto board = std::make_unique<Board>();
   std::string input;
   std::cout << "Perft: " << perft(*board, 5, board->player == WHITE) << std::endl;
   while (getline(std::cin, input)) {

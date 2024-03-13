@@ -8,8 +8,8 @@
 
 extern int pieceValue[6];
 
-int search(BoardManager& boardManager, int depth, int ply, Move& bestMove);
+int search(Board& boardManager, int depth, int ply, Move& bestMove);
 
-int eval(BoardManager& boardManager);
+int eval(Board& boardManager);
 
-Move searchBestNextMove(BoardManager& boardManager, int depth);
+Move searchBestNextMove(Board& boardManager, int depth);

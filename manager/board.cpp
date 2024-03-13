@@ -2,13 +2,13 @@
 // Created by Marvin Becker on 15.12.23.
 //
 
-#include "board_manager.h"
+#include "board.h"
 
-BoardManager::BoardManager() : player(WHITE), board{Piece()} {
+Board::Board() : player(WHITE), board{Piece()} {
   readFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 }
 
-bool BoardManager::popLastMove() {
+bool Board::popLastMove() {
   if (moves.empty() || history.empty()) {
     return false;
   }
@@ -50,7 +50,7 @@ bool BoardManager::popLastMove() {
   return true;
 }
 
-void BoardManager::makeMove(Move move) {
+void Board::makeMove(Move move) {
   board[move.moveSquare] = board[move.square];
   board[move.square].pieceType = EMPTY;
   boardSettings.epSquare = 100;
@@ -97,7 +97,7 @@ void BoardManager::makeMove(Move move) {
   player = player == WHITE ? BLACK : WHITE;
 }
 
-void BoardManager::handleCastlingPermissions(Move &move) {
+void Board::handleCastlingPermissions(Move &move) {
   if (move.movingPiece.pieceType == WK) {
     boardSettings.whiteQueenSide = false;
     boardSettings.whiteKingSide = false;
@@ -140,7 +140,7 @@ void BoardManager::handleCastlingPermissions(Move &move) {
   }
 }
 
-//bool BoardManager::isCheckMate(bool isWhite) {
+//bool Board::isCheckMate(bool isWhite) {
 //  for (int row = 8; row >= 1; row--) {
 //    for (int column = 1; column <= 8; column++) {
 //      if (isWhite && board[calculatePosition(column, row)].isWhite()) {
@@ -158,7 +158,7 @@ void BoardManager::handleCastlingPermissions(Move &move) {
 //  return true;
 //}
 
-bool BoardManager::movePiece(char fig, int x, int y, int move_x, int move_y,
+bool Board::movePiece(char fig, int x, int y, int move_x, int move_y,
                              bool capture, char promotion_figure) {
   if ((player == BLACK && isupper(fig)) || (player == WHITE && islower(fig))) {
     std::cout << "invalid" << std::endl;
@@ -196,7 +196,7 @@ bool BoardManager::movePiece(char fig, int x, int y, int move_x, int move_y,
   return true;
 }
 
-bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
+bool Board::canMove(char fig, int x, int y, int move_x, int move_y,
                            bool capture) {
   int position = calculatePosition(x, y);
   int move = calculatePosition(move_x, move_y);
@@ -260,7 +260,7 @@ bool BoardManager::canMove(char fig, int x, int y, int move_x, int move_y,
   return false;
 }
 
-bool BoardManager::isPathClear(int startX, int startY, int endX, int endY,
+bool Board::isPathClear(int startX, int startY, int endX, int endY,
                                const std::array<Piece, 64>& board) {
   int dx = std::abs(endX - startX);
   int dy = std::abs(endY - startY);
@@ -306,7 +306,7 @@ bool BoardManager::isPathClear(int startX, int startY, int endX, int endY,
   return true;
 }
 
-bool BoardManager::isWhiteKingInDanger() {
+bool Board::isWhiteKingInDanger() {
   int whiteKingPositionX = 0;
   int whiteKingPositionY = 0;
 
@@ -335,7 +335,7 @@ bool BoardManager::isWhiteKingInDanger() {
   return false;
 }
 
-bool BoardManager::isBlackKingInDanger() {
+bool Board::isBlackKingInDanger() {
   int blackKingPositionX = 0;
   int blackKingPositionY = 0;
 
@@ -365,7 +365,7 @@ bool BoardManager::isBlackKingInDanger() {
   return false;
 }
 
-//bool BoardManager::isKingInCheck(bool isWhite) {
+//bool Board::isKingInCheck(bool isWhite) {
 //  if (isWhite && isWhiteKingInDanger()) {
 //    return isCheckMate(isWhite);
 //  }
@@ -375,7 +375,7 @@ bool BoardManager::isBlackKingInDanger() {
 //  return false;
 //}
 
-void BoardManager::readFen(std::string input) {
+void Board::readFen(std::string input) {
   std::vector<std::string> fenSettings;
 
   std::istringstream iss(input);
@@ -478,7 +478,7 @@ void BoardManager::readFen(std::string input) {
   printCurrentBoard();
 }
 
-//int BoardManager::getPossibleMoves(int x, int y) {
+//int Board::getPossibleMoves(int x, int y) {
 //  std::array<Piece, 64> saveBoard;
 //  saveBoard = board;
 //  //  std::memcpy(saveBoard, board, sizeof(board));
@@ -516,7 +516,7 @@ void BoardManager::readFen(std::string input) {
 //  return possibleMoves;
 //}
 //
-//void BoardManager::printPossibleMoves(char fig, int x, int y) {
+//void Board::printPossibleMoves(char fig, int x, int y) {
 //  std::array<PieceType, 64> saveBoard{};
 //  saveBoard = board;
 //  //  std::memcpy(saveBoard, board, sizeof(board));
@@ -563,7 +563,7 @@ void BoardManager::readFen(std::string input) {
 //  //  std::memcpy(board, saveBoard, sizeof(saveBoard));
 //}
 
-void BoardManager::printCurrentBoard() {
+void Board::printCurrentBoard() {
   if (player == WHITE) {
     std::cout << "Current turn: "
               << "White" << std::endl;
@@ -586,7 +586,7 @@ void BoardManager::printCurrentBoard() {
   std::cout << std::endl;
 }
 
-Move BoardManager::generateMove(int position, int moveToPosition,
+Move Board::generateMove(int position, int moveToPosition,
                                 Piece promotionPiece, MoveType moveType) {
   Move move{};
   move.moveSquare = moveToPosition;

@@ -5,8 +5,8 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
 add_executable(pk1_pruefung main.cpp
-        manager/board_manager.cpp
-        manager/board_manager.h
+        manager/board.cpp
+        manager/board.h
         manager/move_gen.cpp
         manager/move_gen.h
         manager/piece_movements.h

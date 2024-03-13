@@ -25,7 +25,9 @@ struct board_setting {
   bool blackKingSide{false};
 };
 
-class BoardManager {
+inline int calculatePosition(int x, int y) { return ((y - 1) * 8 + x) - 1; }
+
+class Board {
 
  private:
   std::array<Piece, 64> board;
@@ -41,7 +43,7 @@ class BoardManager {
     return board[index];
   }
 
-  explicit BoardManager();
+  explicit Board();
   bool movePiece(char fig, int x, int y, int move_x, int move_y, bool capture,
                  char promotion_figure);
   void makeMove(Move move);
