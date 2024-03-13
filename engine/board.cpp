@@ -22,7 +22,8 @@ bool Board::popLastMove() {
   if (last_move.moveType == EN_PASSANT) {
     int enPassantSquare =
         last_move.moveSquare + (last_move.movingPiece.isWhite() ? -8 : +8);
-    board[enPassantSquare].pieceType = (last_move.movingPiece.isWhite() ? BP : WP);
+    board[enPassantSquare].pieceType =
+        (last_move.movingPiece.isWhite() ? BP : WP);
   }
 
   if (last_move.moveType == CASTLING) {
@@ -60,7 +61,8 @@ void Board::makeMove(Move move) {
   }
 
   if (move.moveType == EN_PASSANT) {
-    int enPassantSquare = move.moveSquare + (move.movingPiece.pieceType == WP ? -8 : +8);
+    int enPassantSquare =
+        move.moveSquare + (move.movingPiece.pieceType == WP ? -8 : +8);
     board[enPassantSquare].pieceType = EMPTY;
   }
 
@@ -97,7 +99,7 @@ void Board::makeMove(Move move) {
   player = player == WHITE ? BLACK : WHITE;
 }
 
-void Board::handleCastlingPermissions(Move &move) {
+void Board::handleCastlingPermissions(Move& move) {
   if (move.movingPiece.pieceType == WK) {
     boardSettings.whiteQueenSide = false;
     boardSettings.whiteKingSide = false;
@@ -140,26 +142,26 @@ void Board::handleCastlingPermissions(Move &move) {
   }
 }
 
-//bool Board::isCheckMate(bool isWhite) {
-//  for (int row = 8; row >= 1; row--) {
-//    for (int column = 1; column <= 8; column++) {
-//      if (isWhite && board[calculatePosition(column, row)].isWhite()) {
-//        if (getPossibleMoves(column, row) > 0) {
-//          return false;
-//        }
-//      }
-//      if (!isWhite && (!board[calculatePosition(column, row)].isWhite())) {
-//        if (getPossibleMoves(column, row) > 0) {
-//          return false;
-//        }
-//      }
-//    }
-//  }
-//  return true;
-//}
+// bool Board::isCheckMate(bool isWhite) {
+//   for (int row = 8; row >= 1; row--) {
+//     for (int column = 1; column <= 8; column++) {
+//       if (isWhite && board[calculatePosition(column, row)].isWhite()) {
+//         if (getPossibleMoves(column, row) > 0) {
+//           return false;
+//         }
+//       }
+//       if (!isWhite && (!board[calculatePosition(column, row)].isWhite())) {
+//         if (getPossibleMoves(column, row) > 0) {
+//           return false;
+//         }
+//       }
+//     }
+//   }
+//   return true;
+// }
 
 bool Board::movePiece(char fig, int x, int y, int move_x, int move_y,
-                             bool capture, char promotion_figure) {
+                      bool capture, char promotion_figure) {
   if ((player == BLACK && isupper(fig)) || (player == WHITE && islower(fig))) {
     std::cout << "invalid" << std::endl;
     return false;
@@ -187,17 +189,17 @@ bool Board::movePiece(char fig, int x, int y, int move_x, int move_y,
                    promotion ? PROMOTION : NORMAL);
   makeMove(move);
 
-//  if (isKingInCheck(player == WHITE)) {
-//    std::cout << "King is in check" << std::endl;
-//  } else {
-//    std::cout << "No one is in check" << std::endl;
-//  }
+  //  if (isKingInCheck(player == WHITE)) {
+  //    std::cout << "King is in check" << std::endl;
+  //  } else {
+  //    std::cout << "No one is in check" << std::endl;
+  //  }
 
   return true;
 }
 
 bool Board::canMove(char fig, int x, int y, int move_x, int move_y,
-                           bool capture) {
+                    bool capture) {
   int position = calculatePosition(x, y);
   int move = calculatePosition(move_x, move_y);
 
@@ -216,7 +218,8 @@ bool Board::canMove(char fig, int x, int y, int move_x, int move_y,
   //  }
 
   // Check if capture an empty field or a field without a capture
-  if ((board[move].pieceType != EMPTY && !capture) || (capture && board[move].pieceType == EMPTY)) {
+  if ((board[move].pieceType != EMPTY && !capture) ||
+      (capture && board[move].pieceType == EMPTY)) {
     return false;
   }
 
@@ -261,7 +264,7 @@ bool Board::canMove(char fig, int x, int y, int move_x, int move_y,
 }
 
 bool Board::isPathClear(int startX, int startY, int endX, int endY,
-                               const std::array<Piece, 64>& board) {
+                        const std::array<Piece, 64>& board) {
   int dx = std::abs(endX - startX);
   int dy = std::abs(endY - startY);
   int x = startX;
@@ -365,15 +368,15 @@ bool Board::isBlackKingInDanger() {
   return false;
 }
 
-//bool Board::isKingInCheck(bool isWhite) {
-//  if (isWhite && isWhiteKingInDanger()) {
-//    return isCheckMate(isWhite);
-//  }
-//  if (!isWhite && isBlackKingInDanger()) {
-//    return isCheckMate(isWhite);
-//  }
-//  return false;
-//}
+// bool Board::isKingInCheck(bool isWhite) {
+//   if (isWhite && isWhiteKingInDanger()) {
+//     return isCheckMate(isWhite);
+//   }
+//   if (!isWhite && isBlackKingInDanger()) {
+//     return isCheckMate(isWhite);
+//   }
+//   return false;
+// }
 
 void Board::readFen(std::string input) {
   std::vector<std::string> fenSettings;
@@ -471,97 +474,98 @@ void Board::readFen(std::string input) {
   }
 
   if (fenSettings[3] != "-") {
-    // TODO POSSIBLE EP
+    int col = fenSettings[3][0] - 96;
+    int row = fenSettings[3][1] - 48;
+    boardSettings.epSquare = calculatePosition(col, row);
   }
 
   history.push_back(boardSettings);
-  printCurrentBoard();
 }
 
-//int Board::getPossibleMoves(int x, int y) {
-//  std::array<Piece, 64> saveBoard;
-//  saveBoard = board;
-//  //  std::memcpy(saveBoard, board, sizeof(board));
-//  PieceType piece = board[calculatePosition(x, y)];
-//  int possibleMoves = 0;
-//  for (int row = 8; row >= 1; row--) {
-//    for (int column = 1; column <= 8; column++) {
-//      if (board[calculatePosition(column, row)] == EMPTY &&
-//          canMove(piece, x, y, column, row, false)) {
-//        // Mach den Move!
-//        board[calculatePosition(column, row)] = piece;
-//        board[calculatePosition(x, y)] = EMPTY;
-//        if ((isWhitePiece(piece) && !isWhiteKingInDanger()) ||
-//            ((!isWhitePiece(piece)) && !isBlackKingInDanger())) {
-//          possibleMoves++;
-//        }
-//        board = saveBoard;
-//        //        std::memcpy(board, saveBoard, sizeof(saveBoard));
-//        continue;
-//      }
-//      if (canMove(piece, x, y, column, row, true)) {
-//        // Mach den Move!
-//        board[calculatePosition(column, row)] = piece;
-//        board[calculatePosition(x, y)] = EMPTY;
-//        if ((isWhitePiece(piece) && !isWhiteKingInDanger()) ||
-//            ((!isWhitePiece(piece)) && !isBlackKingInDanger())) {
-//          possibleMoves++;
-//        }
-//        board = saveBoard;
-//        //        std::memcpy(board, saveBoard, sizeof(saveBoard));
-//        continue;
-//      }
-//    }
-//  }
-//  return possibleMoves;
-//}
+// int Board::getPossibleMoves(int x, int y) {
+//   std::array<Piece, 64> saveBoard;
+//   saveBoard = board;
+//   //  std::memcpy(saveBoard, board, sizeof(board));
+//   PieceType piece = board[calculatePosition(x, y)];
+//   int possibleMoves = 0;
+//   for (int row = 8; row >= 1; row--) {
+//     for (int column = 1; column <= 8; column++) {
+//       if (board[calculatePosition(column, row)] == EMPTY &&
+//           canMove(piece, x, y, column, row, false)) {
+//         // Mach den Move!
+//         board[calculatePosition(column, row)] = piece;
+//         board[calculatePosition(x, y)] = EMPTY;
+//         if ((isWhitePiece(piece) && !isWhiteKingInDanger()) ||
+//             ((!isWhitePiece(piece)) && !isBlackKingInDanger())) {
+//           possibleMoves++;
+//         }
+//         board = saveBoard;
+//         //        std::memcpy(board, saveBoard, sizeof(saveBoard));
+//         continue;
+//       }
+//       if (canMove(piece, x, y, column, row, true)) {
+//         // Mach den Move!
+//         board[calculatePosition(column, row)] = piece;
+//         board[calculatePosition(x, y)] = EMPTY;
+//         if ((isWhitePiece(piece) && !isWhiteKingInDanger()) ||
+//             ((!isWhitePiece(piece)) && !isBlackKingInDanger())) {
+//           possibleMoves++;
+//         }
+//         board = saveBoard;
+//         //        std::memcpy(board, saveBoard, sizeof(saveBoard));
+//         continue;
+//       }
+//     }
+//   }
+//   return possibleMoves;
+// }
 //
-//void Board::printPossibleMoves(char fig, int x, int y) {
-//  std::array<PieceType, 64> saveBoard{};
-//  saveBoard = board;
-//  //  std::memcpy(saveBoard, board, sizeof(board));
-//  PieceType figure = board[calculatePosition(x, y)];
+// void Board::printPossibleMoves(char fig, int x, int y) {
+//   std::array<PieceType, 64> saveBoard{};
+//   saveBoard = board;
+//   //  std::memcpy(saveBoard, board, sizeof(board));
+//   PieceType figure = board[calculatePosition(x, y)];
 //
-//  for (int row = 8; row >= 1; row--) {
-//    for (int column = 1; column <= 8; column++) {
-//      if (board[calculatePosition(column, row)] == EMPTY &&
-//          canMove(fig, x, y, column, row, false)) {
-//        // Mach den Move!
-//        board[calculatePosition(column, row)] = figure;
-//        board[calculatePosition(x, y)] = EMPTY;
-//        if ((isupper(fig) && !isWhiteKingInDanger()) ||
-//            (islower(fig) && !isBlackKingInDanger())) {
-//          std::cout << "[o]";
-//          board = saveBoard;
-//          //          std::memcpy(board, saveBoard, sizeof(saveBoard));
-//          continue;
-//        }
-//        board = saveBoard;
-//        //        std::memcpy(board, saveBoard, sizeof(saveBoard));
-//      }
-//      if (canMove(fig, x, y, column, row, true)) {
-//        // Mach den Move!
-//        board[calculatePosition(column, row)] = figure;
-//        board[calculatePosition(x, y)] = EMPTY;
-//        if ((isupper(fig) && !isWhiteKingInDanger()) ||
-//            (islower(fig) && !isBlackKingInDanger())) {
-//          std::cout << "[x]";
-//          board = saveBoard;
-//          //          std::memcpy(board, saveBoard, sizeof(saveBoard));
-//          continue;
-//        }
-//        board = saveBoard;
-//        //        std::memcpy(board, saveBoard, sizeof(saveBoard));
-//      }
-//      std::cout << "[" << pieceToCharMap[board[calculatePosition(x, y)]] << "]";
-//      board = saveBoard;
-//      //      std::memcpy(board, saveBoard, sizeof(saveBoard));
-//    }
-//    std::cout << std::endl;
-//  }
-//  board = saveBoard;
-//  //  std::memcpy(board, saveBoard, sizeof(saveBoard));
-//}
+//   for (int row = 8; row >= 1; row--) {
+//     for (int column = 1; column <= 8; column++) {
+//       if (board[calculatePosition(column, row)] == EMPTY &&
+//           canMove(fig, x, y, column, row, false)) {
+//         // Mach den Move!
+//         board[calculatePosition(column, row)] = figure;
+//         board[calculatePosition(x, y)] = EMPTY;
+//         if ((isupper(fig) && !isWhiteKingInDanger()) ||
+//             (islower(fig) && !isBlackKingInDanger())) {
+//           std::cout << "[o]";
+//           board = saveBoard;
+//           //          std::memcpy(board, saveBoard, sizeof(saveBoard));
+//           continue;
+//         }
+//         board = saveBoard;
+//         //        std::memcpy(board, saveBoard, sizeof(saveBoard));
+//       }
+//       if (canMove(fig, x, y, column, row, true)) {
+//         // Mach den Move!
+//         board[calculatePosition(column, row)] = figure;
+//         board[calculatePosition(x, y)] = EMPTY;
+//         if ((isupper(fig) && !isWhiteKingInDanger()) ||
+//             (islower(fig) && !isBlackKingInDanger())) {
+//           std::cout << "[x]";
+//           board = saveBoard;
+//           //          std::memcpy(board, saveBoard, sizeof(saveBoard));
+//           continue;
+//         }
+//         board = saveBoard;
+//         //        std::memcpy(board, saveBoard, sizeof(saveBoard));
+//       }
+//       std::cout << "[" << pieceToCharMap[board[calculatePosition(x, y)]] <<
+//       "]"; board = saveBoard;
+//       //      std::memcpy(board, saveBoard, sizeof(saveBoard));
+//     }
+//     std::cout << std::endl;
+//   }
+//   board = saveBoard;
+//   //  std::memcpy(board, saveBoard, sizeof(saveBoard));
+// }
 
 void Board::printCurrentBoard() {
   if (player == WHITE) {
@@ -586,8 +590,8 @@ void Board::printCurrentBoard() {
   std::cout << std::endl;
 }
 
-Move Board::generateMove(int position, int moveToPosition,
-                                Piece promotionPiece, MoveType moveType) {
+Move Board::generateMove(int position, int moveToPosition, Piece promotionPiece,
+                         MoveType moveType) {
   Move move{};
   move.moveSquare = moveToPosition;
   move.square = position;

@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include "./board.h"
+#include "../board.h"
 
 const std::array<PieceType, 4> whitePawnPossiblePromotions = {WQ, WR, WN, WB};
 const std::array<PieceType, 4> blackPawnPossiblePromotions = {BQ, BR, BN, BB};
@@ -34,6 +34,7 @@ void getAllPossibleQueenMoves(std::pair<int, int> startSquare,
 void getAllPossibleKingMoves(std::pair<int, int> startSquare,
                              Board& boardManager,
                              AllPseudoMoves& allPseudoMoves, bool pieceColor);
+
 
 void getAllPossibleKnightMoves(std::pair<int, int> startSquare,
                                Board& boardManager,

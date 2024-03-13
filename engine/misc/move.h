@@ -9,7 +9,7 @@
 #include <string>
 #include <utility>
 
-#include "./PieceType.h"
+#include "./piece.h"
 
 #define MAX_MOVES 218
 
@@ -25,9 +25,9 @@ struct Move {
 
   [[nodiscard]] std::string convertToXandY() const {
     std::ostringstream out;
-    out << static_cast<char>((square - 1) % 8 + 'a') << (square - 1) / 8 + 1
-        << static_cast<char>((moveSquare - 1) % 8 + 'a')
-        << (moveSquare - 1) / 8 + 1;
+    out << static_cast<char>((square) % 8 + 'a') << (square) / 8 + 1
+        << static_cast<char>((moveSquare) % 8 + 'a')
+        << (moveSquare) / 8 + 1;
     return out.str();
   }
 };

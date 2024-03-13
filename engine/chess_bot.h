@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include ".././manager/move_gen.h"
+#include "./movement/move_gen.h"
 
 extern int pieceValue[6];
 
