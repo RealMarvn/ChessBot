@@ -10,7 +10,6 @@ class ChessBot {
   Move searchBestNextMove(Board& board, int depth);
 
  private:
-  int search(Board& boardManager, int depth, int alpha, int beta, int ply,
-             Move& bestMove);
+  int search(Board& boardManager, int depth, int alpha, int beta, int ply, Move& bestMove);
   int eval(Board& board);
 };

@@ -39,11 +39,9 @@ class Board {
 
   bool isKingInCheck(bool pieceColor);
   bool isSquareAttacked(std::pair<int, int> square, bool pieceColor);
-  bool movePiece(char fig, int x, int y, int move_x, int move_y, bool capture,
-                 char promotion_figure);
+  bool movePiece(char fig, int x, int y, int move_x, int move_y, bool capture, char promotion_figure);
   void makeMove(Move move);
-  Move generateMove(int position, int moveToPosition, Piece promotionPiece,
-                    MoveType moveType);
+  Move generateMove(int position, int moveToPosition, Piece promotionPiece, MoveType moveType);
   bool popLastMove();
   void printCurrentBoard();
   void readFen(std::string input);
@@ -53,6 +51,5 @@ class Board {
  private:
   void handleCastlingPermissions(Move& move);
   bool canMove(char fig, int x, int y, int move_x, int move_y, bool capture);
-  static bool isPathClear(int startX, int startY, int endX, int endY,
-                          const std::array<Piece, 64>& board);
+  static bool isPathClear(int startX, int startY, int endX, int endY, const std::array<Piece, 64>& board);
 };

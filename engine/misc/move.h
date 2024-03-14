@@ -25,8 +25,7 @@ struct Move {
 
   [[nodiscard]] std::string convertToXandY() const {
     std::ostringstream out;
-    out << static_cast<char>((square) % 8 + 'a') << (square) / 8 + 1
-        << static_cast<char>((moveSquare) % 8 + 'a')
+    out << static_cast<char>((square) % 8 + 'a') << (square) / 8 + 1 << static_cast<char>((moveSquare) % 8 + 'a')
         << (moveSquare) / 8 + 1;
     return out.str();
   }
@@ -37,7 +36,6 @@ class PseudoLegalMoves {
   int index = 0;
 
  public:
-
   using iterator = std::array<Move, MAX_MOVES>::iterator;
   iterator begin() { return move_list.begin(); }
   iterator end() { return move_list.begin() + index; }

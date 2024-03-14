@@ -9,18 +9,15 @@ int ChessBot::eval(Board& board) {
   return number;
 }
 
-int ChessBot::search(Board& boardManager, int depth, int alpha, int beta, int ply,
-           Move& bestMove) {
+int ChessBot::search(Board& boardManager, int depth, int alpha, int beta, int ply, Move& bestMove) {
   if (depth <= 0) {
     return eval(boardManager);
   }
 
-  auto moveList =
-      moveGenUtils::getAllPseudoLegalMoves(boardManager, boardManager.player == WHITE);
+  auto moveList = moveGenUtils::getAllPseudoLegalMoves(boardManager, boardManager.player == WHITE);
 
   int legalMoves = 0;
   int bestScore = -INT_MAX;
-
 
   for (Move& move : moveList) {
     int score;
@@ -28,8 +25,7 @@ int ChessBot::search(Board& boardManager, int depth, int alpha, int beta, int pl
     boardManager.makeMove(move);
 
     if (!boardManager.isKingInCheck(boardManager.player != WHITE)) {
-      score =
-          -search(boardManager, depth - 1, -beta, -alpha, ply + 1, bestMove);
+      score = -search(boardManager, depth - 1, -beta, -alpha, ply + 1, bestMove);
       legalMoves++;
     }
     boardManager.popLastMove();

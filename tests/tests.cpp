@@ -50,34 +50,33 @@ int split_perft(Board& boardManager, int depth, bool player) {
     uint64_t child_nodes = perft(boardManager, depth - 1, !player);
 
     number += child_nodes;
-    std::cout << move.convertToXandY() << " - " << child_nodes
-              << std::endl;
+    std::cout << move.convertToXandY() << " - " << child_nodes << std::endl;
     boardManager.popLastMove();
   }
   return number;
 }
 
- TEST(MoveGenTest, PerftTest) {
-   std::ifstream epd_file("/Users/marvin/CLionProjects/pk1-pruefung/tests/data/perft-positions.epd");
-   ASSERT_TRUE(epd_file.good()) << "Der Pfad ist falsch. Bitte anpassen!";
-   Board myBoard;
+TEST(MoveGenTest, PerftTest) {
+  std::ifstream epd_file("/Users/marvin/CLionProjects/pk1-pruefung/tests/data/perft-positions.epd");
+  ASSERT_TRUE(epd_file.good()) << "Der Pfad ist falsch. Bitte anpassen!";
+  Board myBoard;
 
-   std::string line;
-   while (std::getline(epd_file, line)) {
-     std::istringstream ss(line);
-     std::string setting;
-     std::vector<std::string> settings;
+  std::string line;
+  while (std::getline(epd_file, line)) {
+    std::istringstream ss(line);
+    std::string setting;
+    std::vector<std::string> settings;
 
-     while (std::getline(ss, setting, ';')) {
-       settings.push_back(setting);
-     }
+    while (std::getline(ss, setting, ';')) {
+      settings.push_back(setting);
+    }
 
-         myBoard.readFen(settings[0]);
+    myBoard.readFen(settings[0]);
 
-         int result = perft(myBoard, 4, myBoard.player == WHITE);
-         ASSERT_EQ(result, std::stoi(settings[4].substr(3)));
-   }
- }
+    int result = perft(myBoard, 4, myBoard.player == WHITE);
+    ASSERT_EQ(result, std::stoi(settings[4].substr(3)));
+  }
+}
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);

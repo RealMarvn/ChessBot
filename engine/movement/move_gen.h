@@ -14,32 +14,23 @@ namespace moveGenUtils {
 const static std::array<PieceType, 4> whitePawnPossiblePromotions = {WQ, WR, WN, WB};
 const static std::array<PieceType, 4> blackPawnPossiblePromotions = {BQ, BR, BN, BB};
 
-PseudoLegalMoves getAllPseudoLegalMoves(Board& board,
-                                        bool player);
+PseudoLegalMoves getAllPseudoLegalMoves(Board& board, bool player);
 
-void getAllPossibleRookMoves(std::pair<int, int> startSquare,
-                             Board& board,
-                             PseudoLegalMoves& allPseudoMoves, bool pieceColor);
+void getAllPossibleRookMoves(std::pair<int, int> startSquare, Board& board, PseudoLegalMoves& allPseudoMoves,
+                             bool pieceColor);
 
-void getAllPossiblePawnMoves(std::pair<int, int> startSquare,
-                             Board& board,
-                             PseudoLegalMoves& allPseudoMoves, bool pieceColor);
+void getAllPossiblePawnMoves(std::pair<int, int> startSquare, Board& board, PseudoLegalMoves& allPseudoMoves,
+                             bool pieceColor);
 
-void getAllPossibleQueenMoves(std::pair<int, int> startSquare,
-                              Board& board,
-                              PseudoLegalMoves& allPseudoMoves, bool pieceColor);
+void getAllPossibleQueenMoves(std::pair<int, int> startSquare, Board& board, PseudoLegalMoves& allPseudoMoves,
+                              bool pieceColor);
 
-void getAllPossibleKingMoves(std::pair<int, int> startSquare,
-                             Board& board,
-                             PseudoLegalMoves& allPseudoMoves, bool pieceColor);
+void getAllPossibleKingMoves(std::pair<int, int> startSquare, Board& board, PseudoLegalMoves& allPseudoMoves,
+                             bool pieceColor);
 
+void getAllPossibleKnightMoves(std::pair<int, int> startSquare, Board& board, PseudoLegalMoves& allPseudoMoves,
+                               bool pieceColor);
 
-void getAllPossibleKnightMoves(std::pair<int, int> startSquare,
-                               Board& board,
-                               PseudoLegalMoves& allPseudoMoves, bool pieceColor);
-
-void getAllPossibleBishopMoves(std::pair<int, int> startSquare,
-                               Board& board,
-                               PseudoLegalMoves& allPseudoMoves, bool pieceColor);
-}
-
+void getAllPossibleBishopMoves(std::pair<int, int> startSquare, Board& board, PseudoLegalMoves& allPseudoMoves,
+                               bool pieceColor);
+}  // namespace moveGenUtils

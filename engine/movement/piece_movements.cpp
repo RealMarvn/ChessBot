@@ -20,8 +20,7 @@ bool canQueenMove(int x, int y, int move_x, int move_y) {
   return false;
 }
 
-bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
-                 bool isWhite) {
+bool canPawnMove(int x, int y, int move_x, int move_y, bool capture, bool isWhite) {
   int rowDiff = std::abs(move_y - y);
   int colDiff = std::abs(move_x - x);
 
@@ -48,13 +47,10 @@ bool canPawnMove(int x, int y, int move_x, int move_y, bool capture,
   return false;
 }
 
-bool canPawnPromote(bool isWhite, char fig, char promotion_figure,
-                    int movePosition) {
+bool canPawnPromote(bool isWhite, char fig, char promotion_figure, int movePosition) {
   if (tolower(fig) == 'p') {
-    if ((movePosition >= 55 && movePosition <= 63) ||
-        (movePosition >= 0 && movePosition <= 7)) {
-      if ((isWhite && isupper(promotion_figure)) ||
-          (!isWhite && islower(promotion_figure))) {
+    if ((movePosition >= 55 && movePosition <= 63) || (movePosition >= 0 && movePosition <= 7)) {
+      if ((isWhite && isupper(promotion_figure)) || (!isWhite && islower(promotion_figure))) {
         switch (tolower(promotion_figure)) {
           case 'r':
           case 'n':
@@ -78,12 +74,9 @@ bool canKnightMove(int x, int y, int move_x, int move_y) {
 bool canKingMove(int x, int y, int move_x, int move_y) {
   if ((y == move_y && abs(x - move_x) == 1)) return true;
   if ((x == move_x && abs(y - move_y) == 1)) return true;
-  if (std::abs(y - move_y) == std::abs(x - move_x) && std::abs(y - move_y) == 1)
-    return true;
+  if (std::abs(y - move_y) == std::abs(x - move_x) && std::abs(y - move_y) == 1) return true;
 
   return false;
 }
 
-bool canBishopMove(int x, int y, int move_x, int move_y) {
-  return std::abs(y - move_y) == std::abs(x - move_x);
-}
+bool canBishopMove(int x, int y, int move_x, int move_y) { return std::abs(y - move_y) == std::abs(x - move_x); }

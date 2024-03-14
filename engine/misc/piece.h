@@ -13,9 +13,7 @@ class Piece {
   Piece() : pieceType{EMPTY} {};
   PieceType pieceType{EMPTY};
   [[nodiscard]] inline bool isWhite() const { return (pieceType < BP); };
-  [[nodiscard]] inline char toChar() const {
-    return pieceToChar[pieceType];
-  };
+  [[nodiscard]] inline char toChar() const { return pieceToChar[pieceType]; };
   [[nodiscard]] int getMaterialValue() const {
     if (pieceType == EMPTY) return 0;
     return ((isWhite() ? 1 : -1) * pieceValue[pieceType]);

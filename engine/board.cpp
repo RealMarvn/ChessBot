@@ -4,8 +4,8 @@
 
 #include "board.h"
 
-#include "./movement/move_gen.h"
 #include "./chess_bot.h"
+#include "./movement/move_gen.h"
 
 bool Board::isKingInCheck(bool pieceColor) {
   // Get King moveSquare
@@ -28,49 +28,41 @@ bool Board::isSquareAttacked(std::pair<int, int> square, bool pieceColor) {
 
   moveGenUtils::getAllPossibleKnightMoves(square, *this, allKnightMoves, pieceColor);
   for (Move& move : allKnightMoves) {
-    if (move.capturedPiece.pieceType == WN ||
-        move.capturedPiece.pieceType == BN) {
+    if (move.capturedPiece.pieceType == WN || move.capturedPiece.pieceType == BN) {
       return true;
     }
   }
 
   moveGenUtils::getAllPossiblePawnMoves(square, *this, allPawnMoves, pieceColor);
   for (Move& move : allPawnMoves) {
-    if (move.capturedPiece.pieceType == WP ||
-        move.capturedPiece.pieceType == BP) {
+    if (move.capturedPiece.pieceType == WP || move.capturedPiece.pieceType == BP) {
       return true;
     }
   }
 
   moveGenUtils::getAllPossibleBishopMoves(square, *this, allBishopMoves, pieceColor);
   for (Move& move : allBishopMoves) {
-    if (move.capturedPiece.pieceType == WB ||
-        move.capturedPiece.pieceType == BB ||
-        move.capturedPiece.pieceType == WQ ||
-        move.capturedPiece.pieceType == BQ) {
+    if (move.capturedPiece.pieceType == WB || move.capturedPiece.pieceType == BB ||
+        move.capturedPiece.pieceType == WQ || move.capturedPiece.pieceType == BQ) {
       return true;
     }
   }
 
   moveGenUtils::getAllPossibleRookMoves(square, *this, allRookMoves, pieceColor);
   for (Move& move : allRookMoves) {
-    if (move.capturedPiece.pieceType == WR ||
-        move.capturedPiece.pieceType == BR ||
-        move.capturedPiece.pieceType == WQ ||
-        move.capturedPiece.pieceType == BQ) {
+    if (move.capturedPiece.pieceType == WR || move.capturedPiece.pieceType == BR ||
+        move.capturedPiece.pieceType == WQ || move.capturedPiece.pieceType == BQ) {
       return true;
     }
   }
 
-  std::pair<int, int> directions[8] = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1},
-                                       {0, 1},   {1, -1}, {1, 0},  {1, 1}};
+  std::pair<int, int> directions[8] = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
 
   for (const auto& dir : directions) {
     int x = square.first + dir.first;
     int y = square.second + dir.second;
     if (x > 0 && y > 0 && x < 9 && y < 9) {
-      if (board[calculatePosition(x, y)].pieceType ==
-          (pieceColor ? BK : WK)) {
+      if (board[calculatePosition(x, y)].pieceType == (pieceColor ? BK : WK)) {
         return true;
       }
     }
@@ -91,10 +83,8 @@ bool Board::popLastMove() {
   board[last_move.square] = last_move.movingPiece;
 
   if (last_move.moveType == EN_PASSANT) {
-    int enPassantSquare =
-        last_move.moveSquare + (last_move.movingPiece.isWhite() ? -8 : +8);
-    board[enPassantSquare].pieceType =
-        (last_move.movingPiece.isWhite() ? BP : WP);
+    int enPassantSquare = last_move.moveSquare + (last_move.movingPiece.isWhite() ? -8 : +8);
+    board[enPassantSquare].pieceType = (last_move.movingPiece.isWhite() ? BP : WP);
   }
 
   if (last_move.moveType == CASTLING) {
@@ -132,8 +122,7 @@ void Board::makeMove(Move move) {
   }
 
   if (move.moveType == EN_PASSANT) {
-    int enPassantSquare =
-        move.moveSquare + (move.movingPiece.pieceType == WP ? -8 : +8);
+    int enPassantSquare = move.moveSquare + (move.movingPiece.pieceType == WP ? -8 : +8);
     board[enPassantSquare].pieceType = EMPTY;
   }
 
@@ -158,8 +147,7 @@ void Board::makeMove(Move move) {
 
   if (move.movingPiece.pieceType == WP || move.movingPiece.pieceType == BP) {
     if (std::abs(move.square - move.moveSquare) == 16) {
-      boardSettings.epSquare =
-          move.moveSquare + (move.movingPiece.isWhite() ? -8 : +8);
+      boardSettings.epSquare = move.moveSquare + (move.movingPiece.isWhite() ? -8 : +8);
     }
   }
 
@@ -225,8 +213,7 @@ bool Board::isCheckMate(bool isWhite) {
   return counter == 0;
 }
 
-bool Board::movePiece(char fig, int x, int y, int move_x, int move_y,
-                      bool capture, char promotion_figure) {
+bool Board::movePiece(char fig, int x, int y, int move_x, int move_y, bool capture, char promotion_figure) {
   if ((player == BLACK && isupper(fig)) || (player == WHITE && islower(fig))) {
     std::cout << "invalid" << std::endl;
     return false;
@@ -249,9 +236,7 @@ bool Board::movePiece(char fig, int x, int y, int move_x, int move_y,
     promotion = true;
   }
 
-  Move move =
-      generateMove(position, movePosition, findKeyByValue(promotion_figure),
-                   promotion ? PROMOTION : NORMAL);
+  Move move = generateMove(position, movePosition, findKeyByValue(promotion_figure), promotion ? PROMOTION : NORMAL);
   makeMove(move);
 
   //  if (isKingInCheck(player == WHITE)) {
@@ -263,8 +248,7 @@ bool Board::movePiece(char fig, int x, int y, int move_x, int move_y,
   return true;
 }
 
-bool Board::canMove(char fig, int x, int y, int move_x, int move_y,
-                    bool capture) {
+bool Board::canMove(char fig, int x, int y, int move_x, int move_y, bool capture) {
   int position = calculatePosition(x, y);
   int move = calculatePosition(move_x, move_y);
 
@@ -279,8 +263,7 @@ bool Board::canMove(char fig, int x, int y, int move_x, int move_y,
   }
 
   // Check if capture an empty field or a field without a capture
-  if ((board[move].pieceType != EMPTY && !capture) ||
-      (capture && board[move].pieceType == EMPTY)) {
+  if ((board[move].pieceType != EMPTY && !capture) || (capture && board[move].pieceType == EMPTY)) {
     return false;
   }
 
@@ -324,8 +307,7 @@ bool Board::canMove(char fig, int x, int y, int move_x, int move_y,
   return false;
 }
 
-bool Board::isPathClear(int startX, int startY, int endX, int endY,
-                        const std::array<Piece, 64>& board) {
+bool Board::isPathClear(int startX, int startY, int endX, int endY, const std::array<Piece, 64>& board) {
   int dx = std::abs(endX - startX);
   int dy = std::abs(endY - startY);
   int x = startX;
@@ -544,8 +526,7 @@ void Board::printCurrentBoard() {
   std::cout << std::endl;
 }
 
-Move Board::generateMove(int position, int moveToPosition, Piece promotionPiece,
-                         MoveType moveType) {
+Move Board::generateMove(int position, int moveToPosition, Piece promotionPiece, MoveType moveType) {
   Move move{};
   move.moveSquare = moveToPosition;
   move.square = position;
