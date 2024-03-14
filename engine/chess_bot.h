@@ -11,5 +11,5 @@ class ChessBot {
 
  private:
   int search(Board& boardManager, int depth, int alpha, int beta, int ply, Move& bestMove);
-  int eval(Board& board);
+  static int eval(Board& board);
 };

@@ -30,7 +30,7 @@ uint64_t perft(Board& boardManager, int depth, bool player) {
   return nodes;
 }
 
-int split_perft(Board& boardManager, int depth, bool player) {
+uint64_t split_perft(Board& boardManager, int depth, bool player) {
   if (depth == 0) {
     return 0;
   }
@@ -73,7 +73,7 @@ TEST(MoveGenTest, PerftTest) {
 
     myBoard.readFen(settings[0]);
 
-    int result = perft(myBoard, 4, myBoard.player == WHITE);
+    auto result = perft(myBoard, 4, myBoard.player == WHITE);
     ASSERT_EQ(result, std::stoi(settings[4].substr(3)));
   }
 }

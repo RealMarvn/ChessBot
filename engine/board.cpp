@@ -5,7 +5,6 @@
 #include "board.h"
 
 #include "./chess_bot.h"
-#include "./movement/move_gen.h"
 
 bool Board::isKingInCheck(bool pieceColor) {
   // Get King moveSquare
@@ -434,16 +433,16 @@ void Board::readFen(std::string input) {
     player = BLACK;
   }
 
-  if (fenSettings[2].contains('K')) {
+  if (fenSettings[2].find('K') != std::string::npos) {
     boardSettings.whiteKingSide = true;
   }
-  if (fenSettings[2].contains('Q')) {
+  if (fenSettings[2].find('Q') != std::string::npos) {
     boardSettings.whiteQueenSide = true;
   }
-  if (fenSettings[2].contains('k')) {
+  if (fenSettings[2].find('k') != std::string::npos) {
     boardSettings.blackKingSide = true;
   }
-  if (fenSettings[2].contains('q')) {
+  if (fenSettings[2].find('q') != std::string::npos) {
     boardSettings.blackQueenSide = true;
   }
 
