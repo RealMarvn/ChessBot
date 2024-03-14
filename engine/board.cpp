@@ -4,8 +4,79 @@
 
 #include "board.h"
 
-Board::Board() : player(WHITE), board{Piece()} {
-  readFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+#include "./movement/move_gen.h"
+#include "./chess_bot.h"
+
+bool Board::isKingInCheck(bool pieceColor) {
+  // Get King moveSquare
+  for (int y = 8; y >= 1; y--) {
+    for (int x = 1; x <= 8; x++) {
+      if (board[calculatePosition(x, y)].pieceType == (pieceColor ? WK : BK)) {
+        return isSquareAttacked({x, y}, pieceColor);
+      }
+    }
+  }
+
+  return false;
+}
+
+bool Board::isSquareAttacked(std::pair<int, int> square, bool pieceColor) {
+  PseudoLegalMoves allKnightMoves;
+  PseudoLegalMoves allPawnMoves;
+  PseudoLegalMoves allBishopMoves;
+  PseudoLegalMoves allRookMoves;
+
+  moveGenUtils::getAllPossibleKnightMoves(square, *this, allKnightMoves, pieceColor);
+  for (Move& move : allKnightMoves) {
+    if (move.capturedPiece.pieceType == WN ||
+        move.capturedPiece.pieceType == BN) {
+      return true;
+    }
+  }
+
+  moveGenUtils::getAllPossiblePawnMoves(square, *this, allPawnMoves, pieceColor);
+  for (Move& move : allPawnMoves) {
+    if (move.capturedPiece.pieceType == WP ||
+        move.capturedPiece.pieceType == BP) {
+      return true;
+    }
+  }
+
+  moveGenUtils::getAllPossibleBishopMoves(square, *this, allBishopMoves, pieceColor);
+  for (Move& move : allBishopMoves) {
+    if (move.capturedPiece.pieceType == WB ||
+        move.capturedPiece.pieceType == BB ||
+        move.capturedPiece.pieceType == WQ ||
+        move.capturedPiece.pieceType == BQ) {
+      return true;
+    }
+  }
+
+  moveGenUtils::getAllPossibleRookMoves(square, *this, allRookMoves, pieceColor);
+  for (Move& move : allRookMoves) {
+    if (move.capturedPiece.pieceType == WR ||
+        move.capturedPiece.pieceType == BR ||
+        move.capturedPiece.pieceType == WQ ||
+        move.capturedPiece.pieceType == BQ) {
+      return true;
+    }
+  }
+
+  std::pair<int, int> directions[8] = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1},
+                                       {0, 1},   {1, -1}, {1, 0},  {1, 1}};
+
+  for (const auto& dir : directions) {
+    int x = square.first + dir.first;
+    int y = square.second + dir.second;
+    if (x > 0 && y > 0 && x < 9 && y < 9) {
+      if (board[calculatePosition(x, y)].pieceType ==
+          (pieceColor ? BK : WK)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 bool Board::popLastMove() {
@@ -142,23 +213,17 @@ void Board::handleCastlingPermissions(Move& move) {
   }
 }
 
-// bool Board::isCheckMate(bool isWhite) {
-//   for (int row = 8; row >= 1; row--) {
-//     for (int column = 1; column <= 8; column++) {
-//       if (isWhite && board[calculatePosition(column, row)].isWhite()) {
-//         if (getPossibleMoves(column, row) > 0) {
-//           return false;
-//         }
-//       }
-//       if (!isWhite && (!board[calculatePosition(column, row)].isWhite())) {
-//         if (getPossibleMoves(column, row) > 0) {
-//           return false;
-//         }
-//       }
-//     }
-//   }
-//   return true;
-// }
+bool Board::isCheckMate(bool isWhite) {
+  int counter = 0;
+  for (Move& move : moveGenUtils::getAllPseudoLegalMoves(*this, isWhite)) {
+    makeMove(move);
+    if (!isKingInCheck(isWhite)) {
+      counter++;
+    }
+    popLastMove();
+  }
+  return counter == 0;
+}
 
 bool Board::movePiece(char fig, int x, int y, int move_x, int move_y,
                       bool capture, char promotion_figure) {
@@ -212,10 +277,6 @@ bool Board::canMove(char fig, int x, int y, int move_x, int move_y,
   if (board[position].toChar() != fig) {
     return false;
   }
-
-  //  if (canCastle(x, y, move_x, move_y)) {
-  //    return true;
-  //  }
 
   // Check if capture an empty field or a field without a capture
   if ((board[move].pieceType != EMPTY && !capture) ||
@@ -308,75 +369,6 @@ bool Board::isPathClear(int startX, int startY, int endX, int endY,
 
   return true;
 }
-
-bool Board::isWhiteKingInDanger() {
-  int whiteKingPositionX = 0;
-  int whiteKingPositionY = 0;
-
-  // Get King moveSquare
-  for (int y = 8; y >= 1; y--) {
-    for (int x = 1; x <= 8; x++) {
-      if (board[calculatePosition(x, y)].pieceType == WK) {
-        whiteKingPositionX = x;
-        whiteKingPositionY = y;
-      }
-    }
-  }
-
-  for (int y = 8; y >= 1; y--) {
-    for (int x = 1; x <= 8; x++) {
-      Piece figure = board[calculatePosition(x, y)];
-      if (!figure.isWhite()) {
-        if (canMove(figure.toChar(), x, y, whiteKingPositionX,
-                    whiteKingPositionY, true)) {
-          return true;
-        }
-      }
-    }
-  }
-
-  return false;
-}
-
-bool Board::isBlackKingInDanger() {
-  int blackKingPositionX = 0;
-  int blackKingPositionY = 0;
-
-  // Get King moveSquare
-  for (int y = 8; y >= 1; y--) {
-    for (int x = 1; x <= 8; x++) {
-      if (board[calculatePosition(x, y)].pieceType == BK) {
-        blackKingPositionX = x;
-        blackKingPositionY = y;
-        break;
-      }
-    }
-  }
-
-  for (int y = 8; y >= 1; y--) {
-    for (int x = 1; x <= 8; x++) {
-      Piece figure = board[calculatePosition(x, y)];
-      if (figure.isWhite()) {
-        if (canMove(figure.toChar(), x, y, blackKingPositionX,
-                    blackKingPositionY, true)) {
-          return true;
-        }
-      }
-    }
-  }
-
-  return false;
-}
-
-// bool Board::isKingInCheck(bool isWhite) {
-//   if (isWhite && isWhiteKingInDanger()) {
-//     return isCheckMate(isWhite);
-//   }
-//   if (!isWhite && isBlackKingInDanger()) {
-//     return isCheckMate(isWhite);
-//   }
-//   return false;
-// }
 
 void Board::readFen(std::string input) {
   std::vector<std::string> fenSettings;
@@ -482,44 +474,6 @@ void Board::readFen(std::string input) {
   history.push_back(boardSettings);
 }
 
-// int Board::getPossibleMoves(int x, int y) {
-//   std::array<Piece, 64> saveBoard;
-//   saveBoard = board;
-//   //  std::memcpy(saveBoard, board, sizeof(board));
-//   PieceType piece = board[calculatePosition(x, y)];
-//   int possibleMoves = 0;
-//   for (int row = 8; row >= 1; row--) {
-//     for (int column = 1; column <= 8; column++) {
-//       if (board[calculatePosition(column, row)] == EMPTY &&
-//           canMove(piece, x, y, column, row, false)) {
-//         // Mach den Move!
-//         board[calculatePosition(column, row)] = piece;
-//         board[calculatePosition(x, y)] = EMPTY;
-//         if ((isWhitePiece(piece) && !isWhiteKingInDanger()) ||
-//             ((!isWhitePiece(piece)) && !isBlackKingInDanger())) {
-//           possibleMoves++;
-//         }
-//         board = saveBoard;
-//         //        std::memcpy(board, saveBoard, sizeof(saveBoard));
-//         continue;
-//       }
-//       if (canMove(piece, x, y, column, row, true)) {
-//         // Mach den Move!
-//         board[calculatePosition(column, row)] = piece;
-//         board[calculatePosition(x, y)] = EMPTY;
-//         if ((isWhitePiece(piece) && !isWhiteKingInDanger()) ||
-//             ((!isWhitePiece(piece)) && !isBlackKingInDanger())) {
-//           possibleMoves++;
-//         }
-//         board = saveBoard;
-//         //        std::memcpy(board, saveBoard, sizeof(saveBoard));
-//         continue;
-//       }
-//     }
-//   }
-//   return possibleMoves;
-// }
-//
 // void Board::printPossibleMoves(char fig, int x, int y) {
 //   std::array<PieceType, 64> saveBoard{};
 //   saveBoard = board;

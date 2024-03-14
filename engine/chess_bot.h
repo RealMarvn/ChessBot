@@ -3,13 +3,14 @@
 //
 
 #pragma once
-
 #include "./movement/move_gen.h"
 
-extern int pieceValue[6];
+class ChessBot {
+ public:
+  Move searchBestNextMove(Board& board, int depth);
 
-int search(Board& boardManager, int depth, int ply, Move& bestMove);
-
-int eval(Board& boardManager);
-
-Move searchBestNextMove(Board& boardManager, int depth);
+ private:
+  int search(Board& boardManager, int depth, int alpha, int beta, int ply,
+             Move& bestMove);
+  int eval(Board& board);
+};

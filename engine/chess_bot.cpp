@@ -1,32 +1,33 @@
 #include "./chess_bot.h"
 
-int eval(Board& boardManager) {
+int ChessBot::eval(Board& board) {
   int number = 0;
   for (int i = 1; i < 65; i++) {
-    Piece piece = boardManager[i];
+    Piece piece = board[i];
     number += piece.getMaterialValue();
   }
   return number;
 }
 
-int search(Board& boardManager, int depth, int alpha, int beta, int ply,
+int ChessBot::search(Board& boardManager, int depth, int alpha, int beta, int ply,
            Move& bestMove) {
   if (depth <= 0) {
     return eval(boardManager);
   }
 
-  const auto moveList =
-      getAllPseudoLegalMoves(boardManager, boardManager.player == WHITE);
+  auto moveList =
+      moveGenUtils::getAllPseudoLegalMoves(boardManager, boardManager.player == WHITE);
 
   int legalMoves = 0;
   int bestScore = -INT_MAX;
 
-  for (int i = 0; i < moveList.index; i++) {
+
+  for (Move& move : moveList) {
     int score;
 
-    boardManager.makeMove(moveList.move_list[i]);
+    boardManager.makeMove(move);
 
-    if (!isKingInCheck(boardManager.player != WHITE, boardManager)) {
+    if (!boardManager.isKingInCheck(boardManager.player != WHITE)) {
       score =
           -search(boardManager, depth - 1, -beta, -alpha, ply + 1, bestMove);
       legalMoves++;
@@ -34,7 +35,7 @@ int search(Board& boardManager, int depth, int alpha, int beta, int ply,
     boardManager.popLastMove();
 
     if (legalMoves == 0) {
-      if (isKingInCheck(boardManager.player == WHITE, boardManager)) {
+      if (boardManager.isKingInCheck(boardManager.player == WHITE)) {
         return -INT_MAX + ply;  // checkmate
       } else {
         return 0;  // stalemate
@@ -43,7 +44,7 @@ int search(Board& boardManager, int depth, int alpha, int beta, int ply,
       if (score > bestScore) {
         bestScore = score;
         if (ply == 0) {  // root
-          bestMove = moveList.move_list[i];
+          bestMove = move;
         }
       }
 
@@ -60,8 +61,8 @@ int search(Board& boardManager, int depth, int alpha, int beta, int ply,
   return bestScore;
 }
 
-Move searchBestNextMove(Board& boardManager, int depth) {
+Move ChessBot::searchBestNextMove(Board& board, int depth) {
   Move move;
-  search(boardManager, depth, -INT_MAX, INT_MAX, 0, move);
+  search(board, depth, -INT_MAX, INT_MAX, 0, move);
   return move;
 }

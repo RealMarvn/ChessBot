@@ -32,9 +32,19 @@ struct Move {
   }
 };
 
-struct AllPseudoMoves {
+class PseudoLegalMoves {
   std::array<Move, MAX_MOVES> move_list{};
   int index = 0;
+
+ public:
+
+  using iterator = std::array<Move, MAX_MOVES>::iterator;
+  iterator begin() { return move_list.begin(); }
+  iterator end() { return move_list.begin() + index; }
+  Move& operator[](int number) {
+    assert(number < index);
+    return move_list[number];
+  }
 
   void push_back(const Move& mv) {
     assert(index < MAX_MOVES);

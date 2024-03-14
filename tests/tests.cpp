@@ -15,11 +15,11 @@ uint64_t perft(Board& boardManager, int depth, bool player) {
   }
 
   uint64_t nodes = 0;
-  auto moves = getAllPseudoLegalMoves(boardManager, player);
-  for (int i = 0; i < moves.index; i++) {
-    boardManager.makeMove(moves.move_list[i]);
+  auto moves = moveGenUtils::getAllPseudoLegalMoves(boardManager, player);
+  for (Move& move : moves) {
+    boardManager.makeMove(move);
 
-    if (isKingInCheck(player, boardManager)) {
+    if (boardManager.isKingInCheck(player)) {
       boardManager.popLastMove();
       continue;
     }
@@ -38,11 +38,11 @@ int split_perft(Board& boardManager, int depth, bool player) {
   int number = 0;
 
   // Generiere die Züge für die aktuelle Position
-  auto moves = getAllPseudoLegalMoves(boardManager, player);
-  for (int i = 0; i < moves.index; i++) {
-    boardManager.makeMove(moves.move_list[i]);
+  auto moves = moveGenUtils::getAllPseudoLegalMoves(boardManager, player);
+  for (Move& move : moves) {
+    boardManager.makeMove(move);
 
-    if (isKingInCheck(player, boardManager)) {
+    if (boardManager.isKingInCheck(player)) {
       boardManager.popLastMove();
       continue;
     }
@@ -50,7 +50,7 @@ int split_perft(Board& boardManager, int depth, bool player) {
     uint64_t child_nodes = perft(boardManager, depth - 1, !player);
 
     number += child_nodes;
-    std::cout << moves.move_list[i].convertToXandY() << " - " << child_nodes
+    std::cout << move.convertToXandY() << " - " << child_nodes
               << std::endl;
     boardManager.popLastMove();
   }

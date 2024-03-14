@@ -18,6 +18,7 @@ add_executable(pk1_pruefung main.cpp
         engine/misc/piece.cpp
         engine/chess_bot.cpp
         engine/chess_bot.h
+        engine/misc/board_settings.h
 )
 
 include(FetchContent)
