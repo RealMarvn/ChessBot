@@ -3,42 +3,42 @@
 //
 #include "./move_gen.h"
 
-AllPseudoMoves getAllPseudoLegalMoves(Board& boardManager, bool player) {
-  AllPseudoMoves allPseudoMoves;
+PseudoLegalMoves moveGenUtils::getAllPseudoLegalMoves(Board& board, bool player) {
+  PseudoLegalMoves allPseudoMoves;
   for (int y = 1; y < 9; y++) {
     for (int x = 1; x < 9; x++) {
-      Piece piece = boardManager[calculatePosition(x, y)];
+      Piece piece = board[calculatePosition(x, y)];
       if (piece.pieceType != EMPTY) {
         if ((piece.isWhite() && player) || (!piece.isWhite() && !player)) {
           switch (piece.pieceType) {
             case BP:
             case WP:
-              getAllPossiblePawnMoves({x, y}, boardManager, allPseudoMoves,
+              getAllPossiblePawnMoves({x, y}, board, allPseudoMoves,
                                       player);
               break;
             case BN:
             case WN:
-              getAllPossibleKnightMoves({x, y}, boardManager, allPseudoMoves,
+              getAllPossibleKnightMoves({x, y}, board, allPseudoMoves,
                                         player);
               break;
             case BB:
             case WB:
-              getAllPossibleBishopMoves({x, y}, boardManager, allPseudoMoves,
+              getAllPossibleBishopMoves({x, y}, board, allPseudoMoves,
                                         player);
               break;
             case BR:
             case WR:
-              getAllPossibleRookMoves({x, y}, boardManager, allPseudoMoves,
+              getAllPossibleRookMoves({x, y}, board, allPseudoMoves,
                                       player);
               break;
             case BQ:
             case WQ:
-              getAllPossibleQueenMoves({x, y}, boardManager, allPseudoMoves,
+              getAllPossibleQueenMoves({x, y}, board, allPseudoMoves,
                                        player);
               break;
             case BK:
             case WK:
-              getAllPossibleKingMoves({x, y}, boardManager, allPseudoMoves,
+              getAllPossibleKingMoves({x, y}, board, allPseudoMoves,
                                       player);
               break;
             case EMPTY:
@@ -51,84 +51,9 @@ AllPseudoMoves getAllPseudoLegalMoves(Board& boardManager, bool player) {
   return allPseudoMoves;
 }
 
-bool isKingInCheck(bool pieceColor, Board& boardManager) {
-  // Get King moveSquare
-  for (int y = 8; y >= 1; y--) {
-    for (int x = 1; x <= 8; x++) {
-      if (boardManager[calculatePosition(x, y)].pieceType ==
-          (pieceColor ? WK : BK)) {
-        return isSquareAttacked({x, y}, boardManager, pieceColor);
-      }
-    }
-  }
-
-  return false;
-}
-
-bool isSquareAttacked(std::pair<int, int> square, Board& boardManager,
-                      bool pieceColor) {
-  AllPseudoMoves allKnightMoves;
-  AllPseudoMoves allPawnMoves;
-  AllPseudoMoves allBishopMoves;
-  AllPseudoMoves allRookMoves;
-
-  getAllPossibleKnightMoves(square, boardManager, allKnightMoves, pieceColor);
-  for (int i = 0; i < allKnightMoves.index; i++) {
-    if (allKnightMoves.move_list[i].capturedPiece.pieceType == WN ||
-        allKnightMoves.move_list[i].capturedPiece.pieceType == BN) {
-      return true;
-    }
-  }
-
-  getAllPossiblePawnMoves(square, boardManager, allPawnMoves, pieceColor);
-  for (int i = 0; i < allPawnMoves.index; i++) {
-    if (allPawnMoves.move_list[i].capturedPiece.pieceType == WP ||
-        allPawnMoves.move_list[i].capturedPiece.pieceType == BP) {
-      return true;
-    }
-  }
-
-  getAllPossibleBishopMoves(square, boardManager, allBishopMoves, pieceColor);
-  for (int i = 0; i < allBishopMoves.index; i++) {
-    if (allBishopMoves.move_list[i].capturedPiece.pieceType == WB ||
-        allBishopMoves.move_list[i].capturedPiece.pieceType == BB ||
-        allBishopMoves.move_list[i].capturedPiece.pieceType == WQ ||
-        allBishopMoves.move_list[i].capturedPiece.pieceType == BQ) {
-      return true;
-    }
-  }
-
-  getAllPossibleRookMoves(square, boardManager, allRookMoves, pieceColor);
-  for (int i = 0; i < allRookMoves.index; i++) {
-    if (allRookMoves.move_list[i].capturedPiece.pieceType == WR ||
-        allRookMoves.move_list[i].capturedPiece.pieceType == BR ||
-        allRookMoves.move_list[i].capturedPiece.pieceType == WQ ||
-        allRookMoves.move_list[i].capturedPiece.pieceType == BQ) {
-      return true;
-    }
-  }
-
-
-  std::pair<int, int> directions[8] = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1},
-                                       {0, 1},   {1, -1}, {1, 0},  {1, 1}};
-
-  for (const auto& dir : directions) {
-    int x = square.first + dir.first;
-    int y = square.second + dir.second;
-    if (x > 0 && y > 0 && x < 9 && y < 9) {
-      if (boardManager[calculatePosition(x, y)].pieceType ==
-          (pieceColor ? BK : WK)) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-void getAllPossibleRookMoves(std::pair<int, int> startSquare,
-                             Board& boardManager,
-                             AllPseudoMoves& allPseudoMoves, bool pieceColor) {
+void moveGenUtils::getAllPossibleRookMoves(std::pair<int, int> startSquare,
+                             Board& board,
+                             PseudoLegalMoves& allPseudoMoves, bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
 
   Move move{};
@@ -144,13 +69,13 @@ void getAllPossibleRookMoves(std::pair<int, int> startSquare,
     while (x > 0 && y > 0 && x < 9 && y < 9) {
       int position = calculatePosition(x, y);
       move.moveSquare = position;
-      move.capturedPiece = boardManager[position];
+      move.capturedPiece = board[position];
 
-      if (boardManager[position].pieceType == EMPTY) {
+      if (board[position].pieceType == EMPTY) {
         allPseudoMoves.push_back(move);
-      } else if (boardManager[position].pieceType != EMPTY) {
-        if ((pieceColor && boardManager[position].isWhite()) ||
-            (!pieceColor && !boardManager[position].isWhite())) {
+      } else if (board[position].pieceType != EMPTY) {
+        if ((pieceColor && board[position].isWhite()) ||
+            (!pieceColor && !board[position].isWhite())) {
           break;
         }
         allPseudoMoves.push_back(move);
@@ -165,9 +90,9 @@ void getAllPossibleRookMoves(std::pair<int, int> startSquare,
   }
 }
 
-void getAllPossibleBishopMoves(std::pair<int, int> startSquare,
-                               Board& boardManager,
-                               AllPseudoMoves& allPseudoMoves,
+void moveGenUtils::getAllPossibleBishopMoves(std::pair<int, int> startSquare,
+                               Board& board,
+                               PseudoLegalMoves& allPseudoMoves,
                                bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
 
@@ -184,13 +109,13 @@ void getAllPossibleBishopMoves(std::pair<int, int> startSquare,
     while (x > 0 && y > 0 && x < 9 && y < 9) {
       int position = calculatePosition(x, y);
       move.moveSquare = position;
-      move.capturedPiece = boardManager[position];
+      move.capturedPiece = board[position];
 
-      if (boardManager[position].pieceType == EMPTY) {
+      if (board[position].pieceType == EMPTY) {
         allPseudoMoves.push_back(move);
-      } else if (boardManager[position].pieceType != EMPTY) {
-        if ((pieceColor && boardManager[position].isWhite()) ||
-            (!pieceColor && !boardManager[position].isWhite())) {
+      } else if (board[position].pieceType != EMPTY) {
+        if ((pieceColor && board[position].isWhite()) ||
+            (!pieceColor && !board[position].isWhite())) {
           break;
         }
         allPseudoMoves.push_back(move);
@@ -205,9 +130,9 @@ void getAllPossibleBishopMoves(std::pair<int, int> startSquare,
   }
 }
 
-void getAllPossibleQueenMoves(std::pair<int, int> startSquare,
-                              Board& boardManager,
-                              AllPseudoMoves& allPseudoMoves, bool pieceColor) {
+void moveGenUtils::getAllPossibleQueenMoves(std::pair<int, int> startSquare,
+                              Board& board,
+                              PseudoLegalMoves& allPseudoMoves, bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
 
   Move move{};
@@ -224,13 +149,13 @@ void getAllPossibleQueenMoves(std::pair<int, int> startSquare,
     while (x > 0 && y > 0 && x < 9 && y < 9) {
       int position = calculatePosition(x, y);
       move.moveSquare = position;
-      move.capturedPiece = boardManager[position];
+      move.capturedPiece = board[position];
 
-      if (boardManager[position].pieceType == EMPTY) {
+      if (board[position].pieceType == EMPTY) {
         allPseudoMoves.push_back(move);
-      } else if (boardManager[position].pieceType != EMPTY) {
-        if ((pieceColor && boardManager[position].isWhite()) ||
-            (!pieceColor && !boardManager[position].isWhite())) {
+      } else if (board[position].pieceType != EMPTY) {
+        if ((pieceColor && board[position].isWhite()) ||
+            (!pieceColor && !board[position].isWhite())) {
           break;
         }
         allPseudoMoves.push_back(move);
@@ -245,9 +170,9 @@ void getAllPossibleQueenMoves(std::pair<int, int> startSquare,
   }
 }
 
-void getAllPossibleKingMoves(std::pair<int, int> startSquare,
-                             Board& boardManager,
-                             AllPseudoMoves& allPseudoMoves, bool pieceColor) {
+void moveGenUtils::getAllPossibleKingMoves(std::pair<int, int> startSquare,
+                             Board& board,
+                             PseudoLegalMoves& allPseudoMoves, bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
 
   Move move{};
@@ -263,7 +188,7 @@ void getAllPossibleKingMoves(std::pair<int, int> startSquare,
     int position = calculatePosition(x, y);
 
     if (x > 0 && y > 0 && x < 9 && y < 9) {
-      Piece piece = boardManager[position];
+      Piece piece = board[position];
       if (piece.pieceType != EMPTY) {
         if ((pieceColor && piece.isWhite()) ||
             ((!pieceColor) && (!piece.isWhite()))) {
@@ -276,13 +201,13 @@ void getAllPossibleKingMoves(std::pair<int, int> startSquare,
     }
   }
 
-  if (!isKingInCheck(pieceColor, boardManager)) {
+  if (!board.isKingInCheck(pieceColor)) {
     move.capturedPiece.pieceType = EMPTY;
     move.moveType = CASTLING;
 
     // KINGSIDE
-    if ((pieceColor && boardManager.boardSettings.whiteKingSide) ||
-        (!pieceColor && boardManager.boardSettings.blackKingSide)) {
+    if ((pieceColor && board.boardSettings.whiteKingSide) ||
+        (!pieceColor && board.boardSettings.blackKingSide)) {
       int x = startSquare.first;
       int y = startSquare.second;
       bool canCastle = true;
@@ -290,8 +215,8 @@ void getAllPossibleKingMoves(std::pair<int, int> startSquare,
       for (int i = 1; i < 3; i++) {
         int position = calculatePosition(x + i, y);
 
-        if (boardManager[position].pieceType != EMPTY ||
-            isSquareAttacked({x + i, y}, boardManager, pieceColor)) {
+        if (board[position].pieceType != EMPTY ||
+            board.isSquareAttacked({x + i, y}, pieceColor)) {
           canCastle = false;
           break;
         }
@@ -304,8 +229,8 @@ void getAllPossibleKingMoves(std::pair<int, int> startSquare,
     }
 
     // QUEENSIDE
-    if ((pieceColor && boardManager.boardSettings.whiteQueenSide) ||
-        (!pieceColor && boardManager.boardSettings.blackQueenSide)) {
+    if ((pieceColor && board.boardSettings.whiteQueenSide) ||
+        (!pieceColor && board.boardSettings.blackQueenSide)) {
       int x = startSquare.first;
       int y = startSquare.second;
       bool canCastle = true;
@@ -313,13 +238,13 @@ void getAllPossibleKingMoves(std::pair<int, int> startSquare,
       for (int i = 1; i < 4; i++) {
         int position = calculatePosition(x - i, y);
 
-        if (boardManager[position].pieceType != EMPTY) {
+        if (board[position].pieceType != EMPTY) {
           canCastle = false;
           break;
         }
 
         if (i < 3) {
-          if (isSquareAttacked({x - i, y}, boardManager, pieceColor)) {
+          if (board.isSquareAttacked({x - i, y}, pieceColor)) {
             canCastle = false;
             break;
           }
@@ -334,9 +259,9 @@ void getAllPossibleKingMoves(std::pair<int, int> startSquare,
   }
 }
 
-void getAllPossibleKnightMoves(std::pair<int, int> startSquare,
-                               Board& boardManager,
-                               AllPseudoMoves& allPseudoMoves,
+void moveGenUtils::getAllPossibleKnightMoves(std::pair<int, int> startSquare,
+                               Board& board,
+                               PseudoLegalMoves& allPseudoMoves,
                                bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
 
@@ -353,7 +278,7 @@ void getAllPossibleKnightMoves(std::pair<int, int> startSquare,
     int position = calculatePosition(x, y);
 
     if (x > 0 && y > 0 && x < 9 && y < 9) {
-      Piece piece = boardManager[position];
+      Piece piece = board[position];
       if (piece.pieceType != EMPTY) {
         if ((pieceColor && piece.isWhite()) ||
             ((!pieceColor) && (!piece.isWhite()))) {
@@ -361,15 +286,15 @@ void getAllPossibleKnightMoves(std::pair<int, int> startSquare,
         }
       }
       move.moveSquare = position;
-      move.capturedPiece = boardManager[position];
+      move.capturedPiece = board[position];
       allPseudoMoves.push_back(move);
     }
   }
 }
 
-void getAllPossiblePawnMoves(std::pair<int, int> startSquare,
-                             Board& boardManager,
-                             AllPseudoMoves& allPseudoMoves, bool pieceColor) {
+void moveGenUtils::getAllPossiblePawnMoves(std::pair<int, int> startSquare,
+                             Board& board,
+                             PseudoLegalMoves& allPseudoMoves, bool pieceColor) {
   int old_position = calculatePosition(startSquare.first, startSquare.second);
 
   std::pair<int, int> directions[4] = {{0, 1}, {-1, 1}, {1, 1}, {0, 2}};
@@ -390,7 +315,7 @@ void getAllPossiblePawnMoves(std::pair<int, int> startSquare,
     int position = calculatePosition(x, y);
 
     if (x > 0 && y > 0 && x < 9 && y < 9) {
-      Piece piece = boardManager[calculatePosition(x, y)];
+      Piece piece = board[calculatePosition(x, y)];
       if (dir.first != 0 && dir.second != 0) {
         if (piece.pieceType != EMPTY) {
           if ((pieceColor && piece.isWhite()) ||
@@ -404,21 +329,21 @@ void getAllPossiblePawnMoves(std::pair<int, int> startSquare,
                   (pieceColor ? whitePawnPossiblePromotions[promotionIndex]
                               : blackPawnPossiblePromotions[promotionIndex]);
               move.moveSquare = position;
-              move.capturedPiece = boardManager[position];
+              move.capturedPiece = board[position];
               allPseudoMoves.push_back(move);
             }
             continue;
           }
 
           move.moveSquare = position;
-          move.capturedPiece = boardManager[position];
+          move.capturedPiece = board[position];
           allPseudoMoves.push_back(move);
         } else {
-          if (boardManager.boardSettings.epSquare != 100 &&
-              calculatePosition(x, y) == boardManager.boardSettings.epSquare) {
+          if (board.boardSettings.epSquare != 100 &&
+              calculatePosition(x, y) == board.boardSettings.epSquare) {
             move.moveType = EN_PASSANT;
             move.moveSquare = position;
-            move.capturedPiece = boardManager[position];
+            move.capturedPiece = board[position];
             allPseudoMoves.push_back(move);
           }
         }
@@ -427,11 +352,11 @@ void getAllPossiblePawnMoves(std::pair<int, int> startSquare,
         if (dir.second == 2) {
           if ((pieceColor && startSquare.second == 2) ||
               (!pieceColor && startSquare.second == 7)) {
-            if (boardManager[calculatePosition(
+            if (board[calculatePosition(
                                  x, startSquare.second + (pieceColor ? 1 : -1))]
                     .pieceType == EMPTY) {
               move.moveSquare = position;
-              move.capturedPiece = boardManager[position];
+              move.capturedPiece = board[position];
               allPseudoMoves.push_back(move);
             }
           }
@@ -445,14 +370,14 @@ void getAllPossiblePawnMoves(std::pair<int, int> startSquare,
                 (pieceColor ? whitePawnPossiblePromotions[promotionIndex]
                             : blackPawnPossiblePromotions[promotionIndex]);
             move.moveSquare = position;
-            move.capturedPiece = boardManager[position];
+            move.capturedPiece = board[position];
             allPseudoMoves.push_back(move);
           }
           continue;
         }
 
         move.moveSquare = position;
-        move.capturedPiece = boardManager[position];
+        move.capturedPiece = board[position];
         allPseudoMoves.push_back(move);
       }
     }

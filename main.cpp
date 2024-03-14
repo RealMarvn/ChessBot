@@ -2,63 +2,15 @@
 
 #include "./engine/chess_bot.h"
 
-uint64_t perft(Board& boardManager, int depth, bool player) {
-  if (depth == 0) {
-    return 1;
-  }
-
-  uint64_t nodes = 0;
-  auto moves = getAllPseudoLegalMoves(boardManager, player);
-  for (int i = 0; i < moves.index; i++) {
-    boardManager.makeMove(moves.move_list[i]);
-
-    if (isKingInCheck(player, boardManager)) {
-      boardManager.popLastMove();
-      continue;
-    }
-    nodes += perft(boardManager, depth - 1, !player);
-    boardManager.popLastMove();
-  }
-
-  return nodes;
-}
-
-int split_perft(Board& boardManager, int depth, bool player) {
-  if (depth == 0) {
-    return 0;
-  }
-
-  int number = 0;
-
-  // Generiere die Züge für die aktuelle Position
-  auto moves = getAllPseudoLegalMoves(boardManager, player);
-  for (int i = 0; i < moves.index; i++) {
-    boardManager.makeMove(moves.move_list[i]);
-
-    if (isKingInCheck(player, boardManager)) {
-      boardManager.popLastMove();
-      continue;
-    }
-
-    uint64_t child_nodes = perft(boardManager, depth - 1, !player);
-
-    number += child_nodes;
-    std::cout << moves.move_list[i].convertToXandY() << " - " << child_nodes
-              << std::endl;
-    boardManager.popLastMove();
-  }
-  return number;
-}
-
 int main() {
-  const auto board = std::make_unique<Board>();
+  auto board = std::make_unique<Board>();
+  auto chessBot = ChessBot();
   board->printCurrentBoard();
   std::string input;
   while (getline(std::cin, input)) {
     if (input[0] == 'B') {
       board->readFen(input.substr(1, input.length()));
       board->printCurrentBoard();
-      split_perft(*board, 1, true);
       continue;
     }
 
@@ -94,12 +46,11 @@ int main() {
       promotion_figure = input[6];
     }
 
-    board->movePiece(figure, col, row, move_col, move_row, capture,
-                     promotion_figure);
-
-    auto move = searchBestNextMove(*board, 5);
-    board->makeMove(move);
-    board->printCurrentBoard();
+    if (board->movePiece(figure, col, row, move_col, move_row, capture,
+                         promotion_figure)) {
+      board->makeMove(chessBot.searchBestNextMove(*board, 5));
+      board->printCurrentBoard();
+    }
   }
   return EXIT_SUCCESS;
 }
