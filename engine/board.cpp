@@ -217,34 +217,60 @@ bool Board::movePiece(char fig, int x, int y, int move_x, int move_y, bool captu
     return false;
   }
 
-  if (!canMove(fig, x, y, move_x, move_y, capture)) {
+  MoveType moveType = NORMAL;
+  int position = calculatePosition(x, y);
+  int movePosition = calculatePosition(move_x, move_y);
+
+  if (movePosition == boardSettings.epSquare) {
+    moveType = EN_PASSANT;
+  }
+
+  if (promotion_figure != ' ') {
+    moveType = PROMOTION;
+  }
+
+  // Check if moveSquare is out of bounds!
+  if (position < 0 || position > 63 || movePosition < 0 || movePosition > 63) {
     std::cout << "invalid" << std::endl;
     return false;
   }
 
-  bool promotion = false;
-  int position = calculatePosition(x, y);
-  int movePosition = calculatePosition(move_x, move_y);
+  // Check if movingPiece is really that movingPiece.
+  if (board[position].toChar() != fig) {
+    std::cout << "invalid" << std::endl;
+    return false;
+  }
 
-  if (promotion_figure != ' ') {
-    if (!canPawnPromote(player == WHITE, fig, promotion_figure, movePosition)) {
+  // Check if capture an empty field or a field without a capture
+  if ((board[movePosition].pieceType != EMPTY && !capture) || (capture && board[movePosition].pieceType == EMPTY)) {
+    std::cout << "invalid" << std::endl;
+    return false;
+  }
+
+  if (capture) {
+    // Check if you try to capture your own team.
+    if ((board[position].isWhite() && board[movePosition].isWhite()) ||
+        ((!board[position].isWhite()) && (!board[movePosition].isWhite()))) {
       std::cout << "invalid" << std::endl;
       return false;
     }
-    promotion = true;
   }
 
-  //TODO use MOVEGEN instead of canMove
-  Move move = buildMove(position, movePosition, findKeyByValue(promotion_figure), promotion ? PROMOTION : NORMAL);
-  makeMove(move);
+  // TODO add casteling
+  Move move = buildMove(position, movePosition, findKeyByValue(promotion_figure), moveType);
+  if (moveGenUtils::getAllPseudoLegalMoves(*this, player == WHITE).contains(move)) {
+    makeMove(move);
+    return true;
+  } else {
+    std::cout << "invalid" << std::endl;
+    return false;
+  }
 
   //  if (isKingInCheck(player == WHITE)) {
   //    std::cout << "King is in check" << std::endl;
   //  } else {
   //    std::cout << "No one is in check" << std::endl;
   //  }
-
-  return true;
 }
 
 bool Board::canMove(char fig, int x, int y, int move_x, int move_y, bool capture) {
