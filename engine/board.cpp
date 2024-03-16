@@ -7,7 +7,6 @@
 #include "./chess_bot.h"
 
 bool Board::isKingInCheck(bool pieceColor) {
-  // Get King moveSquare
   for (int y = 8; y >= 1; y--) {
     for (int x = 1; x <= 8; x++) {
       if (board[calculatePosition(x, y)].pieceType == (pieceColor ? WK : BK)) {
@@ -235,7 +234,8 @@ bool Board::movePiece(char fig, int x, int y, int move_x, int move_y, bool captu
     promotion = true;
   }
 
-  Move move = generateMove(position, movePosition, findKeyByValue(promotion_figure), promotion ? PROMOTION : NORMAL);
+  //TODO use MOVEGEN instead of canMove
+  Move move = buildMove(position, movePosition, findKeyByValue(promotion_figure), promotion ? PROMOTION : NORMAL);
   makeMove(move);
 
   //  if (isKingInCheck(player == WHITE)) {
@@ -455,53 +455,6 @@ void Board::readFen(std::string input) {
   history.push_back(boardSettings);
 }
 
-// void Board::printPossibleMoves(char fig, int x, int y) {
-//   std::array<PieceType, 64> saveBoard{};
-//   saveBoard = board;
-//   //  std::memcpy(saveBoard, board, sizeof(board));
-//   PieceType figure = board[calculatePosition(x, y)];
-//
-//   for (int row = 8; row >= 1; row--) {
-//     for (int column = 1; column <= 8; column++) {
-//       if (board[calculatePosition(column, row)] == EMPTY &&
-//           canMove(fig, x, y, column, row, false)) {
-//         // Mach den Move!
-//         board[calculatePosition(column, row)] = figure;
-//         board[calculatePosition(x, y)] = EMPTY;
-//         if ((isupper(fig) && !isWhiteKingInDanger()) ||
-//             (islower(fig) && !isBlackKingInDanger())) {
-//           std::cout << "[o]";
-//           board = saveBoard;
-//           //          std::memcpy(board, saveBoard, sizeof(saveBoard));
-//           continue;
-//         }
-//         board = saveBoard;
-//         //        std::memcpy(board, saveBoard, sizeof(saveBoard));
-//       }
-//       if (canMove(fig, x, y, column, row, true)) {
-//         // Mach den Move!
-//         board[calculatePosition(column, row)] = figure;
-//         board[calculatePosition(x, y)] = EMPTY;
-//         if ((isupper(fig) && !isWhiteKingInDanger()) ||
-//             (islower(fig) && !isBlackKingInDanger())) {
-//           std::cout << "[x]";
-//           board = saveBoard;
-//           //          std::memcpy(board, saveBoard, sizeof(saveBoard));
-//           continue;
-//         }
-//         board = saveBoard;
-//         //        std::memcpy(board, saveBoard, sizeof(saveBoard));
-//       }
-//       std::cout << "[" << pieceToCharMap[board[calculatePosition(x, y)]] <<
-//       "]"; board = saveBoard;
-//       //      std::memcpy(board, saveBoard, sizeof(saveBoard));
-//     }
-//     std::cout << std::endl;
-//   }
-//   board = saveBoard;
-//   //  std::memcpy(board, saveBoard, sizeof(saveBoard));
-// }
-
 void Board::printCurrentBoard() {
   if (player == WHITE) {
     std::cout << "Current turn: "
@@ -525,7 +478,7 @@ void Board::printCurrentBoard() {
   std::cout << std::endl;
 }
 
-Move Board::generateMove(int position, int moveToPosition, Piece promotionPiece, MoveType moveType) {
+Move Board::buildMove(int position, int moveToPosition, Piece promotionPiece, MoveType moveType) {
   Move move{};
   move.moveSquare = moveToPosition;
   move.square = position;

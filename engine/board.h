@@ -14,9 +14,8 @@
 #include "./misc/board_settings.h"
 #include "./misc/move.h"
 #include "./misc/piece.h"
+#include "./misc/player.h"
 #include "./movement/piece_movements.h"
-
-enum player_type { WHITE, BLACK };
 
 inline int calculatePosition(int x, int y) { return ((y - 1) * 8 + x) - 1; }
 
@@ -41,12 +40,11 @@ class Board {
   bool isSquareAttacked(std::pair<int, int> square, bool pieceColor);
   bool movePiece(char fig, int x, int y, int move_x, int move_y, bool capture, char promotion_figure);
   void makeMove(Move move);
-  Move generateMove(int position, int moveToPosition, Piece promotionPiece, MoveType moveType);
+  Move buildMove(int position, int moveToPosition, Piece promotionPiece, MoveType moveType);
   bool popLastMove();
   void printCurrentBoard();
   void readFen(std::string input);
   bool isCheckMate(bool isWhite);
-  //  void printPossibleMoves(char fig, int x, int y);
 
  private:
   void handleCastlingPermissions(Move& move);

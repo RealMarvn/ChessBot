@@ -29,6 +29,11 @@ struct Move {
         << (moveSquare) / 8 + 1;
     return out.str();
   }
+
+  bool operator==(const Move& other) const {
+    return moveSquare == other.moveSquare && square == other.square && movingPiece.pieceType == other.movingPiece.pieceType
+           && capturedPiece.pieceType == other.capturedPiece.pieceType && promotionPiece.pieceType == other.promotionPiece.pieceType && moveType == other.moveType;
+  }
 };
 
 class PseudoLegalMoves {
@@ -48,5 +53,9 @@ class PseudoLegalMoves {
     assert(index < MAX_MOVES);
     move_list[index] = mv;
     ++index;
+  }
+
+  bool contains(const Move& mv) {
+    return std::find(begin(), end(), mv) != end();
   }
 };
