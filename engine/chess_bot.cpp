@@ -62,8 +62,8 @@ int ChessBot::eval(Board& board) {
     }
   }
 
-  int mgScore = mg[0] - mg[1];
-  int egScore = eg[0] - eg[1];
+  int mgScore = mg[board.player == WHITE] - mg[board.player != WHITE];
+  int egScore = eg[board.player == WHITE] - eg[board.player != WHITE];
   int mgPhase = gamePhase;
   if (mgPhase > 24) mgPhase = 24;
   int egPhase = 24 - mgPhase;
