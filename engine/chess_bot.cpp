@@ -8,64 +8,64 @@ int ChessBot::eval(Board& board) {
   for (int i = 0; i < 64; i++) {
     Piece piece = board[i];
     materialValue += piece.getMaterialValue();
-        switch (piece.pieceType) {
-          case WP:
-            mg[0] += mg_pawn_table[i];
-            gamePhase += gamePhaseInc[piece.pieceType];
-            break;
-          case WN:
-            mg[0] += mg_knight_table[i];
-            gamePhase += gamePhaseInc[piece.pieceType];
-            break;
-          case WB:
-            mg[0] += mg_bishop_table[i];
-            gamePhase += gamePhaseInc[piece.pieceType];
-            break;
-          case WR:
-            mg[0] += mg_rook_table[i];
-            gamePhase += gamePhaseInc[piece.pieceType];
-            break;
-          case WQ:
-            mg[0] += mg_queen_table[i];
-            gamePhase += gamePhaseInc[piece.pieceType];
-            break;
-          case WK:
-            mg[0] += mg_king_table[i];
-            gamePhase += gamePhaseInc[piece.pieceType];
-            break;
-          case BP:
-            mg[1] += mg_pawn_table[i];
-            gamePhase += gamePhaseInc[piece.pieceType];
-            break;
-          case BN:
-            mg[1] += mg_knight_table[i];
-            gamePhase += gamePhaseInc[piece.pieceType];
-            break;
-          case BB:
-            mg[1] += mg_bishop_table[i];
-            gamePhase += gamePhaseInc[piece.pieceType];
-            break;
-          case BR:
-            mg[1] += mg_rook_table[i];
-            gamePhase += gamePhaseInc[piece.pieceType];
-            break;
-          case BQ:
-            mg[1] += mg_queen_table[i];
-            gamePhase += gamePhaseInc[piece.pieceType];
-            break;
-          case BK:
-            mg[1] += mg_king_table[i];
-            gamePhase += gamePhaseInc[piece.pieceType];
-            break;
-          case EMPTY:
-            break;
-        }
+    switch (piece.pieceType) {
+      case WP:
+        mg[0] += -1 * mg_pawn_table[i ^ 0b111000];
+        gamePhase += gamePhaseInc[piece.pieceType];
+        break;
+      case WN:
+        mg[0] += -1 * mg_knight_table[i ^ 0b111000];
+        gamePhase += gamePhaseInc[piece.pieceType];
+        break;
+      case WB:
+        mg[0] += -1 * mg_bishop_table[i ^ 0b111000];
+        gamePhase += gamePhaseInc[piece.pieceType];
+        break;
+      case WR:
+        mg[0] += -1 * mg_rook_table[i ^ 0b111000];
+        gamePhase += gamePhaseInc[piece.pieceType];
+        break;
+      case WQ:
+        mg[0] += -1 * mg_queen_table[i ^ 0b111000];
+        gamePhase += gamePhaseInc[piece.pieceType];
+        break;
+      case WK:
+        mg[0] += -1 * mg_king_table[i ^ 0b111000];
+        gamePhase += gamePhaseInc[piece.pieceType];
+        break;
+      case BP:
+        mg[1] += mg_pawn_table[i];
+        gamePhase += gamePhaseInc[piece.pieceType];
+        break;
+      case BN:
+        mg[1] += mg_knight_table[i];
+        gamePhase += gamePhaseInc[piece.pieceType];
+        break;
+      case BB:
+        mg[1] += mg_bishop_table[i];
+        gamePhase += gamePhaseInc[piece.pieceType];
+        break;
+      case BR:
+        mg[1] += mg_rook_table[i];
+        gamePhase += gamePhaseInc[piece.pieceType];
+        break;
+      case BQ:
+        mg[1] += mg_queen_table[i];
+        gamePhase += gamePhaseInc[piece.pieceType];
+        break;
+      case BK:
+        mg[1] += mg_king_table[i];
+        gamePhase += gamePhaseInc[piece.pieceType];
+        break;
+      case EMPTY:
+        break;
+    }
   }
 
   int mgScore = mg[0] - mg[1];
   int egScore = eg[0] - eg[1];
   int mgPhase = gamePhase;
-  if (mgPhase > 24) mgPhase = 24; /* in case of early promotion */
+  if (mgPhase > 24) mgPhase = 24;
   int egPhase = 24 - mgPhase;
 
   return ((mgScore * mgPhase + egScore * egPhase) / 24) + materialValue;
