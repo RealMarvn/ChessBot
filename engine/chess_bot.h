@@ -3,6 +3,8 @@
 //
 
 #pragma once
+#include <climits>
+
 #include "./movement/move_gen.h"
 
 class ChessBot {

@@ -16,6 +16,7 @@ void ChessGame::start() {
 
     if (input == "undo") {
       board->popLastMove();
+      board->popLastMove();
       board->printCurrentBoard();
       continue;
     }
