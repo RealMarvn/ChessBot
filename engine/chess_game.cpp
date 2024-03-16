@@ -8,7 +8,7 @@ void ChessGame::start() {
   board->printCurrentBoard();
   std::string input;
   while (getline(std::cin, input)) {
-    if (input[0] == 'B') {
+    if (input[0] == 'F') {
       board->readFen(input.substr(1, input.length()));
       board->printCurrentBoard();
       continue;
