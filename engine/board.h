@@ -10,7 +10,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <regex>
 
 #include "./misc/board_settings.h"
 #include "./misc/move.h"
