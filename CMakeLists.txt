@@ -20,6 +20,7 @@ add_executable(pk1_pruefung main.cpp
         engine/chess_game.cpp
         engine/chess_game.h
         engine/misc/player.h
+        engine/exceptions/fen_exception.h
 )
 
 include(FetchContent)
