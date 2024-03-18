@@ -8,13 +8,14 @@ void ChessGame::start() {
   board->printCurrentBoard();
   std::string input;
   while (getline(std::cin, input)) {
-    if (input[0] == 'B') {
+    if (input[0] == 'F') {
       board->readFen(input.substr(1, input.length()));
       board->printCurrentBoard();
       continue;
     }
 
     if (input == "undo") {
+      board->popLastMove();
       board->popLastMove();
       board->printCurrentBoard();
       continue;
@@ -47,8 +48,19 @@ void ChessGame::start() {
     }
 
     if (board->movePiece(figure, col, row, move_col, move_row, capture, promotion_figure)) {
+      if (board->isCheckMate(board->player == WHITE)) {
+        std::cout << "CHECK MATE!" << std::endl;
+        return;
+      }
+
       board->makeMove(bot->searchBestNextMove(*board, 5));
       board->printCurrentBoard();
+
+      if (board->isCheckMate(board->player == WHITE)) {
+        board->printCurrentBoard();
+        std::cout << "CHECK MATE!" << std::endl;
+        return;
+      }
     }
   }
 }

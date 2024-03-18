@@ -110,7 +110,7 @@ bool Board::popLastMove() {
   return true;
 }
 
-void Board::makeMove(Move move) {
+bool Board::makeMove(Move move) {
   board[move.moveSquare] = board[move.square];
   board[move.square].pieceType = EMPTY;
   boardSettings.epSquare = 100;
@@ -154,6 +154,11 @@ void Board::makeMove(Move move) {
   moves.push_back(move);
   history.push_back(boardSettings);
   player = player == WHITE ? BLACK : WHITE;
+  if (isKingInCheck(player != WHITE)) {
+    popLastMove();
+    return false;
+  }
+  return true;
 }
 
 void Board::handleCastlingPermissions(Move& move) {
@@ -202,49 +207,71 @@ void Board::handleCastlingPermissions(Move& move) {
 bool Board::isCheckMate(bool isWhite) {
   int counter = 0;
   for (Move& move : moveGenUtils::getAllPseudoLegalMoves(*this, isWhite)) {
-    makeMove(move);
-    if (!isKingInCheck(isWhite)) {
+    if (makeMove(move)) {
       counter++;
+      popLastMove();
     }
-    popLastMove();
   }
   return counter == 0;
 }
 
 bool Board::movePiece(char fig, int x, int y, int move_x, int move_y, bool capture, char promotion_figure) {
   if ((player == BLACK && isupper(fig)) || (player == WHITE && islower(fig))) {
-    std::cout << "invalid" << std::endl;
+    std::cout << "invalid." << std::endl;
     return false;
   }
 
-  if (!canMove(fig, x, y, move_x, move_y, capture)) {
-    std::cout << "invalid" << std::endl;
-    return false;
-  }
-
-  bool promotion = false;
+  MoveType moveType = NORMAL;
   int position = calculatePosition(x, y);
   int movePosition = calculatePosition(move_x, move_y);
 
+  if (movePosition == boardSettings.epSquare) {
+    moveType = EN_PASSANT;
+  }
+
   if (promotion_figure != ' ') {
-    if (!canPawnPromote(player == WHITE, fig, promotion_figure, movePosition)) {
+    moveType = PROMOTION;
+  }
+
+  // Check if moveSquare is out of bounds!
+  if (position < 0 || position > 63 || movePosition < 0 || movePosition > 63) {
+    std::cout << "invalid" << std::endl;
+    return false;
+  }
+
+  // Check if movingPiece is really that movingPiece.
+  if (board[position].toChar() != fig) {
+    std::cout << "invalid" << std::endl;
+    return false;
+  }
+
+  // Check if capture an empty field or a field without a capture
+  if ((board[movePosition].pieceType != EMPTY && !capture) || (capture && board[movePosition].pieceType == EMPTY)) {
+    std::cout << "invalid" << std::endl;
+    return false;
+  }
+
+  if (capture) {
+    // Check if you try to capture your own team.
+    if ((board[position].isWhite() && board[movePosition].isWhite()) ||
+        ((!board[position].isWhite()) && (!board[movePosition].isWhite()))) {
       std::cout << "invalid" << std::endl;
       return false;
     }
-    promotion = true;
   }
 
-  //TODO use MOVEGEN instead of canMove
-  Move move = buildMove(position, movePosition, findKeyByValue(promotion_figure), promotion ? PROMOTION : NORMAL);
-  makeMove(move);
-
-  //  if (isKingInCheck(player == WHITE)) {
-  //    std::cout << "King is in check" << std::endl;
-  //  } else {
-  //    std::cout << "No one is in check" << std::endl;
-  //  }
-
-  return true;
+  // TODO add casteling
+  Move move = buildMove(position, movePosition, findKeyByValue(promotion_figure), moveType);
+  if (moveGenUtils::getAllPseudoLegalMoves(*this, player == WHITE).contains(move)) {
+    if (!makeMove(move)) {
+      std::cout << "Move not legal! Check your king!" << std::endl;
+      return false;
+    }
+    return true;
+  } else {
+    std::cout << "invalid" << std::endl;
+    return false;
+  }
 }
 
 bool Board::canMove(char fig, int x, int y, int move_x, int move_y, bool capture) {
