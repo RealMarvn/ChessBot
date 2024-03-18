@@ -11,8 +11,6 @@ add_executable(pk1_pruefung main.cpp
         engine/board.h
         engine/movement/move_gen.cpp
         engine/movement/move_gen.h
-        engine/movement/piece_movements.h
-        engine/movement/piece_movements.cpp
         engine/misc/move.h
         engine/misc/piece.h
         engine/misc/piece.cpp
@@ -39,8 +37,6 @@ add_executable(tests tests/tests.cpp
         engine/board.h
         engine/movement/move_gen.cpp
         engine/movement/move_gen.h
-        engine/movement/piece_movements.h
-        engine/movement/piece_movements.cpp
         engine/misc/move.h
         engine/misc/piece.h
         engine/misc/piece.cpp

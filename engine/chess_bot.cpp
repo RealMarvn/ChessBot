@@ -79,33 +79,39 @@ int ChessBot::search(Board& boardManager, int depth, int alpha, int beta, int pl
   auto moveList = moveGenUtils::getAllPseudoLegalMoves(boardManager, boardManager.player == WHITE);
 
   int legalMoves = 0;
+  // First best score should be the worst.
   int bestScore = -INT_MAX;
 
   for (Move& move : moveList) {
     int score{0};
 
+    // Make every move and gather the value of the opponent.
     if (boardManager.makeMove(move)) {
       score = -search(boardManager, depth - 1, -beta, -alpha, ply + 1, bestMove);
       legalMoves++;
       boardManager.popLastMove();
     }
 
+    // Set best score if the current one is less.
     if (score > bestScore) {
       bestScore = score;
-      if (ply == 0) {  // root
+      if (ply == 0) { // Set best move if it is the root.
         bestMove = move;
       }
     }
+
+    // ALPHA BETA PRUNING
 
     if (bestScore > alpha) {
       alpha = bestScore;
     }
 
     if (alpha >= beta) {
-      break;  // beta killen
+      break;  // beta kill
     }
   }
 
+  // If no legal moves
   if (legalMoves == 0) {
     if (boardManager.isKingInCheck(boardManager.player == WHITE)) {
       return -INT_MAX + ply;  // checkmate

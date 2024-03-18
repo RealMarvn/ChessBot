@@ -5,7 +5,9 @@
 #pragma once
 
 struct board_setting {
+  // EP square
   int epSquare{100};
+  // Castling moves.
   bool whiteQueenSide{false};
   bool whiteKingSide{false};
   bool blackQueenSide{false};

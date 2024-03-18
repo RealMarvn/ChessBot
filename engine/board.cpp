@@ -9,7 +9,7 @@
 bool Board::isKingInCheck(bool pieceColor) {
   for (int y = 8; y >= 1; y--) {
     for (int x = 1; x <= 8; x++) {
-      if (board[calculatePosition(x, y)].pieceType == (pieceColor ? WK : BK)) {
+      if (board[calculateSquare(x, y)].pieceType == (pieceColor ? WK : BK)) {
         return isSquareAttacked({x, y}, pieceColor);
       }
     }
@@ -23,6 +23,9 @@ bool Board::isSquareAttacked(std::pair<int, int> square, bool pieceColor) {
   PseudoLegalMoves allPawnMoves;
   PseudoLegalMoves allBishopMoves;
   PseudoLegalMoves allRookMoves;
+
+  // getALlPossible###Moves does only return captures of the opponent pieces. So no need to check again if you capture
+  // your own piece
 
   moveGenUtils::getAllPossibleKnightMoves(square, *this, allKnightMoves, pieceColor);
   for (Move& move : allKnightMoves) {
@@ -38,6 +41,7 @@ bool Board::isSquareAttacked(std::pair<int, int> square, bool pieceColor) {
     }
   }
 
+  // You also have to check for Queens because they can move like the bishop too!
   moveGenUtils::getAllPossibleBishopMoves(square, *this, allBishopMoves, pieceColor);
   for (Move& move : allBishopMoves) {
     if (move.capturedPiece.pieceType == WB || move.capturedPiece.pieceType == BB ||
@@ -46,6 +50,7 @@ bool Board::isSquareAttacked(std::pair<int, int> square, bool pieceColor) {
     }
   }
 
+  // You also have to check for Queens because they can move like the rook too!
   moveGenUtils::getAllPossibleRookMoves(square, *this, allRookMoves, pieceColor);
   for (Move& move : allRookMoves) {
     if (move.capturedPiece.pieceType == WR || move.capturedPiece.pieceType == BR ||
@@ -54,13 +59,13 @@ bool Board::isSquareAttacked(std::pair<int, int> square, bool pieceColor) {
     }
   }
 
+  // Specifically check if there is a king near you.
   std::pair<int, int> directions[8] = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
-
   for (const auto& dir : directions) {
     int x = square.first + dir.first;
     int y = square.second + dir.second;
     if (x > 0 && y > 0 && x < 9 && y < 9) {
-      if (board[calculatePosition(x, y)].pieceType == (pieceColor ? BK : WK)) {
+      if (board[calculateSquare(x, y)].pieceType == (pieceColor ? BK : WK)) {
         return true;
       }
     }
@@ -70,6 +75,7 @@ bool Board::isSquareAttacked(std::pair<int, int> square, bool pieceColor) {
 }
 
 bool Board::popLastMove() {
+  // You shouldn't be able to pop if there is nothing.
   if (moves.empty() || history.empty()) {
     return false;
   }
@@ -106,6 +112,7 @@ bool Board::popLastMove() {
 
   player = player == WHITE ? BLACK : WHITE;
 
+  // Settings reset.
   boardSettings = history.back();
   return true;
 }
@@ -145,23 +152,31 @@ bool Board::makeMove(Move move) {
 
   if (move.movingPiece.pieceType == WP || move.movingPiece.pieceType == BP) {
     if (std::abs(move.square - move.moveSquare) == 16) {
+      // Set EP square if a pawn moves exact 2 rows.
       boardSettings.epSquare = move.moveSquare + (move.movingPiece.isWhite() ? -8 : +8);
     }
   }
 
+  // Set the permissions!
   handleCastlingPermissions(move);
 
+  // Save move
   moves.push_back(move);
+  // Save settings
   history.push_back(boardSettings);
   player = player == WHITE ? BLACK : WHITE;
+
+  // Check if your king is in check after the move and pop if yes.
   if (isKingInCheck(player != WHITE)) {
     popLastMove();
     return false;
   }
+  // return true if everything is fine.
   return true;
 }
 
 void Board::handleCastlingPermissions(Move& move) {
+  // If king is moved. disable everything.
   if (move.movingPiece.pieceType == WK) {
     boardSettings.whiteQueenSide = false;
     boardSettings.whiteKingSide = false;
@@ -170,6 +185,7 @@ void Board::handleCastlingPermissions(Move& move) {
     boardSettings.blackKingSide = false;
   }
 
+  // disable permission if rook is moved.
   if (move.movingPiece.pieceType == WR) {
     if (move.square == 0) {
       boardSettings.whiteQueenSide = false;
@@ -187,6 +203,7 @@ void Board::handleCastlingPermissions(Move& move) {
     }
   }
 
+  // disable permission if rook is captured.
   if (move.capturedPiece.pieceType == WR) {
     if (move.moveSquare == 0) {
       boardSettings.whiteQueenSide = false;
@@ -216,14 +233,15 @@ bool Board::isCheckMate(bool isWhite) {
 }
 
 bool Board::movePiece(char fig, int x, int y, int move_x, int move_y, bool capture, char promotion_figure) {
+  // Check if you try to move a piece of the opponent.
   if ((player == BLACK && isupper(fig)) || (player == WHITE && islower(fig))) {
     std::cout << "invalid." << std::endl;
     return false;
   }
 
   MoveType moveType = NORMAL;
-  int position = calculatePosition(x, y);
-  int movePosition = calculatePosition(move_x, move_y);
+  int position = calculateSquare(x, y);
+  int movePosition = calculateSquare(move_x, move_y);
 
   if (movePosition == boardSettings.epSquare) {
     moveType = EN_PASSANT;
@@ -239,7 +257,7 @@ bool Board::movePiece(char fig, int x, int y, int move_x, int move_y, bool captu
     return false;
   }
 
-  // Check if movingPiece is really that movingPiece.
+  // Check if moving piece is really that piece.
   if (board[position].toChar() != fig) {
     std::cout << "invalid" << std::endl;
     return false;
@@ -261,8 +279,11 @@ bool Board::movePiece(char fig, int x, int y, int move_x, int move_y, bool captu
   }
 
   // TODO add casteling
-  Move move = buildMove(position, movePosition, findKeyByValue(promotion_figure), moveType);
+  // Build the move you try to execute.
+  Move move = buildMove(position, movePosition, Piece(promotion_figure), moveType);
+  // Check if your move is pseudo legal.
   if (moveGenUtils::getAllPseudoLegalMoves(*this, player == WHITE).contains(move)) {
+    // Check moves legality.
     if (!makeMove(move)) {
       std::cout << "Move not legal! Check your king!" << std::endl;
       return false;
@@ -272,110 +293,6 @@ bool Board::movePiece(char fig, int x, int y, int move_x, int move_y, bool captu
     std::cout << "invalid" << std::endl;
     return false;
   }
-}
-
-bool Board::canMove(char fig, int x, int y, int move_x, int move_y, bool capture) {
-  int position = calculatePosition(x, y);
-  int move = calculatePosition(move_x, move_y);
-
-  // Check if moveSquare is out of bounds!
-  if (position < 0 || position > 63 || move < 0 || move > 63) {
-    return false;
-  }
-
-  // Check if movingPiece is really that movingPiece.
-  if (board[position].toChar() != fig) {
-    return false;
-  }
-
-  // Check if capture an empty field or a field without a capture
-  if ((board[move].pieceType != EMPTY && !capture) || (capture && board[move].pieceType == EMPTY)) {
-    return false;
-  }
-
-  if (capture) {
-    // Check if you try to capture your own team.
-    if ((board[position].isWhite() && board[move].isWhite()) ||
-        ((!board[position].isWhite()) && (!board[move].isWhite()))) {
-      return false;
-    }
-  }
-
-  switch (tolower(fig)) {
-    case 'p':
-      if (isPathClear(x, y, move_x, move_y, board)) {
-        return canPawnMove(x, y, move_x, move_y, capture, isupper(fig));
-      }
-      break;
-    case 'k':
-      if (isPathClear(x, y, move_x, move_y, board)) {
-        return canKingMove(x, y, move_x, move_y);
-      }
-      break;
-    case 'b':
-      if (isPathClear(x, y, move_x, move_y, board)) {
-        return canBishopMove(x, y, move_x, move_y);
-      }
-      break;
-    case 'r':
-      if (isPathClear(x, y, move_x, move_y, board)) {
-        return canRookMove(x, y, move_x, move_y);
-      }
-      break;
-    case 'q':
-      if (isPathClear(x, y, move_x, move_y, board)) {
-        return canQueenMove(x, y, move_x, move_y);
-      }
-      break;
-    case 'n':
-      return canKnightMove(x, y, move_x, move_y);
-  }
-  return false;
-}
-
-bool Board::isPathClear(int startX, int startY, int endX, int endY, const std::array<Piece, 64>& board) {
-  int dx = std::abs(endX - startX);
-  int dy = std::abs(endY - startY);
-  int x = startX;
-  int y = startY;
-  int xInc = (endX > startX) ? 1 : -1;
-  int yInc = (endY > startY) ? 1 : -1;
-
-  if (dx > dy) {
-    int p = 2 * dy - dx;
-    while (x != endX) {
-      if (p >= 0) {
-        y += yInc;
-        p -= 2 * dx;
-      }
-      x += xInc;
-      p += 2 * dy;
-
-      if (x != endX || y != endY) {
-        if (board[calculatePosition(x, y)].pieceType != EMPTY) {
-          return false;
-        }
-      }
-    }
-  } else {
-    int p = 2 * dx - dy;
-    while (y != endY) {
-      if (p >= 0) {
-        x += xInc;
-        p -= 2 * dy;
-      }
-      y += yInc;
-      p += 2 * dx;
-
-      if (x != endX || y != endY) {
-        if (board[calculatePosition(x, y)].pieceType != EMPTY) {
-          return false;
-        }
-      }
-    }
-  }
-
-  return true;
 }
 
 void Board::readFen(std::string input) {
@@ -399,56 +316,56 @@ void Board::readFen(std::string input) {
         y--;
         break;
       case 'k':
-        board[calculatePosition(x, y)] = Piece(BK);
+        board[calculateSquare(x, y)] = Piece(BK);
         x++;
         break;
       case 'K':
-        board[calculatePosition(x, y)] = Piece(WK);
+        board[calculateSquare(x, y)] = Piece(WK);
         x++;
         break;
       case 'q':
-        board[calculatePosition(x, y)] = Piece(BQ);
+        board[calculateSquare(x, y)] = Piece(BQ);
         x++;
         break;
       case 'Q':
-        board[calculatePosition(x, y)] = Piece(WQ);
+        board[calculateSquare(x, y)] = Piece(WQ);
         x++;
         break;
       case 'r':
-        board[calculatePosition(x, y)] = Piece(BR);
+        board[calculateSquare(x, y)] = Piece(BR);
         x++;
         break;
       case 'R':
-        board[calculatePosition(x, y)] = Piece(WR);
+        board[calculateSquare(x, y)] = Piece(WR);
         x++;
         break;
       case 'b':
-        board[calculatePosition(x, y)] = Piece(BB);
+        board[calculateSquare(x, y)] = Piece(BB);
         x++;
         break;
       case 'B':
-        board[calculatePosition(x, y)] = Piece(WB);
+        board[calculateSquare(x, y)] = Piece(WB);
         x++;
         break;
       case 'n':
-        board[calculatePosition(x, y)] = Piece(BN);
+        board[calculateSquare(x, y)] = Piece(BN);
         x++;
         break;
       case 'N':
-        board[calculatePosition(x, y)] = Piece(WN);
+        board[calculateSquare(x, y)] = Piece(WN);
         x++;
         break;
       case 'p':
-        board[calculatePosition(x, y)] = Piece(BP);
+        board[calculateSquare(x, y)] = Piece(BP);
         x++;
         break;
       case 'P':
-        board[calculatePosition(x, y)] = Piece(WP);
+        board[calculateSquare(x, y)] = Piece(WP);
         x++;
         break;
       default:
         for (int i = input[inputIndex] - '0'; i > 0; --i) {
-          board[calculatePosition(x, y)] = Piece(EMPTY);
+          board[calculateSquare(x, y)] = Piece(EMPTY);
           x++;
         }
         break;
@@ -456,10 +373,12 @@ void Board::readFen(std::string input) {
     inputIndex++;
   }
 
+  // Set turn
   if (fenSettings[1] == "b") {
     player = BLACK;
   }
 
+  // Set casteling permissions to true
   if (fenSettings[2].find('K') != std::string::npos) {
     boardSettings.whiteKingSide = true;
   }
@@ -473,12 +392,14 @@ void Board::readFen(std::string input) {
     boardSettings.blackQueenSide = true;
   }
 
+  // Set ep square if given.
   if (fenSettings[3] != "-") {
     int col = fenSettings[3][0] - 96;
     int row = fenSettings[3][1] - 48;
-    boardSettings.epSquare = calculatePosition(col, row);
+    boardSettings.epSquare = calculateSquare(col, row);
   }
 
+  // Save current settings.
   history.push_back(boardSettings);
 }
 
@@ -494,7 +415,7 @@ void Board::printCurrentBoard() {
   for (int y = 8; y >= 1; y--) {
     std::cout << y << " | ";
     for (int x = 1; x <= 8; x++) {
-      std::cout << "[" << board[calculatePosition(x, y)].toChar() << "]";
+      std::cout << "[" << board[calculateSquare(x, y)].toChar() << "]";
     }
     std::cout << std::endl;
   }

@@ -9,22 +9,53 @@
 
 class ChessBot {
  public:
+  /**
+   * @brief Search for the best next move in a chess game.
+   *
+   * This function performs a search for the best next move in a given chess board configuration.
+   * The search is based on a specified depth, which determines the level of exploration of possible game positions.
+   * The function implements the negamax algorithm with alpha-beta pruning to make the search more efficient.
+   *
+   * @param board The current board configuration.
+   * @param depth The depth of the search. Determines the level of exploration of possible game positions.
+   *
+   * @return The best move found by the search algorithm.
+   */
   Move searchBestNextMove(Board& board, int depth);
 
  private:
+  /**
+   * @brief Performs a search for the best move using the negamax algorithm with alpha-beta pruning.
+   *
+   * @param boardManager The board object representing the current game state.
+   * @param depth The maximum depth for the search.
+   * @param alpha The alpha value representing the best lower bound found so far.
+   * @param beta The beta value representing the best upper bound found so far.
+   * @param ply The current ply (half-move) count.
+   * @param bestMove The reference to the best move found so far.
+   * @return The score of the best move found.
+   */
   int search(Board& boardManager, int depth, int alpha, int beta, int ply, Move& bestMove);
+  /**
+   * @brief Evaluates the position on the chess board.
+   *
+   * This function calculates the evaluation score of the given chess board position.
+   * The evaluation score is calculated based on the material value of the pieces, as well as
+   * the position of the pieces on the board. It takes into account both the middle game and end game
+   * phase of the game.
+   *
+   * @param board The chess board to be evaluated.
+   * @return The evaluation score of the position.
+   */
   static int eval(Board& board);
 
-  constexpr static int gamePhaseInc[12] = {0,0,1,1,1,1,2,2,4,4,0,0};
+
+  //These are premade tables from https://www.chessprogramming.org.
+  constexpr static int gamePhaseInc[12] = {0, 0, 1, 1, 1, 1, 2, 2, 4, 4, 0, 0};
   constexpr static int mg_pawn_table[64] = {
-      0,  0,   0,   0,   0,   0,  0,   0,
-      98,  134, 61,  95,  68, 126, 34, -11,
-      -6, 7,   26,  31, 65, 56,25, -20,
-      -14, 13,  6,   21, 23,  12,  17,  -23,
-      -27, -2,  -5, 12,  17, 6,   10, -25,
-      -26, -4, -4, -10,3,  3,   33,  -12,
-      -35, -1, -20, -23, -15, 24,  38,  -22,
-      0,  0,   0,  0,   0,  0,   0,   0,
+      0,  0,   0,   0,   0,   0,  0,   0,   98,  134, 61,  95,  68, 126, 34, -11, -6, 7,   26,  31, 65, 56,
+      25, -20, -14, 13,  6,   21, 23,  12,  17,  -23, -27, -2,  -5, 12,  17, 6,   10, -25, -26, -4, -4, -10,
+      3,  3,   33,  -12, -35, -1, -20, -23, -15, 24,  38,  -22, 0,  0,   0,  0,   0,  0,   0,   0,
   };
 
   constexpr static int eg_pawn_table[64] = {
@@ -58,14 +89,9 @@ class ChessBot {
   };
 
   constexpr static int mg_rook_table[64] = {
-      32, 42, 32,  51,  63,  9,   31,  43,
-      27, 32,  58,  62,  80,  67,  26, 44,
-      -5, 19,  26,  36,  17,  45,61, 16,
-      -24, -11, 7,   26,  24,  35, -8, -20,
-      -36, -26, -12, -1,  9,  -7, 6,  -23,
-      -45, -25, -16, -17,3,  0,  -5,  -33,
-      -44, -16, -20, -9, -1, 11,  -6,  -71,
-      -19, -13, 1,  17, 16, 7,   -37, -26,
+      32, 42, 32,  51,  63,  9,   31,  43, 27, 32,  58,  62,  80,  67,  26, 44, -5, 19,  26,  36,  17,  45,
+      61, 16, -24, -11, 7,   26,  24,  35, -8, -20, -36, -26, -12, -1,  9,  -7, 6,  -23, -45, -25, -16, -17,
+      3,  0,  -5,  -33, -44, -16, -20, -9, -1, 11,  -6,  -71, -19, -13, 1,  17, 16, 7,   -37, -26,
   };
 
   constexpr static int eg_rook_table[64] = {
