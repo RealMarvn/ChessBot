@@ -48,13 +48,15 @@ void ChessGame::start() {
     }
 
     if (board->movePiece(figure, col, row, move_col, move_row, capture, promotion_figure)) {
-      board->printCurrentBoard();
       if (board->isCheckMate(board->player == WHITE)) {
         std::cout << "CHECK MATE!" << std::endl;
         return;
       }
 
-      board->makeMove(bot->searchBestNextMove(*board, 5));
+      auto move = bot->searchBestNextMove(*board, 5);
+      board->makeMove(move);
+      board->printCurrentBoard();
+
       if (board->isCheckMate(board->player == WHITE)) {
         board->printCurrentBoard();
         std::cout << "CHECK MATE!" << std::endl;
