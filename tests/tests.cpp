@@ -17,14 +17,10 @@ uint64_t perft(Board& boardManager, int depth, bool player) {
   uint64_t nodes = 0;
   auto moves = moveGenUtils::getAllPseudoLegalMoves(boardManager, player);
   for (Move& move : moves) {
-    boardManager.makeMove(move);
-
-    if (boardManager.isKingInCheck(player)) {
+    if (boardManager.makeMove(move)) {
+      nodes += perft(boardManager, depth - 1, !player);
       boardManager.popLastMove();
-      continue;
     }
-    nodes += perft(boardManager, depth - 1, !player);
-    boardManager.popLastMove();
   }
 
   return nodes;

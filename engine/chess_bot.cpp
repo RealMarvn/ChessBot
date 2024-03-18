@@ -82,37 +82,35 @@ int ChessBot::search(Board& boardManager, int depth, int alpha, int beta, int pl
   int bestScore = -INT_MAX;
 
   for (Move& move : moveList) {
-    int score;
+    int score{0};
 
-    boardManager.makeMove(move);
-
-    if (!boardManager.isKingInCheck(boardManager.player != WHITE)) {
+    if (boardManager.makeMove(move)) {
       score = -search(boardManager, depth - 1, -beta, -alpha, ply + 1, bestMove);
       legalMoves++;
+      boardManager.popLastMove();
     }
-    boardManager.popLastMove();
 
-    if (legalMoves == 0) {
-      if (boardManager.isKingInCheck(boardManager.player == WHITE)) {
-        return -INT_MAX + ply;  // checkmate
-      } else {
-        return 0;  // stalemate
+    if (score > bestScore) {
+      bestScore = score;
+      if (ply == 0) {  // root
+        bestMove = move;
       }
+    }
+
+    if (bestScore > alpha) {
+      alpha = bestScore;
+    }
+
+    if (alpha >= beta) {
+      break;  // beta killen
+    }
+  }
+
+  if (legalMoves == 0) {
+    if (boardManager.isKingInCheck(boardManager.player == WHITE)) {
+      return -INT_MAX + ply;  // checkmate
     } else {
-      if (score > bestScore) {
-        bestScore = score;
-        if (ply == 0) {  // root
-          bestMove = move;
-        }
-      }
-
-      if (bestScore > alpha) {
-        alpha = bestScore;
-      }
-
-      if (alpha >= beta) {
-        break;  // beta killen
-      }
+      return 0;  // stalemate
     }
   }
 

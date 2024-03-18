@@ -110,7 +110,7 @@ bool Board::popLastMove() {
   return true;
 }
 
-void Board::makeMove(Move move) {
+bool Board::makeMove(Move move) {
   board[move.moveSquare] = board[move.square];
   board[move.square].pieceType = EMPTY;
   boardSettings.epSquare = 100;
@@ -154,6 +154,11 @@ void Board::makeMove(Move move) {
   moves.push_back(move);
   history.push_back(boardSettings);
   player = player == WHITE ? BLACK : WHITE;
+  if (isKingInCheck(player != WHITE)) {
+    popLastMove();
+    return false;
+  }
+  return true;
 }
 
 void Board::handleCastlingPermissions(Move& move) {
@@ -202,18 +207,17 @@ void Board::handleCastlingPermissions(Move& move) {
 bool Board::isCheckMate(bool isWhite) {
   int counter = 0;
   for (Move& move : moveGenUtils::getAllPseudoLegalMoves(*this, isWhite)) {
-    makeMove(move);
-    if (!isKingInCheck(isWhite)) {
+    if (makeMove(move)) {
       counter++;
+      popLastMove();
     }
-    popLastMove();
   }
   return counter == 0;
 }
 
 bool Board::movePiece(char fig, int x, int y, int move_x, int move_y, bool capture, char promotion_figure) {
   if ((player == BLACK && isupper(fig)) || (player == WHITE && islower(fig))) {
-    std::cout << "invalid" << std::endl;
+    std::cout << "invalid." << std::endl;
     return false;
   }
 
@@ -259,18 +263,15 @@ bool Board::movePiece(char fig, int x, int y, int move_x, int move_y, bool captu
   // TODO add casteling
   Move move = buildMove(position, movePosition, findKeyByValue(promotion_figure), moveType);
   if (moveGenUtils::getAllPseudoLegalMoves(*this, player == WHITE).contains(move)) {
-    makeMove(move);
+    if (!makeMove(move)) {
+      std::cout << "Move not legal! Check your king!" << std::endl;
+      return false;
+    }
     return true;
   } else {
     std::cout << "invalid" << std::endl;
     return false;
   }
-
-  //  if (isKingInCheck(player == WHITE)) {
-  //    std::cout << "King is in check" << std::endl;
-  //  } else {
-  //    std::cout << "No one is in check" << std::endl;
-  //  }
 }
 
 bool Board::canMove(char fig, int x, int y, int move_x, int move_y, bool capture) {

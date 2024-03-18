@@ -53,8 +53,7 @@ void ChessGame::start() {
         return;
       }
 
-      auto move = bot->searchBestNextMove(*board, 5);
-      board->makeMove(move);
+      board->makeMove(bot->searchBestNextMove(*board, 5));
       board->printCurrentBoard();
 
       if (board->isCheckMate(board->player == WHITE)) {

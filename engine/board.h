@@ -10,6 +10,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <regex>
 
 #include "./misc/board_settings.h"
 #include "./misc/move.h"
@@ -39,7 +40,7 @@ class Board {
   bool isKingInCheck(bool pieceColor);
   bool isSquareAttacked(std::pair<int, int> square, bool pieceColor);
   bool movePiece(char fig, int x, int y, int move_x, int move_y, bool capture, char promotion_figure);
-  void makeMove(Move move);
+  bool makeMove(Move move);
   Move buildMove(int position, int moveToPosition, Piece promotionPiece, MoveType moveType);
   bool popLastMove();
   void printCurrentBoard();
