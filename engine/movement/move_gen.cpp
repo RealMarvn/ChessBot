@@ -45,15 +45,15 @@ PseudoLegalMoves moveGenUtils::getAllPseudoLegalMoves(Board& board, bool player)
   return allPseudoMoves;
 }
 
-void moveGenUtils::getAllPossibleRookMoves(std::pair<int, int> startSquare, Board& board,
-                                           PseudoLegalMoves& allPseudoMoves, bool pieceColor) {
+template <int arraySize>
+inline static void getAllTemplateMoves(std::pair<int, int>& startSquare, Board& board, PseudoLegalMoves& allPseudoMoves,
+                                     bool pieceColor, PieceType movingPiece,
+                                     std::array<std::pair<int, int>, arraySize> directions) {
   int old_position = calculateSquare(startSquare.first, startSquare.second);
 
   Move move{};
   move.square = old_position;
-  move.movingPiece.pieceType = pieceColor ? WR : BR;
-
-  std::pair<int, int> directions[4] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+  move.movingPiece.pieceType = movingPiece;
 
   for (const auto& dir : directions) {
     int x = startSquare.first + dir.first;
@@ -82,82 +82,32 @@ void moveGenUtils::getAllPossibleRookMoves(std::pair<int, int> startSquare, Boar
       y += dir.second;
     }
   }
+}
+
+void moveGenUtils::getAllPossibleRookMoves(std::pair<int, int> startSquare, Board& board,
+                                           PseudoLegalMoves& allPseudoMoves, bool pieceColor) {
+  std::array<std::pair<int, int>, 4> directions = {std::pair(-1, 0), std::pair(1, 0), std::pair(0, -1),
+                                                   std::pair(0, 1)};
+
+  getAllTemplateMoves<4>(startSquare, board, allPseudoMoves, pieceColor, (pieceColor ? WR : BR), directions);
 }
 
 void moveGenUtils::getAllPossibleBishopMoves(std::pair<int, int> startSquare, Board& board,
                                              PseudoLegalMoves& allPseudoMoves, bool pieceColor) {
-  int old_position = calculateSquare(startSquare.first, startSquare.second);
+  std::array<std::pair<int, int>, 4> directions = {std::pair(-1, -1), std::pair(-1, 1), std::pair(1, -1),
+                                                   std::pair(1, 1)};
 
-  Move move{};
-  move.square = old_position;
-  move.movingPiece.pieceType = pieceColor ? WB : BB;
-
-  std::pair<int, int> directions[4] = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
-
-  for (const auto& dir : directions) {
-    int x = startSquare.first + dir.first;
-    int y = startSquare.second + dir.second;
-
-    // Every direction until the board ends.
-    while (x > 0 && y > 0 && x < 9 && y < 9) {
-      int position = calculateSquare(x, y);
-      move.moveSquare = position;
-      move.capturedPiece = board[position];
-
-      if (board[position].pieceType == EMPTY) {
-        allPseudoMoves.push_back(move);
-      } else if (board[position].pieceType != EMPTY) {
-        // Check if it is your own piece.
-        if ((pieceColor && board[position].isWhite()) || (!pieceColor && !board[position].isWhite())) {
-          break;
-        }
-        allPseudoMoves.push_back(move);
-        break;
-      } else {
-        break;
-      }
-
-      x += dir.first;
-      y += dir.second;
-    }
-  }
+  getAllTemplateMoves<4>(startSquare, board, allPseudoMoves, pieceColor, (pieceColor ? WB : BB), directions);
 }
 
 void moveGenUtils::getAllPossibleQueenMoves(std::pair<int, int> startSquare, Board& board,
                                             PseudoLegalMoves& allPseudoMoves, bool pieceColor) {
-  int old_position = calculateSquare(startSquare.first, startSquare.second);
+  std::array<std::pair<int, int>, 8> directions = {
+      std::pair(-1, 0),  std::pair(1, 0),  std::pair(0, -1), std::pair(0, 1),
+      std::pair(-1, -1), std::pair(-1, 1), std::pair(1, -1), std::pair(1, 1),
+  };
 
-  Move move{};
-  move.square = old_position;
-  move.movingPiece.pieceType = pieceColor ? WQ : BQ;
-
-  std::pair<int, int> directions[8] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
-
-  for (const auto& dir : directions) {
-    int x = startSquare.first + dir.first;
-    int y = startSquare.second + dir.second;
-
-    // Run until edge is reached.
-    while (x > 0 && y > 0 && x < 9 && y < 9) {
-      int position = calculateSquare(x, y);
-      move.moveSquare = position;
-      move.capturedPiece = board[position];
-
-      if (board[position].pieceType == EMPTY) {
-        allPseudoMoves.push_back(move);
-      } else if (board[position].pieceType != EMPTY) {
-        // Check if it is your own piece.
-        if ((pieceColor && board[position].isWhite()) || (!pieceColor && !board[position].isWhite())) {
-          break;
-        }
-        allPseudoMoves.push_back(move);
-        break;
-      }
-
-      x += dir.first;
-      y += dir.second;
-    }
-  }
+  getAllTemplateMoves<8>(startSquare, board, allPseudoMoves, pieceColor, (pieceColor ? WQ : BQ), directions);
 }
 
 void moveGenUtils::getAllPossibleKingMoves(std::pair<int, int> startSquare, Board& board,
