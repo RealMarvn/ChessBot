@@ -8,13 +8,13 @@
 enum PieceType { WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, EMPTY };
 
 /**
-   * @brief The Piece class represents a chess piece.
-   *
-   * This class encapsulates the data and behavior of a chess piece.
-   * It has a pieceType member variable which stores the type of the piece.
-   * The class provides methods to retrieve information about the piece, such as whether it is white,
-   * its character representation, and its material value.
-   * It also provides static member variables and methods for piece value and character mappings.
+ * @brief The Piece class represents a chess piece.
+ *
+ * This class encapsulates the data and behavior of a chess piece.
+ * It has a pieceType member variable which stores the type of the piece.
+ * The class provides methods to retrieve information about the piece, such as whether it is white,
+ * its character representation, and its material value.
+ * It also provides static member variables and methods for piece value and character mappings.
  */
 class Piece {
  public:
@@ -41,12 +41,12 @@ class Piece {
   PieceType pieceType{EMPTY};
 
   /**
-     * @brief Checks if the piece is white.
-     *
-     * This function returns true if the piece is white, and false otherwise.
-     *
-     * @return True if the piece is white, false otherwise.
-     */
+   * @brief Checks if the piece is white.
+   *
+   * This function returns true if the piece is white, and false otherwise.
+   *
+   * @return True if the piece is white, false otherwise.
+   */
   [[nodiscard]] inline bool isWhite() const { return (pieceType < BP); };
 
   /**
@@ -67,27 +67,28 @@ class Piece {
    * If the piece type is not EMPTY, the material value is calculated as follows:
    * - If the piece is white, the material value is positive.
    * - If the piece is black, the material value is negative.
-   * - The material value is multiplied by the pieceValue of the piece type.
+   * - The material value is multiplied by the mg_pieceValue of the piece type.
    *
    * @return The material value of the piece.
    */
-  [[nodiscard]] int getMaterialValue() const {
+  [[nodiscard]] int getMaterialValue(bool endGame) const {
     if (pieceType == EMPTY) return 0;
-    return ((isWhite() ? 1 : -1) * pieceValue[pieceType]);
+    return ((isWhite() ? 1 : -1) * (endGame ? eg_pieceValue[pieceType] : mg_pieceValue[pieceType]));
   };
 
  private:
-  static int pieceValue[6];
-  static char pieceToChar[13];
+  constexpr static int mg_pieceValue[6] = {82, 337, 365, 477, 1025, 0};
+  constexpr static int eg_pieceValue[6] = {94, 281, 297, 512, 936, 0};
+  constexpr static char pieceToChar[13] = {'P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k', ' '};
   /**
-    * @brief Finds the PieceType based on the given character value.
-    *
-    * This function searches for the character value in the pieceToChar array
-    * and returns the corresponding PieceType.
-    * If the character value is not found in the array, it returns EMPTY.
-    *
-    * @param value The character value representing the piece.
-    * @return The PieceType corresponding to the character value.
-    */
+   * @brief Finds the PieceType based on the given character value.
+   *
+   * This function searches for the character value in the pieceToChar array
+   * and returns the corresponding PieceType.
+   * If the character value is not found in the array, it returns EMPTY.
+   *
+   * @param value The character value representing the piece.
+   * @return The PieceType corresponding to the character value.
+   */
   static PieceType findKeyByValue(char value);
 };

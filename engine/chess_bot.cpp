@@ -1,13 +1,15 @@
 #include "./chess_bot.h"
 
 int ChessBot::eval(Board& board) {
-  int materialValue = 0;
+  int mg_MaterialValue = 0;
+  int eg_MaterialValue = 0;
   int mg[2];
   int eg[2];
   int gamePhase = 0;
   for (int i = 0; i < 64; i++) {
     Piece piece = board[i];
-    materialValue += piece.getMaterialValue();
+    mg_MaterialValue += piece.getMaterialValue(false);
+    eg_MaterialValue += piece.getMaterialValue(true);
     switch (piece.pieceType) {
       case WP:
         mg[0] += -1 * mg_pawn_table[i];
@@ -62,13 +64,16 @@ int ChessBot::eval(Board& board) {
     }
   }
 
-  int mgScore = mg[board.player == WHITE] - mg[board.player != WHITE];
-  int egScore = eg[board.player == WHITE] - eg[board.player != WHITE];
+  int mgScore = mg[board.player == WHITE] - mg[board.player != WHITE] + mg_MaterialValue;
+  int egScore = eg[board.player == WHITE] - eg[board.player != WHITE] + eg_MaterialValue;
   int mgPhase = gamePhase;
   if (mgPhase > 24) mgPhase = 24;
   int egPhase = 24 - mgPhase;
 
-  return ((mgScore * mgPhase + egScore * egPhase) / 24) + materialValue;
+  int evaluation = ((mgScore * mgPhase + egScore * egPhase) / 24);
+
+  // Give a bonus to side to move (TEMPO).
+  return evaluation + 20;
 }
 
 int ChessBot::search(Board& boardManager, int depth, int alpha, int beta, int ply, Move& bestMove) {
