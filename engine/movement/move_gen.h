@@ -11,8 +11,8 @@
 
 namespace moveGenUtils {
 
-const static std::array<PieceType, 4> whitePawnPossiblePromotions = {WQ, WR, WN, WB};
-const static std::array<PieceType, 4> blackPawnPossiblePromotions = {BQ, BR, BN, BB};
+static const std::array<PieceType, 4> whitePawnPossiblePromotions = {WQ, WR, WN, WB};
+static const std::array<PieceType, 4> blackPawnPossiblePromotions = {BQ, BR, BN, BB};
 
 /**
  * @brief Generates all pseudo-legal moves on the given board for a specific player.

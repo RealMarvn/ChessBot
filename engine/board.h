@@ -9,8 +9,8 @@
 #include <memory>
 #include <sstream>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "./exceptions/fen_exception.h"
 #include "./misc/board_settings.h"
