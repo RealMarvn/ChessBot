@@ -11,5 +11,5 @@
 class InvalidFENException : public std::exception {
  public:
   InvalidFENException() = default;
-  [[nodiscard]] const char* what() const noexcept override { return "FEN is invalid!!!"; }
+  [[nodiscard]] const char* what() const noexcept override { return "FEN is incomplete."; }
 };

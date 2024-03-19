@@ -3,7 +3,6 @@
 //
 
 #pragma once
-#include <cassert>
 
 enum PieceType { WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, EMPTY };
 

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -65,7 +66,10 @@ class Board {
   board_setting boardSettings;
 
   // To access the board at the given index directly.
-  Piece& operator[](int index) { return board[index]; }
+  Piece& operator[](int index) {
+    assert(index < 64 && index >= 0);
+    return board[index];
+  }
 
   /**
    * @brief Initializes a new Board object.
