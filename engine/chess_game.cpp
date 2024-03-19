@@ -74,10 +74,10 @@ void ChessGame::start() {
       continue;
     }
 
-    Move move = board->parseMove(input);
+    Move playerMove = board->parseMove(input);
 
     // Make the move and check for CheckMate.
-    if (board->tryToMovePiece(move)) {
+    if (board->tryToMovePiece(playerMove)) {
       if (board->isCheckMate(board->player == WHITE)) {
         std::cout << "CHECK MATE!" << std::endl;
         return;
@@ -85,7 +85,7 @@ void ChessGame::start() {
 
       // Bot can only move legal so no need to check if the move is legal.
       // Check if opponent is in check mate after bots turn.
-      auto move = ChessBot::searchBestNextMove(*board, 5);
+      Move move = ChessBot::searchBestNextMove(*board, 5);
       board->makeMove(move);
       board->printCurrentBoard();
 
