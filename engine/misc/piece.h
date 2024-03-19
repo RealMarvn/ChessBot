@@ -47,7 +47,7 @@ class Piece {
    *
    * @return True if the piece is white, false otherwise.
    */
-  [[nodiscard]] inline bool isWhite() const { return (pieceType < BP); };
+  [[nodiscard]] inline bool isWhite() const { return (pieceType < BP); }
 
   /**
    * @brief Returns the character representation of the piece.
@@ -56,7 +56,7 @@ class Piece {
    *
    * @return The character representation of the piece.
    */
-  [[nodiscard]] inline char toChar() const { return pieceToChar[pieceType]; };
+  [[nodiscard]] inline char toChar() const { return pieceToChar[pieceType]; }
 
   /**
    * @brief Retrieves the material value of the piece.
@@ -74,7 +74,7 @@ class Piece {
   [[nodiscard]] int getMaterialValue(bool endGame) const {
     if (pieceType == EMPTY) return 0;
     return ((isWhite() ? 1 : -1) * (endGame ? eg_pieceValue[pieceType % BP] : mg_pieceValue[pieceType % BP]));
-  };
+  }
 
  private:
   constexpr static int eg_pieceValue[6] = {94, 281, 297, 512, 936, 1000};
