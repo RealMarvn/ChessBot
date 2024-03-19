@@ -15,6 +15,7 @@ class ChessGame {
    * Represents a chess game.
    */
   ChessGame() : board{new Board}, bot{new ChessBot} {};
+
   /**
    * @brief Starts the chess game and handles the input and gameplay.
    *

@@ -28,30 +28,8 @@ uint64_t perft(Board& boardManager, int depth, bool player) {
   return nodes;
 }
 
-uint64_t split_perft(Board& boardManager, int depth, bool player) {
-  if (depth == 0) {
-    return 0;
-  }
-
-  int number = 0;
-
-  // Generate every move for the current position.
-  auto moves = moveGenUtils::getAllPseudoLegalMoves(boardManager, player);
-  for (Move& move : moves) {
-    if (boardManager.makeMove(move)) {
-      uint64_t child_nodes = perft(boardManager, depth - 1, !player);
-
-      number += child_nodes;
-      // Print all moves a move can generate.
-      std::cout << move.convertToXandY() << " - " << child_nodes << std::endl;
-      boardManager.popLastMove();
-    }
-  }
-  return number;
-}
-
 TEST(MoveGenTest, PerftTest) {
-  // PERFT file holen.
+  // Get Perft file!
   std::ifstream epd_file("/Users/marvin/CLionProjects/pk1-pruefung/tests/data/perft-positions.epd");
   ASSERT_TRUE(epd_file.good()) << "Der Pfad der testing suite ist falsch. Bitte anpassen!";
   Board myBoard;
@@ -74,6 +52,34 @@ TEST(MoveGenTest, PerftTest) {
     // Check FEN!
     auto result = perft(myBoard, 4, myBoard.player == WHITE);
     ASSERT_EQ(result, std::stoi(settings[4].substr(3)));
+  }
+}
+
+TEST(UserInput, MoveParsing) {
+  // Get move file!
+  std::ifstream epd_file("/Users/marvin/CLionProjects/pk1-pruefung/tests/data/input-test.epd");
+  ASSERT_TRUE(epd_file.good()) << "Der Pfad der testing suite ist falsch. Bitte anpassen!";
+  Board myBoard;
+
+  std::string line;
+  // Read in perft file per line.
+  while (std::getline(epd_file, line)) {
+    std::istringstream ss(line);
+    std::string setting;
+    std::vector<std::string> settings;
+
+    // Cut the line into sections.
+    while (std::getline(ss, setting, ';')) {
+      settings.push_back(setting);
+    }
+
+    // Read in the board.
+    myBoard.readFen(settings[0]);
+
+    // Build the move based on the input string.
+    Move move = myBoard.parseMove(settings[1]);
+    // Convert the move back to a string and check if it is the same.
+    ASSERT_EQ(move.convertToXandY(), settings[1]);
   }
 }
 

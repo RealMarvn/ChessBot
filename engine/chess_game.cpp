@@ -4,6 +4,49 @@
 
 #include "chess_game.h"
 
+#ifdef DEBUG
+uint64_t perft(Board& boardManager, int depth, bool player) {
+  if (depth == 0) {
+    return 1;
+  }
+
+  uint64_t nodes = 0;
+  // Get all moves.
+  auto moves = moveGenUtils::getAllPseudoLegalMoves(boardManager, player);
+  for (Move& move : moves) {
+    // If move is valid get the value.
+    if (boardManager.makeMove(move)) {
+      nodes += perft(boardManager, depth - 1, !player);
+      boardManager.popLastMove();
+    }
+  }
+
+  return nodes;
+}
+
+uint64_t split_perft(Board& boardManager, int depth, bool player) {
+  if (depth == 0) {
+    return 0;
+  }
+
+  int number = 0;
+
+  // Generate every move for the current position.
+  auto moves = moveGenUtils::getAllPseudoLegalMoves(boardManager, player);
+  for (Move& move : moves) {
+    if (boardManager.makeMove(move)) {
+      uint64_t child_nodes = perft(boardManager, depth - 1, !player);
+
+      number += child_nodes;
+      // Print all moves a move can generate.
+      std::cout << move.convertToXandY() << " - " << child_nodes << std::endl;
+      boardManager.popLastMove();
+    }
+  }
+  return number;
+}
+#endif
+
 void ChessGame::start() {
   board->printCurrentBoard();
   std::string input;
@@ -11,6 +54,9 @@ void ChessGame::start() {
     // Read in FEN notation.
     if (input[0] == 'F') {
       board->readFen(input.substr(1, input.length()));
+#ifdef DEBUG
+      split_perft(*board, 1, board->player == WHITE);
+#endif
       board->printCurrentBoard();
       continue;
     }
@@ -28,32 +74,10 @@ void ChessGame::start() {
       continue;
     }
 
-    bool capture = false;
-    char promotion_figure = ' ';
-    char figure = input[0];
-    // Use the ascii code of the char to subtract a number to get the correct number.
-    int col = input[1] - 96;
-    int row = input[2] - 48;
-
-    int move_col = input[3] - 96;
-    int move_row = input[4] - 48;
-
-    // Capture can be lower or upper case.
-    if (input[3] == 'x' || input[3] == 'X') {
-      move_col = input[4] - 96;
-      move_row = input[5] - 48;
-      capture = true;
-    }
-
-    // If there is a capture the promotion is moved.
-    if ((capture && input.length() == 8 && input[6] == '=')) {
-      promotion_figure = input[7];
-    } else if (input.length() == 7 && input[5] == '=') {
-      promotion_figure = input[6];
-    }
+    Move move = board->parseMove(input);
 
     // Make the move and check for CheckMate.
-    if (board->movePiece(figure, col, row, move_col, move_row, capture, promotion_figure)) {
+    if (board->tryToMovePiece(move)) {
       if (board->isCheckMate(board->player == WHITE)) {
         std::cout << "CHECK MATE!" << std::endl;
         return;
@@ -69,6 +93,8 @@ void ChessGame::start() {
         std::cout << "CHECK MATE!" << std::endl;
         return;
       }
+    } else {
+      std::cout << "invalid" << std::endl;
     }
   }
 }

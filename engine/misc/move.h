@@ -3,12 +3,12 @@
 //
 
 #pragma once
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <sstream>
 #include <string>
 #include <utility>
-#include <algorithm>
 
 #include "./piece.h"
 
@@ -27,18 +27,25 @@ struct Move {
   /**
    * @brief Converts the Move object's square and moveSquare coordinates to corresponding X and Y coordinates.
    *
-   * This function takes the square and moveSquare coordinates of a Move object and converts them to X and Y coordinates.
-   * The X coordinate is obtained by adding the ASCII value of 'a' to the remainder of square divided by 8, and casting it to a character.
-   * The Y coordinate is obtained by adding 1 to the result of square divided by 8.
-   * The same process is applied to the moveSquare coordinates to obtain the second set of X and Y coordinates.
-   * The resulting X and Y coordinates are then concatenated together as a string and returned.
+   * This function takes the square and moveSquare coordinates of a Move object and converts them to X and Y
+   * coordinates. The X coordinate is obtained by adding the ASCII value of 'a' to the remainder of square divided by 8,
+   * and casting it to a character. The Y coordinate is obtained by adding 1 to the result of square divided by 8. The
+   * same process is applied to the moveSquare coordinates to obtain the second set of X and Y coordinates. The
+   * resulting X and Y coordinates are then concatenated together as a string and returned.
    *
    * @return A string representation of the X and Y coordinates of the Move object.
    */
   [[nodiscard]] std::string convertToXandY() const {
     std::ostringstream out;
-    out << static_cast<char>((square) % 8 + 'a') << (square) / 8 + 1 << static_cast<char>((moveSquare) % 8 + 'a')
-        << (moveSquare) / 8 + 1;
+    out << movingPiece.toChar();
+    out << static_cast<char>((square) % 8 + 'a') << (square) / 8 + 1;
+    if (capturedPiece.pieceType != EMPTY) {
+      out << 'x';
+    }
+    out << static_cast<char>((moveSquare) % 8 + 'a') << (moveSquare) / 8 + 1;
+    if (moveType == PROMOTION) {
+      out << '=' << promotionPiece.toChar();
+    }
     return out.str();
   }
 
@@ -49,8 +56,10 @@ struct Move {
    * @return True if the two Move objects are equal, false otherwise.
    */
   bool operator==(const Move& other) const {
-    return moveSquare == other.moveSquare && square == other.square && movingPiece.pieceType == other.movingPiece.pieceType
-           && capturedPiece.pieceType == other.capturedPiece.pieceType && promotionPiece.pieceType == other.promotionPiece.pieceType && moveType == other.moveType;
+    return moveSquare == other.moveSquare && square == other.square &&
+           movingPiece.pieceType == other.movingPiece.pieceType &&
+           capturedPiece.pieceType == other.capturedPiece.pieceType &&
+           promotionPiece.pieceType == other.promotionPiece.pieceType && moveType == other.moveType;
   }
 };
 
@@ -83,8 +92,8 @@ class PseudoLegalMoves {
    *
    * @brief Returns an iterator one past the last element of the move list.
    *
-   * This function returns an iterator pointing to one past the last element in the move list. It is used to indicate the end
-   * of the range of elements in the move list.
+   * This function returns an iterator pointing to one past the last element in the move list. It is used to indicate
+   * the end of the range of elements in the move list.
    *
    * @return An iterator pointing to one past the last element of the move list.
    */
@@ -111,7 +120,8 @@ class PseudoLegalMoves {
   /**
    * @brief Adds a move to the move list.
    *
-   * This function adds a move to the move list by assigning it to the element at the current index. It then increments the index by 1.
+   * This function adds a move to the move list by assigning it to the element at the current index. It then increments
+   * the index by 1.
    *
    * @param mv The move to add to the move list.
    * @pre The index must be less than the maximum number of moves allowed.
@@ -128,13 +138,11 @@ class PseudoLegalMoves {
    *
    * @brief Checks if the move list contains a specified move.
    *
-   * This function checks if the move list contains the specified move. It uses the std::find algorithm to search for the move in the move list. If the move is found, it returns true;
-   * otherwise, it returns false.
+   * This function checks if the move list contains the specified move. It uses the std::find algorithm to search for
+   * the move in the move list. If the move is found, it returns true; otherwise, it returns false.
    *
    * @param mv The move to check for in the move list.
    * @return True if the move list contains the specified move, false otherwise.
    */
-  bool contains(const Move& mv) {
-    return std::find(begin(), end(), mv) != end();
-  }
+  bool contains(const Move& mv) { return std::find(begin(), end(), mv) != end(); }
 };

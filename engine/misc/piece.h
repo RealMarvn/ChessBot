@@ -89,5 +89,5 @@ class Piece {
     * @param value The character value representing the piece.
     * @return The PieceType corresponding to the character value.
     */
-  PieceType findKeyByValue(char value);
+  static PieceType findKeyByValue(char value);
 };

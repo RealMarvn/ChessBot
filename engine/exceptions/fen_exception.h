@@ -9,9 +9,7 @@
 #include <utility>
 
 class InvalidFENException : public std::exception {
-public:
-    explicit InvalidFENException() = default;
-    [[nodiscard]] const char* what() const noexcept override {
-        return "FEN is invalid!!!";
-    }
+ public:
+  explicit InvalidFENException() = default;
+  [[nodiscard]] const char* what() const noexcept override { return "FEN is invalid!!!"; }
 };

@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+#include "./exceptions/fen_exception.h"
 #include "./misc/board_settings.h"
 #include "./misc/move.h"
 #include "./misc/piece.h"
@@ -27,6 +28,23 @@
  * @return The position in the grid.
  */
 inline int calculateSquare(int x, int y) { return ((y - 1) * 8 + x) - 1; }
+
+/**
+ * @brief Converts a square number to its corresponding X and Y coordinates on a chess board.
+ *
+ * Given a square number on a chess board, this function converts the square number to its
+ * corresponding X and Y coordinates. The X-coordinate is represented by a letter from 'a' to 'h',
+ * while the Y-coordinate is represented by a number from 1 to 8.
+ *
+ * @param square The square number on the chess board, ranging from 0 to 63.
+ * @return A string representation of the X and Y coordinates in the format "Xn", where X is a letter
+ *         and n is a number.
+ */
+inline std::string convertToXandY(int square) {
+  std::ostringstream out;
+  out << static_cast<char>((square) % 8 + 'a') << (square) / 8 + 1;
+  return out.str();
+}
 
 /**
  * @class Board
@@ -88,50 +106,29 @@ class Board {
   bool isSquareAttacked(std::pair<int, int> square, bool pieceColor);
 
   /**
-   * @brief Checks a move and moves a chess piece on the board.
+   * @brief Attempts to move a chess piece on the board.
    *
-   * This function attempts to move a chess piece on the board. It checks various conditions to ensure the move is valid
-   * and updates the board accordingly. The function returns true if the move is successful, and false otherwise.
-   * If false the move will not be applied!.
+   * This function attempts to move a chess piece on the board. It checks various conditions such as legality of the
+   * move and checks for pieces belonging to the opponent. If the move is successful, it updates the board state
+   * accordingly.
    *
-   * @param fig The character representation of the piece to move.
-   * @param x The x-coordinate of the current position of the piece.
-   * @param y The y-coordinate of the current position of the piece.
-   * @param move_x The x-coordinate of the destination position.
-   * @param move_y The y-coordinate of the destination position.
-   * @param capture True if the move is a capture, false otherwise.
-   * @param promotion_figure The character representation of the piece to promote to, if the move is a promotion.
-   * @return True if the move is successful, false otherwise. If false the move will not be applied!
+   * @param move The move to be made.
+   * @return True if the move is successful, false otherwise. If false, the move will not be applied.
    */
-  bool movePiece(char fig, int x, int y, int move_x, int move_y, bool capture, char promotion_figure);
+  bool tryToMovePiece(Move& move);
 
   /**
    * @brief Moves a chess piece on the board.
    *
-   * This function moves a chess piece on the board. It only checks if the move is legal, you don't set yourself in
-   * check, and updates the board accordingly. This function does not check if the move is correct. Use @see movePiece
-   * for correct checking. The function returns true if the move is successful, and false otherwise. If false the move
-   * will not be applied!
+   * This function moves a chess piece on the board. It only checks if the move is legal (you don't set yourself in
+   * check) and updates the board accordingly. This function does not check if the move is correct. Use @see
+   * tryToMovePiece for correct checking. The function returns true if the move is successful, and false otherwise. If
+   * false the move will not be applied!
    *
    * @param move The move to make.
    * @return True if the move is successful, false otherwise. If false the move will not be applied!.
    */
   bool makeMove(Move move);
-
-  /**
-   * @brief Builds a Move object with the provided parameters.
-   *
-   * This function constructs a Move object with the provided parameters.
-   * It sets the moveSquare, square, movingPiece, capturedPiece, promotionPiece,
-   * and moveType fields of the Move object, and returns the constructed Move object.
-   *
-   * @param position The starting position of the move.
-   * @param moveToPosition The destination position of the move.
-   * @param promotionPiece The piece to promote to (if the move is a promotion).
-   * @param moveType The type of the move.
-   * @return The constructed Move object.
-   */
-  Move buildMove(int position, int moveToPosition, Piece promotionPiece, MoveType moveType);
 
   /**
    * @brief Removes the last move from the list of moves and updates the board state accordingly.
@@ -159,7 +156,18 @@ class Board {
    *
    * @param input The FEN string to parse.
    */
-  void readFen(std::string input);
+  void readFen(const std::string& input);
+
+  /**
+   * @brief Returns the current FEN representation of the chessboard.
+   *
+   * This function returns the current FEN (Forsyth-Edwards Notation) representation of the chessboard.
+   * The FEN string represents the board state, the current player to move, castling rights and the en passant target
+   * square.
+   *
+   * @return The current FEN representation of the chessboard.
+   */
+  std::string getFen();
 
   /**
    * @brief Checks if the current player is in checkmate.
@@ -172,6 +180,20 @@ class Board {
    * @return True if the current player is in checkmate, false otherwise.
    */
   bool isCheckMate(bool isWhite);
+
+  /**
+   * @brief Parses a chess move from a string input.
+   *
+   * This function takes a string input representing a chess move and parses it into a Move object.
+   * The string input should follow this notation: Pa2(x)a3(=Q).
+   * First the piece, second the square, third a capture if it is one, fourth a square and fifth a promotion.
+   * The function extracts the figure, starting square, target square, capture flag, promotion figure,
+   * and move type from the input string and constructs a Move object with these values.
+   *
+   * @param input The string representing the chess move.
+   * @return The parsed Move object.
+   */
+  Move parseMove(std::string input);
 
  private:
   /**

@@ -95,7 +95,7 @@ int ChessBot::search(Board& boardManager, int depth, int alpha, int beta, int pl
     // Set best score if the current one is less.
     if (score > bestScore) {
       bestScore = score;
-      if (ply == 0) { // Set best move if it is the root.
+      if (ply == 0) {  // Set best move if it is the root.
         bestMove = move;
       }
     }

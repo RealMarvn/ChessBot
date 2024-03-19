@@ -49,8 +49,7 @@ class ChessBot {
    */
   static int eval(Board& board);
 
-
-  //These are premade tables from https://www.chessprogramming.org.
+  // These are premade tables from https://www.chessprogramming.org.
   constexpr static int gamePhaseInc[12] = {0, 0, 1, 1, 1, 1, 2, 2, 4, 4, 0, 0};
   constexpr static int mg_pawn_table[64] = {
       0,  0,   0,   0,   0,   0,  0,   0,   98,  134, 61,  95,  68, 126, 34, -11, -6, 7,   26,  31, 65, 56,

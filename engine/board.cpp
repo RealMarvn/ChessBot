@@ -232,16 +232,50 @@ bool Board::isCheckMate(bool isWhite) {
   return counter == 0;
 }
 
-bool Board::movePiece(char fig, int x, int y, int move_x, int move_y, bool capture, char promotion_figure) {
-  // Check if you try to move a piece of the opponent.
-  if ((player == BLACK && isupper(fig)) || (player == WHITE && islower(fig))) {
-    std::cout << "invalid." << std::endl;
-    return false;
+Move Board::parseMove(std::string input) {
+  bool capture = false;
+  char promotion_figure = ' ';
+  char figure = input[0];
+  // Use the ascii code of the char to subtract a number to get the correct number.
+  int x = input[1] - 96;
+  int y = input[2] - 48;
+  int position = calculateSquare(x, y);
+
+  int move_x = input[3] - 96;
+  int move_y = input[4] - 48;
+
+  // Capture can be lower or upper case.
+  if (input[3] == 'x' || input[3] == 'X') {
+    move_x = input[4] - 96;
+    move_y = input[5] - 48;
+    capture = true;
+  }
+  int movePosition = calculateSquare(move_x, move_y);
+
+  // If there is a capture the promotion is moved.
+  if ((capture && input.length() == 8 && input[6] == '=')) {
+    promotion_figure = input[7];
+  } else if (input.length() == 7 && input[5] == '=') {
+    promotion_figure = input[6];
+  }
+  MoveType moveType = NORMAL;
+
+  // If figure is a king
+  if (figure == 'K') {
+    if (position == 4 && movePosition == 6) {
+      moveType = CASTLING;
+    } else if (position == 4 && movePosition == 2) {
+      moveType = CASTLING;
+    }
   }
 
-  MoveType moveType = NORMAL;
-  int position = calculateSquare(x, y);
-  int movePosition = calculateSquare(move_x, move_y);
+  if (figure == 'k') {
+    if (position == 60 && movePosition == 62) {
+      moveType = CASTLING;
+    } else if (position == 60 && movePosition == 58) {
+      moveType = CASTLING;
+    }
+  }
 
   if (movePosition == boardSettings.epSquare) {
     moveType = EN_PASSANT;
@@ -251,36 +285,45 @@ bool Board::movePiece(char fig, int x, int y, int move_x, int move_y, bool captu
     moveType = PROMOTION;
   }
 
+  return Move{
+      movePosition, position, Piece(figure), (capture ? board[movePosition] : Piece(EMPTY)), Piece(promotion_figure),
+      moveType};
+}
+
+bool Board::tryToMovePiece(Move& move) {
+  bool capture = false;
+  if (move.capturedPiece.pieceType != EMPTY) {
+    capture = true;
+  }
+  // Check if you try to move a piece of the opponent.
+  if ((player == BLACK && move.movingPiece.isWhite()) || (player == WHITE && (!move.movingPiece.isWhite()))) {
+    return false;
+  }
+
   // Check if moveSquare is out of bounds!
-  if (position < 0 || position > 63 || movePosition < 0 || movePosition > 63) {
-    std::cout << "invalid" << std::endl;
+  if (move.square < 0 || move.square > 63 || move.moveSquare < 0 || move.moveSquare > 63) {
     return false;
   }
 
   // Check if moving piece is really that piece.
-  if (board[position].toChar() != fig) {
-    std::cout << "invalid" << std::endl;
+  if (board[move.square].pieceType != move.movingPiece.pieceType) {
     return false;
   }
 
   // Check if capture an empty field or a field without a capture
-  if ((board[movePosition].pieceType != EMPTY && !capture) || (capture && board[movePosition].pieceType == EMPTY)) {
-    std::cout << "invalid" << std::endl;
+  if ((board[move.moveSquare].pieceType != EMPTY && !capture) ||
+      (capture && board[move.moveSquare].pieceType == EMPTY)) {
     return false;
   }
 
   if (capture) {
     // Check if you try to capture your own team.
-    if ((board[position].isWhite() && board[movePosition].isWhite()) ||
-        ((!board[position].isWhite()) && (!board[movePosition].isWhite()))) {
-      std::cout << "invalid" << std::endl;
+    if ((board[move.square].isWhite() && board[move.moveSquare].isWhite()) ||
+        ((!board[move.square].isWhite()) && (!board[move.moveSquare].isWhite()))) {
       return false;
     }
   }
 
-  // TODO add casteling
-  // Build the move you try to execute.
-  Move move = buildMove(position, movePosition, Piece(promotion_figure), moveType);
   // Check if your move is pseudo legal.
   if (moveGenUtils::getAllPseudoLegalMoves(*this, player == WHITE).contains(move)) {
     // Check moves legality.
@@ -290,87 +333,42 @@ bool Board::movePiece(char fig, int x, int y, int move_x, int move_y, bool captu
     }
     return true;
   } else {
-    std::cout << "invalid" << std::endl;
     return false;
   }
 }
 
-void Board::readFen(std::string input) {
+void Board::readFen(const std::string& input) {
   std::vector<std::string> fenSettings;
 
   std::istringstream iss(input);
   for (std::string s; iss >> s;) fenSettings.push_back(s);
+
+  if (fenSettings.size() != 6) {
+    throw InvalidFENException();
+  }
+
   player = WHITE;
   boardSettings = board_setting{100, false, false, false, false};
 
-  int inputIndex = 0;
   int x = 1;
   int y = 8;
-  while (input[inputIndex] != ' ' && y != 0) {
-    if (x > 8) {
+  for (char& character : fenSettings[0]) {
+    if (character == '/') {
+      y--;
       x = 1;
+      continue;
     }
 
-    switch (input[inputIndex]) {
-      case '/':
-        y--;
-        break;
-      case 'k':
-        board[calculateSquare(x, y)] = Piece(BK);
+    if (std::isdigit(character)) {
+      for (int i = character - '0'; i > 0; --i) {
+        board[calculateSquare(x, y)] = Piece(EMPTY);
         x++;
-        break;
-      case 'K':
-        board[calculateSquare(x, y)] = Piece(WK);
-        x++;
-        break;
-      case 'q':
-        board[calculateSquare(x, y)] = Piece(BQ);
-        x++;
-        break;
-      case 'Q':
-        board[calculateSquare(x, y)] = Piece(WQ);
-        x++;
-        break;
-      case 'r':
-        board[calculateSquare(x, y)] = Piece(BR);
-        x++;
-        break;
-      case 'R':
-        board[calculateSquare(x, y)] = Piece(WR);
-        x++;
-        break;
-      case 'b':
-        board[calculateSquare(x, y)] = Piece(BB);
-        x++;
-        break;
-      case 'B':
-        board[calculateSquare(x, y)] = Piece(WB);
-        x++;
-        break;
-      case 'n':
-        board[calculateSquare(x, y)] = Piece(BN);
-        x++;
-        break;
-      case 'N':
-        board[calculateSquare(x, y)] = Piece(WN);
-        x++;
-        break;
-      case 'p':
-        board[calculateSquare(x, y)] = Piece(BP);
-        x++;
-        break;
-      case 'P':
-        board[calculateSquare(x, y)] = Piece(WP);
-        x++;
-        break;
-      default:
-        for (int i = input[inputIndex] - '0'; i > 0; --i) {
-          board[calculateSquare(x, y)] = Piece(EMPTY);
-          x++;
-        }
-        break;
+      }
+      continue;
     }
-    inputIndex++;
+
+    board[calculateSquare(x, y)] = Piece(character);
+    x++;
   }
 
   // Set turn
@@ -426,13 +424,66 @@ void Board::printCurrentBoard() {
   std::cout << std::endl;
 }
 
-Move Board::buildMove(int position, int moveToPosition, Piece promotionPiece, MoveType moveType) {
-  Move move{};
-  move.moveSquare = moveToPosition;
-  move.square = position;
-  move.movingPiece = board[position];
-  move.capturedPiece = board[moveToPosition];
-  move.promotionPiece = promotionPiece;
-  move.moveType = moveType;
-  return move;
+std::string Board::getFen() {
+  std::string outPutFen;
+  // Got through y = 8-1 and x = 1-8.
+  for (int y = 8; y > 0; y--) {
+    // Representing the number of empty fields in one row.
+    int emptyFields = 0;
+    for (int x = 1; x < 9; x++) {
+      Piece piece = board[calculateSquare(x, y)];
+      if (piece.pieceType == EMPTY) {
+        emptyFields++;
+        // If the whole row is Empty fields it should print it after hitting the end.
+        if (x == 8) {
+          outPutFen += std::to_string(emptyFields);
+        }
+      } else {
+        // If there were only empty fields until now. Add the number!
+        if (emptyFields != 0) {
+          outPutFen += std::to_string(emptyFields);
+          emptyFields = 0;
+        }
+        outPutFen += board[calculateSquare(x, y)].toChar();
+      }
+    }
+    // Add the line break!
+    if (y != 1) {
+      outPutFen += '/';
+    }
+  }
+
+  outPutFen += ' ';
+  // Add the turn.
+  outPutFen += (player == WHITE) ? "w" : "b";
+  outPutFen += ' ';
+
+  // Add castling rights!
+  if (boardSettings.blackQueenSide || boardSettings.whiteQueenSide || boardSettings.whiteKingSide ||
+      boardSettings.blackKingSide) {
+    if (boardSettings.whiteKingSide) {
+      outPutFen += 'K';
+    }
+    if (boardSettings.whiteQueenSide) {
+      outPutFen += 'Q';
+    }
+    if (boardSettings.blackKingSide) {
+      outPutFen += 'k';
+    }
+    if (boardSettings.blackQueenSide) {
+      outPutFen += 'q';
+    }
+  } else {
+    outPutFen += '-';
+  }
+
+  outPutFen += ' ';
+  // Add EP square
+  outPutFen += boardSettings.epSquare != 100 ? convertToXandY(boardSettings.epSquare) : "-";
+  outPutFen += ' ';
+  // Add turns
+  outPutFen += '0';
+  outPutFen += ' ';
+  outPutFen += '1';
+  return outPutFen;
 }
