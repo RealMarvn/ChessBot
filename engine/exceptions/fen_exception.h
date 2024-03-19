@@ -10,6 +10,6 @@
 
 class InvalidFENException : public std::exception {
  public:
-  explicit InvalidFENException() = default;
+  InvalidFENException() = default;
   [[nodiscard]] const char* what() const noexcept override { return "FEN is invalid!!!"; }
 };
