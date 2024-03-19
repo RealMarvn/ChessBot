@@ -2,7 +2,7 @@
 // Created by Marvin Becker on 15.12.23.
 //
 
-#include "board.h"
+#include "./board.h"
 
 #include "./chess_bot.h"
 
