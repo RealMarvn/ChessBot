@@ -55,11 +55,11 @@ inline std::string convertToXandY(int square) {
 class Board {
  private:
   // Represents the board.
-  std::array<Piece, 64> board;
+  std::array<Piece, 64> board{Piece(EMPTY)};
 
  public:
   // Represents the current side to move.
-  player_type player;
+  player_type player{WHITE};
   // Represents all moves so far.
   std::vector<Move> moves;
   // Represents all settings so far.
@@ -76,7 +76,7 @@ class Board {
    * This constructor initializes a new Board object. It sets the current player to WHITE and initializes
    * each piece on the board to an empty piece. It then reads the initial board state from a FEN string.
    */
-  explicit Board() : player(WHITE), board{Piece()} {
+  explicit Board() : player(WHITE), board{Piece(EMPTY)} {
     readFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
   };
 
