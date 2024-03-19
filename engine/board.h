@@ -10,6 +10,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "./exceptions/fen_exception.h"
 #include "./misc/board_settings.h"
@@ -72,9 +73,7 @@ class Board {
    * This constructor initializes a new Board object. It sets the current player to WHITE and initializes
    * each piece on the board to an empty piece. It then reads the initial board state from a FEN string.
    */
-  explicit Board() : player(WHITE), board{Piece(EMPTY)} {
-    readFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-  };
+  Board() : player(WHITE), board{Piece(EMPTY)} { readFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); };
 
   /**
    * @brief Checks if the king of the given piece color is in check.
