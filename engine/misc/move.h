@@ -39,9 +39,6 @@ struct Move {
     std::ostringstream out;
     out << movingPiece.toChar();
     out << static_cast<char>((square) % 8 + 'a') << (square) / 8 + 1;
-    if (capturedPiece.pieceType != EMPTY) {
-      out << 'x';
-    }
     out << static_cast<char>((moveSquare) % 8 + 'a') << (moveSquare) / 8 + 1;
     if (moveType == PROMOTION) {
       out << '=' << promotionPiece.toChar();

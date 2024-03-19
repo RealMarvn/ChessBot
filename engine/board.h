@@ -181,7 +181,7 @@ class Board {
    *
    * This function takes a string input representing a chess move and parses it into a Move object.
    * The string input should follow this notation: Pa2(x)a3(=Q).
-   * First the piece, second the square, third a capture if it is one, fourth a square and fifth a promotion.
+   * First the piece, second the square, third capture is optional, fourth a square and fifth a promotion.
    * The function extracts the figure, starting square, target square, capture flag, promotion figure,
    * and move type from the input string and constructs a Move object with these values.
    *

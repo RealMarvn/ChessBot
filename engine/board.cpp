@@ -281,9 +281,7 @@ Move Board::parseMove(std::string input) {
     moveType = PROMOTION;
   }
 
-  return Move{
-      movePosition, position, Piece(figure), (capture ? board[movePosition] : Piece(EMPTY)), Piece(promotion_figure),
-      moveType};
+  return Move{movePosition, position, Piece(figure), board[movePosition], Piece(promotion_figure), moveType};
 }
 
 bool Board::tryToMovePiece(Move& move) {
@@ -291,6 +289,7 @@ bool Board::tryToMovePiece(Move& move) {
   if (move.capturedPiece.pieceType != EMPTY) {
     capture = true;
   }
+
   // Check if you try to move a piece of the opponent.
   if ((player == BLACK && move.movingPiece.isWhite()) || (player == WHITE && (!move.movingPiece.isWhite()))) {
     return false;
@@ -303,12 +302,6 @@ bool Board::tryToMovePiece(Move& move) {
 
   // Check if moving piece is really that piece.
   if (board[move.square].pieceType != move.movingPiece.pieceType) {
-    return false;
-  }
-
-  // Check if capture an empty field or a field without a capture
-  if ((board[move.moveSquare].pieceType != EMPTY && !capture) ||
-      (capture && board[move.moveSquare].pieceType == EMPTY)) {
     return false;
   }
 

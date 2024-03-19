@@ -119,4 +119,3 @@ void getAllPossibleKnightMoves(std::pair<int, int> startSquare, Board& board, Ps
 void getAllPossibleBishopMoves(std::pair<int, int> startSquare, Board& board, PseudoLegalMoves& allPseudoMoves,
                                bool pieceColor);
 }  // namespace moveGenUtils
-
