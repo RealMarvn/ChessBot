@@ -53,10 +53,6 @@ inline std::string convertToXandY(int square) {
  * The Board class represents a chessboard and provides functions for managing the state of the board and making moves.
  */
 class Board {
- private:
-  // Represents the board.
-  std::array<Piece, 64> board{Piece(EMPTY)};
-
  public:
   // Represents the current side to move.
   player_type player{WHITE};
@@ -196,6 +192,9 @@ class Board {
   Move parseMove(std::string input);
 
  private:
+  // Represents the board.
+  std::array<Piece, 64> board{Piece(EMPTY)};
+
   /**
    * @brief Updates the castling permissions after a move.
    *
