@@ -2,7 +2,7 @@
 // Created by Marvin Becker on 16.03.24.
 //
 
-#include "chess_game.h"
+#include "./chess_game.h"
 
 #ifdef DEBUG
 uint64_t perft(Board& boardManager, int depth, bool player) {
