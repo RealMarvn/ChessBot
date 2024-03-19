@@ -79,7 +79,7 @@ TEST(UserInput, MoveParsing) {
     // Build the move based on the input string.
     Move move = myBoard.parseMove(settings[1]);
     // Convert the move back to a string and check if it is the same.
-    ASSERT_EQ(move.convertToXandY(), settings[1]);
+    ASSERT_EQ(move.toString(), settings[1]);
   }
 }
 

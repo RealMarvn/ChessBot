@@ -35,7 +35,7 @@ struct Move {
    *
    * @return A string representation of the X and Y coordinates of the Move object.
    */
-  [[nodiscard]] std::string convertToXandY() const {
+  [[nodiscard]] std::string toString() const {
     std::ostringstream out;
     out << movingPiece.toChar();
     out << static_cast<char>((square) % 8 + 'a') << (square) / 8 + 1;

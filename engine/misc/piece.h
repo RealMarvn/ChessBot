@@ -3,7 +3,7 @@
 //
 
 #pragma once
-#include <map>
+#include <cassert>
 
 enum PieceType { WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, EMPTY };
 
@@ -73,13 +73,14 @@ class Piece {
    */
   [[nodiscard]] int getMaterialValue(bool endGame) const {
     if (pieceType == EMPTY) return 0;
-    return ((isWhite() ? 1 : -1) * (endGame ? eg_pieceValue[pieceType] : mg_pieceValue[pieceType]));
+    return ((isWhite() ? 1 : -1) * (endGame ? eg_pieceValue[pieceType % BP] : mg_pieceValue[pieceType % BP]));
   };
 
  private:
-  constexpr static int mg_pieceValue[6] = {82, 337, 365, 477, 1025, 0};
-  constexpr static int eg_pieceValue[6] = {94, 281, 297, 512, 936, 0};
+  constexpr static int eg_pieceValue[6] = {94, 281, 297, 512, 936, 1000};
+  constexpr static int mg_pieceValue[6] = {82, 337, 365, 477, 1025, 1000};
   constexpr static char pieceToChar[13] = {'P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k', ' '};
+
   /**
    * @brief Finds the PieceType based on the given character value.
    *

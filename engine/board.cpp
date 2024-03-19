@@ -262,17 +262,13 @@ Move Board::parseMove(std::string input) {
 
   // If figure is a king
   if (figure == 'K') {
-    if (position == 4 && movePosition == 6) {
-      moveType = CASTLING;
-    } else if (position == 4 && movePosition == 2) {
+    if (position == 4 && (movePosition == 6 || movePosition == 2)) {
       moveType = CASTLING;
     }
   }
 
   if (figure == 'k') {
-    if (position == 60 && movePosition == 62) {
-      moveType = CASTLING;
-    } else if (position == 60 && movePosition == 58) {
+    if (position == 60 && (movePosition == 62 || movePosition == 58)) {
       moveType = CASTLING;
     }
   }

@@ -21,7 +21,7 @@ class ChessBot {
    *
    * @return The best move found by the search algorithm.
    */
-  Move searchBestNextMove(Board& board, int depth);
+  static Move searchBestNextMove(Board& board, int depth);
 
  private:
   /**
@@ -35,7 +35,7 @@ class ChessBot {
    * @param bestMove The reference to the best move found so far.
    * @return The score of the best move found.
    */
-  int search(Board& boardManager, int depth, int alpha, int beta, int ply, Move& bestMove);
+  static int search(Board& boardManager, int depth, int alpha, int beta, int ply, Move& bestMove);
   /**
    * @brief Evaluates the position on the chess board.
    *

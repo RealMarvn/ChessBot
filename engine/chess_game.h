@@ -14,7 +14,7 @@ class ChessGame {
    * @class ChessGame
    * Represents a chess game.
    */
-  ChessGame() : board{Board()}, bot{ChessBot()} {};
+  ChessGame() : board{new Board} {};
 
   /**
    * @brief Starts the chess game and handles the input and gameplay.
@@ -26,6 +26,5 @@ class ChessGame {
   void start();
 
  private:
-  Board board;
-  ChessBot bot;
+  std::unique_ptr<Board> board;
 };

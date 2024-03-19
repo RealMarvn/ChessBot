@@ -5,7 +5,7 @@
 #include "./piece.h"
 
 PieceType Piece::findKeyByValue(char value) {
-  for (int i=0; i<13; ++i) {
+  for (int i = 0; i < 13; ++i) {
     if (pieceToChar[i] == value) return static_cast<PieceType>(i);
   }
   return EMPTY;
