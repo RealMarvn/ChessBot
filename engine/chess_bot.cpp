@@ -64,6 +64,8 @@ int ChessBot::eval(Board& board) {
     }
   }
 
+  // Calculate PSQT and game phase (CODE from https://www.chessprogramming.org/PeSTO's_Evaluation_Function) (MODIFIED by
+  // MARVIN).
   int mgScore = mg[board.player == WHITE] - mg[board.player != WHITE] + mg_MaterialValue;
   int egScore = eg[board.player == WHITE] - eg[board.player != WHITE] + eg_MaterialValue;
   int mgPhase = gamePhase;

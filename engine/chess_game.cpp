@@ -48,24 +48,24 @@ uint64_t split_perft(Board& boardManager, int depth, bool player) {
 #endif
 
 void ChessGame::start() {
-  board->printCurrentBoard();
+  board.printCurrentBoard();
   std::string input;
   while (getline(std::cin, input)) {
     // Read in FEN notation.
     if (input[0] == 'F') {
-      board->readFen(input.substr(1, input.length()));
+      board.readFen(input.substr(1, input.length()));
 #ifdef DEBUG
       split_perft(*board, 1, board->player == WHITE);
 #endif
-      board->printCurrentBoard();
+      board.printCurrentBoard();
       continue;
     }
 
     // undo the last two moves. (Bot did also move that's why)
     if (input == "undo") {
-      board->popLastMove();
-      board->popLastMove();
-      board->printCurrentBoard();
+      board.popLastMove();
+      board.popLastMove();
+      board.printCurrentBoard();
       continue;
     }
 
@@ -74,22 +74,22 @@ void ChessGame::start() {
       continue;
     }
 
-    Move move = board->parseMove(input);
+    Move move = board.parseMove(input);
 
     // Make the move and check for CheckMate.
-    if (board->tryToMovePiece(move)) {
-      if (board->isCheckMate(board->player == WHITE)) {
+    if (board.tryToMovePiece(move)) {
+      if (board.isCheckMate(board.player == WHITE)) {
         std::cout << "CHECK MATE!" << std::endl;
         return;
       }
 
       // Bot can only move legal so no need to check if the move is legal.
       // Check if opponent is in check mate after bots turn.
-      board->makeMove(bot->searchBestNextMove(*board, 5));
-      board->printCurrentBoard();
+      board.makeMove(bot.searchBestNextMove(board, 5));
+      board.printCurrentBoard();
 
-      if (board->isCheckMate(board->player == WHITE)) {
-        board->printCurrentBoard();
+      if (board.isCheckMate(board.player == WHITE)) {
+        board.printCurrentBoard();
         std::cout << "CHECK MATE!" << std::endl;
         return;
       }
