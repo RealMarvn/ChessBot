@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
 enable_testing()
 
-add_executable(pk1_pruefung main.cpp
+add_executable(pk1_pruefung engine/main.cpp
         engine/board.cpp
         engine/board.h
         engine/movement/move_gen.cpp

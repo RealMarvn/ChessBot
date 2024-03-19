@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "./engine/chess_game.h"
+#include "chess_game.h"
 
 int main() {
   ChessGame chessGame;
