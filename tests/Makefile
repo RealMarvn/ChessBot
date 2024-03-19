@@ -5,7 +5,7 @@ GOOGLE_TEST_INCLUDE = /usr/local/include
 
 G++ = g++
 
-G++_FLAGS = -std=c++17 -c -Wall -I $(GOOGLE_TEST_INCLUDE)
+G++_FLAGS = -std=c++17 -c -Wall -Wextra -Wpedantic -O3 -I $(GOOGLE_TEST_INCLUDE)
 LD_FLAGS = -L /usr/local/lib -l $(GOOGLE_TEST_LIB) -l pthread
 
 OBJECTS = chess_game.o chess_bot.o board.o move_gen.o piece.o tests.o

@@ -1,8 +1,8 @@
-# Makefile for gtest
+# Makefile for chess engine
 
 G++ = g++
 
-G++_FLAGS = -std=c++17 -c -Wall -O3
+G++_FLAGS = -std=c++17 -c -Wall -Wextra -Wpedantic -O3
 LD_FLAGS = -L /usr/local/lib -l pthread
 
 OBJECTS = chess_game.o chess_bot.o board.o move_gen.o piece.o main.o
