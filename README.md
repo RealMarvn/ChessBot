@@ -322,7 +322,7 @@ Spielerzügen funktionieren fehlerfrei. Da ich bei einem Zug von dem Spieler den
 MoveGEN ist garantiert das der Spieler nur einen Zug machen kann welcher auch von der MoveGEN generiert werden kann.
 Diese ist mit Perft auf ihre Korrektheit ueberprueft und somit kann sich der Spieler nur legal bewegen.
 
-##### Wichtig: Beim Testen den Pfad in /tests/tests.cpp anpassen, da absolute Pfade verwendet werden!
+### **Wichtig: Beim Testen den Pfad in /tests/tests.cpp anpassen, da absolute Pfade verwendet werden!**
 
 [//]: # (Beim schreiben der automatisierten Test habe ich 2 verschiedene Tests vorbereitet welche Zeigen das der Code fehlerfrei)
 
