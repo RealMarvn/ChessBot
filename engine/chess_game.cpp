@@ -4,49 +4,6 @@
 
 #include "./chess_game.h"
 
-#ifdef DEBUG
-uint64_t perft(Board& boardManager, int depth, bool player) {
-  if (depth == 0) {
-    return 1;
-  }
-
-  uint64_t nodes = 0;
-  // Get all moves.
-  auto moves = moveGenUtils::getAllPseudoLegalMoves(boardManager, player);
-  for (Move& move : moves) {
-    // If move is valid get the value.
-    if (boardManager.makeMove(move)) {
-      nodes += perft(boardManager, depth - 1, !player);
-      boardManager.popLastMove();
-    }
-  }
-
-  return nodes;
-}
-
-uint64_t split_perft(Board& boardManager, int depth, bool player) {
-  if (depth == 0) {
-    return 0;
-  }
-
-  int number = 0;
-
-  // Generate every move for the current position.
-  auto moves = moveGenUtils::getAllPseudoLegalMoves(boardManager, player);
-  for (Move& move : moves) {
-    if (boardManager.makeMove(move)) {
-      uint64_t child_nodes = perft(boardManager, depth - 1, !player);
-
-      number += child_nodes;
-      // Print all moves a move can generate.
-      std::cout << move.convertToXandY() << " - " << child_nodes << std::endl;
-      boardManager.popLastMove();
-    }
-  }
-  return number;
-}
-#endif
-
 void ChessGame::start() {
   board->printCurrentBoard();
   std::string input;
@@ -54,9 +11,6 @@ void ChessGame::start() {
     // Read in FEN notation.
     if (input[0] == 'F') {
       board->readFen(input.substr(1, input.length()));
-#ifdef DEBUG
-      split_perft(*board, 1, board->player == WHITE);
-#endif
       board->printCurrentBoard();
       continue;
     }

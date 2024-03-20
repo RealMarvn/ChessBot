@@ -32,23 +32,6 @@
 inline int calculateSquare(int x, int y) { return ((y - 1) * 8 + x) - 1; }
 
 /**
- * @brief Converts a square number to its corresponding X and Y coordinates on a chess board.
- *
- * Given a square number on a chess board, this function converts the square number to its
- * corresponding X and Y coordinates. The X-coordinate is represented by a letter from 'a' to 'h',
- * while the Y-coordinate is represented by a number from 1 to 8.
- *
- * @param square The square number on the chess board, ranging from 0 to 63.
- * @return A string representation of the X and Y coordinates in the format "Xn", where X is a letter
- *         and n is a number.
- */
-inline std::string convertToXandY(int square) {
-  std::ostringstream out;
-  out << static_cast<char>((square) % 8 + 'a') << (square) / 8 + 1;
-  return out.str();
-}
-
-/**
  * @class Board
  * @brief Represents a chessboard.
  *
@@ -208,4 +191,21 @@ class Board {
    * @param move The move that was made.
    */
   void handleCastlingPermissions(Move& move);
+
+  /**
+   * @brief Converts a square number to its corresponding X and Y coordinates on a chess board.
+   *
+   * Given a square number on a chess board, this function converts the square number to its
+   * corresponding X and Y coordinates. The X-coordinate is represented by a letter from 'a' to 'h',
+   * while the Y-coordinate is represented by a number from 1 to 8.
+   *
+   * @param square The square number on the chess board, ranging from 0 to 63.
+   * @return A string representation of the X and Y coordinates in the format "Xn", where X is a letter
+   *         and n is a number.
+   */
+  static inline std::string convertToXandY(int square) {
+    std::ostringstream out;
+    out << static_cast<char>((square) % 8 + 'a') << (square) / 8 + 1;
+    return out.str();
+  }
 };

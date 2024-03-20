@@ -46,7 +46,7 @@ PseudoLegalMoves moveGenUtils::getAllPseudoLegalMoves(Board& board, bool player)
 }
 
 template <int arraySize>
-inline static void getAllTemplateMoves(std::pair<int, int>& startSquare, Board& board, PseudoLegalMoves& allPseudoMoves,
+inline static void getAllLinearMoves(std::pair<int, int>& startSquare, Board& board, PseudoLegalMoves& allPseudoMoves,
                                        bool pieceColor, PieceType movingPiece,
                                        std::array<std::pair<int, int>, arraySize> directions) {
   int old_position = calculateSquare(startSquare.first, startSquare.second);
@@ -89,7 +89,7 @@ void moveGenUtils::getAllPossibleRookMoves(std::pair<int, int> startSquare, Boar
   std::array<std::pair<int, int>, 4> directions = {std::pair(-1, 0), std::pair(1, 0), std::pair(0, -1),
                                                    std::pair(0, 1)};
 
-  getAllTemplateMoves<4>(startSquare, board, allPseudoMoves, pieceColor, (pieceColor ? WR : BR), directions);
+  getAllLinearMoves<4>(startSquare, board, allPseudoMoves, pieceColor, (pieceColor ? WR : BR), directions);
 }
 
 void moveGenUtils::getAllPossibleBishopMoves(std::pair<int, int> startSquare, Board& board,
@@ -97,7 +97,7 @@ void moveGenUtils::getAllPossibleBishopMoves(std::pair<int, int> startSquare, Bo
   std::array<std::pair<int, int>, 4> directions = {std::pair(-1, -1), std::pair(-1, 1), std::pair(1, -1),
                                                    std::pair(1, 1)};
 
-  getAllTemplateMoves<4>(startSquare, board, allPseudoMoves, pieceColor, (pieceColor ? WB : BB), directions);
+  getAllLinearMoves<4>(startSquare, board, allPseudoMoves, pieceColor, (pieceColor ? WB : BB), directions);
 }
 
 void moveGenUtils::getAllPossibleQueenMoves(std::pair<int, int> startSquare, Board& board,
@@ -107,7 +107,7 @@ void moveGenUtils::getAllPossibleQueenMoves(std::pair<int, int> startSquare, Boa
       std::pair(-1, -1), std::pair(-1, 1), std::pair(1, -1), std::pair(1, 1),
   };
 
-  getAllTemplateMoves<8>(startSquare, board, allPseudoMoves, pieceColor, (pieceColor ? WQ : BQ), directions);
+  getAllLinearMoves<8>(startSquare, board, allPseudoMoves, pieceColor, (pieceColor ? WQ : BQ), directions);
 }
 
 void moveGenUtils::getAllPossibleKingMoves(std::pair<int, int> startSquare, Board& board,
