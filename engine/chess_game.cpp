@@ -13,6 +13,9 @@ void ChessGame::start() {
       board->readFen(input.substr(1, input.length()));
       board->printCurrentBoard();
       continue;
+    } else if (input[0] == 'f') {
+      std::cout << "Your FEN: " << board->getFen() << std::endl;
+      continue;
     }
 
     // undo the last two moves. (Bot did also move that's why)
