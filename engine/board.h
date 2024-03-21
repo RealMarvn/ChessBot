@@ -141,17 +141,6 @@ class Board {
   void readFen(const std::string& input);
 
   /**
-   * @brief Returns the current FEN representation of the chessboard.
-   *
-   * This function returns the current FEN (Forsyth-Edwards Notation) representation of the chessboard.
-   * The FEN string represents the board state, the current player to move, castling rights and the en passant target
-   * square.
-   *
-   * @return The current FEN representation of the chessboard.
-   */
-  std::string getFen();
-
-  /**
    * @brief Checks if the current player is in checkmate.
    *
    * This function determines if the current player is in checkmate.

@@ -47,8 +47,8 @@ PseudoLegalMoves moveGenUtils::getAllPseudoLegalMoves(Board& board, bool player)
 
 template <int arraySize>
 inline static void getAllLinearMoves(std::pair<int, int>& startSquare, Board& board, PseudoLegalMoves& allPseudoMoves,
-                                       bool pieceColor, PieceType movingPiece,
-                                       std::array<std::pair<int, int>, arraySize> directions) {
+                                     bool pieceColor, PieceType movingPiece,
+                                     std::array<std::pair<int, int>, arraySize> directions) {
   int old_position = calculateSquare(startSquare.first, startSquare.second);
 
   Move move{};
