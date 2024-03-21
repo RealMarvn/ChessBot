@@ -413,3 +413,67 @@ void Board::printCurrentBoard() {
   }
   std::cout << std::endl;
 }
+
+std::string Board::getFen() {
+  std::string outPutFen;
+  // Got through y = 8-1 and x = 1-8.
+  for (int y = 8; y > 0; y--) {
+    // Representing the number of empty fields in one row.
+    int emptyFields = 0;
+    for (int x = 1; x < 9; x++) {
+      Piece piece = board[calculateSquare(x, y)];
+      if (piece.pieceType == EMPTY) {
+        emptyFields++;
+        // If the whole row is Empty fields it should print it after hitting the end.
+        if (x == 8) {
+          outPutFen += std::to_string(emptyFields);
+        }
+      } else {
+        // If there were only empty fields until now. Add the number!
+        if (emptyFields != 0) {
+          outPutFen += std::to_string(emptyFields);
+          emptyFields = 0;
+        }
+        outPutFen += board[calculateSquare(x, y)].toChar();
+      }
+    }
+    // Add the line break!
+    if (y != 1) {
+      outPutFen += '/';
+    }
+  }
+
+  outPutFen += ' ';
+  // Add the turn.
+  outPutFen += (player == WHITE) ? "w" : "b";
+  outPutFen += ' ';
+
+  // Add castling rights!
+  if (boardSettings.blackQueenSide || boardSettings.whiteQueenSide || boardSettings.whiteKingSide ||
+      boardSettings.blackKingSide) {
+    if (boardSettings.whiteKingSide) {
+      outPutFen += 'K';
+    }
+    if (boardSettings.whiteQueenSide) {
+      outPutFen += 'Q';
+    }
+    if (boardSettings.blackKingSide) {
+      outPutFen += 'k';
+    }
+    if (boardSettings.blackQueenSide) {
+      outPutFen += 'q';
+    }
+  } else {
+    outPutFen += '-';
+  }
+
+  outPutFen += ' ';
+  // Add EP square
+  outPutFen += boardSettings.epSquare != 100 ? convertToXandY(boardSettings.epSquare) : "-";
+  outPutFen += ' ';
+  // Add turns
+  outPutFen += '0';
+  outPutFen += ' ';
+  outPutFen += '1';
+  return outPutFen;
+}
