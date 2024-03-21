@@ -388,6 +388,7 @@ void Board::readFen(const std::string& input) {
 
   // Save current settings.
   history.push_back(boardSettings);
+  moves.clear();
 }
 
 void Board::printCurrentBoard() {

@@ -36,6 +36,7 @@ class ChessBot {
    * @return The score of the best move found.
    */
   static int search(Board& boardManager, int depth, int alpha, int beta, int ply, Move& bestMove);
+
   /**
    * @brief Evaluates the position on the chess board.
    *
