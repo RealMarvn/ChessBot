@@ -76,6 +76,7 @@ TEST(Board, GenerateFenTest) {
     // Read in FEN.
     myBoard.readFen(settings[0]);
 
+    // Add the space after the fen because the data has one in the end.
     ASSERT_EQ(myBoard.getFen() + " ", settings[0]);
   }
 }
