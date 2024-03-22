@@ -13,7 +13,6 @@ add_executable(pk1_pruefung engine/main.cpp
         engine/movement/move_gen.h
         engine/misc/move.h
         engine/misc/piece.h
-        engine/misc/piece.cpp
         engine/chess_bot.cpp
         engine/chess_bot.h
         engine/misc/board_settings.h
@@ -21,6 +20,7 @@ add_executable(pk1_pruefung engine/main.cpp
         engine/chess_game.h
         engine/misc/player.h
         engine/exceptions/fen_exception.h
+        engine/exceptions/board_exception.h
 )
 
 include(FetchContent)
@@ -40,9 +40,9 @@ add_executable(tests tests/tests.cpp
         engine/movement/move_gen.h
         engine/misc/move.h
         engine/misc/piece.h
-        engine/misc/piece.cpp
         engine/chess_bot.cpp
         engine/chess_bot.h
+        engine/exceptions/board_exception.h
 )
 
 # Link the Google libraries to your test executable

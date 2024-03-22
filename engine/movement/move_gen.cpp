@@ -5,11 +5,13 @@
 
 PseudoLegalMoves moveGenUtils::getAllPseudoLegalMoves(Board& board, bool player) {
   PseudoLegalMoves allPseudoMoves;
+  // Go through the board with x and y coordinates.
   for (int y = 1; y < 9; y++) {
     for (int x = 1; x < 9; x++) {
+      // Get the piece.
       Piece piece = board[calculateSquare(x, y)];
       if (piece.pieceType != EMPTY) {
-        if ((piece.isWhite() && player) || (!piece.isWhite() && !player)) {
+        if ((piece.isWhite() && player) || (!piece.isWhite() && !player)) {  // Only get the players pieces.
           switch (piece.pieceType) {
             case BP:
             case WP:
@@ -42,6 +44,7 @@ PseudoLegalMoves moveGenUtils::getAllPseudoLegalMoves(Board& board, bool player)
       }
     }
   }
+  // Return all moves.
   return allPseudoMoves;
 }
 
@@ -49,32 +52,39 @@ template <int arraySize>
 inline static void getAllLinearMoves(std::pair<int, int>& startSquare, Board& board, PseudoLegalMoves& allPseudoMoves,
                                      bool pieceColor, PieceType movingPiece,
                                      std::array<std::pair<int, int>, arraySize> directions) {
+  // Calculate the square where the piece will be.
   int old_position = calculateSquare(startSquare.first, startSquare.second);
 
+  // Build the move already.
   Move move{};
   move.square = old_position;
   move.movingPiece.pieceType = movingPiece;
 
+  // Go through all directions.
   for (const auto& dir : directions) {
     int x = startSquare.first + dir.first;
     int y = startSquare.second + dir.second;
 
     // Every direction until the board ends.
     while (x > 0 && y > 0 && x < 9 && y < 9) {
+      // Calculate the position.
       int position = calculateSquare(x, y);
+      // Add to move.
       move.moveSquare = position;
       move.capturedPiece = board[position];
 
+      // If move to an EMPTY field, just add it.
       if (board[position].pieceType == EMPTY) {
         allPseudoMoves.push_back(move);
-      } else if (board[position].pieceType != EMPTY) {
+      } else if (board[position].pieceType != EMPTY) {  // If it is a piece.
         // Check if it is your own piece.
         if ((pieceColor && board[position].isWhite()) || (!pieceColor && !board[position].isWhite())) {
+          // Break the loop cause you cannot move further.
           break;
         }
+        // Add if enemy piece.
         allPseudoMoves.push_back(move);
-        break;
-      } else {
+        // Break the loop cause you cannot move further.
         break;
       }
 
@@ -86,38 +96,44 @@ inline static void getAllLinearMoves(std::pair<int, int>& startSquare, Board& bo
 
 void moveGenUtils::getAllPossibleRookMoves(std::pair<int, int> startSquare, Board& board,
                                            PseudoLegalMoves& allPseudoMoves, bool pieceColor) {
+  // All directions a rook can move.
   std::array<std::pair<int, int>, 4> directions = {std::pair(-1, 0), std::pair(1, 0), std::pair(0, -1),
                                                    std::pair(0, 1)};
 
+  // Generate all the moves.
   getAllLinearMoves<4>(startSquare, board, allPseudoMoves, pieceColor, (pieceColor ? WR : BR), directions);
 }
 
 void moveGenUtils::getAllPossibleBishopMoves(std::pair<int, int> startSquare, Board& board,
                                              PseudoLegalMoves& allPseudoMoves, bool pieceColor) {
+  // All directions a bishop can move.
   std::array<std::pair<int, int>, 4> directions = {std::pair(-1, -1), std::pair(-1, 1), std::pair(1, -1),
                                                    std::pair(1, 1)};
-
+  // Generate all the moves.
   getAllLinearMoves<4>(startSquare, board, allPseudoMoves, pieceColor, (pieceColor ? WB : BB), directions);
 }
 
 void moveGenUtils::getAllPossibleQueenMoves(std::pair<int, int> startSquare, Board& board,
                                             PseudoLegalMoves& allPseudoMoves, bool pieceColor) {
+  // All directions a queen can move.
   std::array<std::pair<int, int>, 8> directions = {
       std::pair(-1, 0),  std::pair(1, 0),  std::pair(0, -1), std::pair(0, 1),
       std::pair(-1, -1), std::pair(-1, 1), std::pair(1, -1), std::pair(1, 1),
   };
-
+  // Generate all the moves.
   getAllLinearMoves<8>(startSquare, board, allPseudoMoves, pieceColor, (pieceColor ? WQ : BQ), directions);
 }
 
 void moveGenUtils::getAllPossibleKingMoves(std::pair<int, int> startSquare, Board& board,
                                            PseudoLegalMoves& allPseudoMoves, bool pieceColor) {
+  // Calculate current square.
   int old_position = calculateSquare(startSquare.first, startSquare.second);
 
   Move move{};
   move.square = old_position;
   move.movingPiece.pieceType = pieceColor ? WK : BK;
 
+  // All directions a king can move.
   std::pair<int, int> directions[8] = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
 
   // Only run once. The king can only move one square.
@@ -158,12 +174,13 @@ void moveGenUtils::getAllPossibleKingMoves(std::pair<int, int> startSquare, Boar
 
         // Check if the square is not empty or attacked.
         if (board[position].pieceType != EMPTY || board.isSquareAttacked({x + i, y}, pieceColor)) {
-          // Turn of casteling if so.
+          // Turn off casteling if so.
           canCastle = false;
           break;
         }
       }
 
+      // After the full check if castling is still on add the move.
       if (canCastle) {
         move.moveSquare = calculateSquare(x + 2, y);
         allPseudoMoves.push_back(move);
@@ -195,6 +212,7 @@ void moveGenUtils::getAllPossibleKingMoves(std::pair<int, int> startSquare, Boar
         }
       }
 
+      // After the full check if castling is still on add the move.
       if (canCastle) {
         move.moveSquare = calculateSquare(x - 2, y);
         allPseudoMoves.push_back(move);
@@ -205,12 +223,14 @@ void moveGenUtils::getAllPossibleKingMoves(std::pair<int, int> startSquare, Boar
 
 void moveGenUtils::getAllPossibleKnightMoves(std::pair<int, int> startSquare, Board& board,
                                              PseudoLegalMoves& allPseudoMoves, bool pieceColor) {
+  // Calculate the original square.
   int old_position = calculateSquare(startSquare.first, startSquare.second);
 
   Move move{};
   move.square = old_position;
   move.movingPiece.pieceType = pieceColor ? WN : BN;
 
+  // All the directions a knight can move to.
   std::pair<int, int> directions[8] = {{-2, -1}, {-1, -2}, {1, -2}, {2, -1}, {2, 1}, {1, 2}, {-1, 2}, {-2, 1}};
 
   // Knight can only move in 8 directions.
@@ -222,7 +242,7 @@ void moveGenUtils::getAllPossibleKnightMoves(std::pair<int, int> startSquare, Bo
     // If it is in the board.
     if (x > 0 && y > 0 && x < 9 && y < 9) {
       Piece piece = board[position];
-      if (piece.pieceType != EMPTY) {
+      if (piece.pieceType != EMPTY) {  // If there is a piece on that square.
         // Check if you capture your own piece.
         if ((pieceColor && piece.isWhite()) || ((!pieceColor) && (!piece.isWhite()))) {
           continue;
@@ -237,18 +257,23 @@ void moveGenUtils::getAllPossibleKnightMoves(std::pair<int, int> startSquare, Bo
 
 void moveGenUtils::getAllPossiblePawnMoves(std::pair<int, int> startSquare, Board& board,
                                            PseudoLegalMoves& allPseudoMoves, bool pieceColor) {
+  // Calculate original square.
   int old_position = calculateSquare(startSquare.first, startSquare.second);
 
+  // All directions a pawn can move to including captures.
   std::pair<int, int> directions[4] = {{0, 1}, {-1, 1}, {1, 1}, {0, 2}};
+
   // Pawn only has 4 possible moves.
   for (const auto& dir : directions) {
     Move move{};
     move.square = old_position;
     move.movingPiece.pieceType = pieceColor ? WP : BP;
 
+    // Calculate the square to move to.
     int x = startSquare.first + dir.first;
     int y = startSquare.second + dir.second;
 
+    // If the pawn is black I need to negate it.
     if (!pieceColor) {
       x = startSquare.first - dir.first;
       y = startSquare.second - dir.second;
@@ -258,17 +283,17 @@ void moveGenUtils::getAllPossiblePawnMoves(std::pair<int, int> startSquare, Boar
 
     // If it is in the board.
     if (x > 0 && y > 0 && x < 9 && y < 9) {
-      Piece piece = board[calculateSquare(x, y)];
-      // If it is a diagonal jump.
-      if (dir.first != 0 && dir.second != 0) {
-        // If there is a piece.
-        if (piece.pieceType != EMPTY) {
+      Piece piece = board[position];
+
+      if (dir.first != 0 && dir.second != 0) {  // If it is a diagonal jump.
+        if (piece.pieceType != EMPTY) {         // If there is a piece.
           // If there is your own piece.
           if ((pieceColor && piece.isWhite()) || ((!pieceColor) && (!piece.isWhite()))) {
+            // Break the move.
             continue;
           }
 
-          // Check for promotion on rank 8 or 1 with capture.
+          // Check for promotion on rank 8 or 1 WITH capture.
           if ((pieceColor && y == 8) || (!pieceColor && y == 1)) {
             move.moveType = PROMOTION;
             // Add all possible promotions.
@@ -279,15 +304,17 @@ void moveGenUtils::getAllPossiblePawnMoves(std::pair<int, int> startSquare, Boar
               move.capturedPiece = board[position];
               allPseudoMoves.push_back(move);
             }
+            // Stop here before I add the move again.
             continue;
           }
 
+          // If there is no move to rank 8 or 1, just add the normal move.
           move.moveSquare = position;
           move.capturedPiece = board[position];
           allPseudoMoves.push_back(move);
         } else {
-          // Check for EP
-          if (board.boardSettings.epSquare != 100 && calculateSquare(x, y) == board.boardSettings.epSquare) {
+          if (board.boardSettings.epSquare != 100 &&
+              calculateSquare(x, y) == board.boardSettings.epSquare) {  // Check for EP
             move.moveType = EN_PASSANT;
             move.moveSquare = position;
             move.capturedPiece = board[position];
@@ -296,10 +323,11 @@ void moveGenUtils::getAllPossiblePawnMoves(std::pair<int, int> startSquare, Boar
         }
       } else if (dir.first == 0 && dir.second != 0 && piece.pieceType == EMPTY) {  // If jump is just forward.
         if (dir.second == 2) {
-          // Check if allowed to do the double jump.
-          if ((pieceColor && startSquare.second == 2) || (!pieceColor && startSquare.second == 7)) {
-            // Check if there is a piece on the destination.
-            if (board[calculateSquare(x, startSquare.second + (pieceColor ? 1 : -1))].pieceType == EMPTY) {
+          if ((pieceColor && startSquare.second == 2) ||
+              (!pieceColor && startSquare.second == 7)) {  // Check if allowed to do the double jump.
+
+            if (board[calculateSquare(x, startSquare.second + (pieceColor ? 1 : -1))].pieceType ==
+                EMPTY) {  // Check if there is a piece on the destination.
               move.moveSquare = position;
               move.capturedPiece = board[position];
               allPseudoMoves.push_back(move);

@@ -4,4 +4,5 @@
 
 #pragma once
 
+// Represents the STM.
 enum player_type { WHITE, BLACK };

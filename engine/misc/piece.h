@@ -4,6 +4,7 @@
 
 #pragma once
 
+// Represents the pieces with colors. Color + Piece = White + Pawn = WP
 enum PieceType { WP, WN, WB, WR, WQ, WK, BP, BN, BB, BR, BQ, BK, EMPTY };
 
 /**
@@ -75,9 +76,33 @@ class Piece {
     return ((isWhite() ? 1 : -1) * (endGame ? eg_pieceValue[pieceType % BP] : mg_pieceValue[pieceType % BP]));
   }
 
+  /**
+   * @brief Retrieves the game phase value of the piece.
+   *
+   * This method retrieves the game phase value of the piece based on its pieceType.
+   * The game phase value represents the piece's importance of the game.
+   * It is used to calculate the current game phase.
+   * To learn more about the game phase value check out 'Tampered Eval'.
+   *
+   * If the piece type is EMPTY, the game phase value is 0.
+   * If the piece is not EMPTY, the game phase value is retrieved from the gamePhaseValue array
+   * based on the piece type modulo BP (i.e., the piece type index in the array).
+   *
+   * @return The game phase value of the piece.
+   */
+  [[nodiscard]] int getGamePhaseValue() const {
+    if (pieceType == EMPTY) return 0;
+    return gamePhaseValue[pieceType % BP];
+  }
+
  private:
-  constexpr static int eg_pieceValue[6] = {94, 281, 297, 512, 936, 1000};
-  constexpr static int mg_pieceValue[6] = {82, 337, 365, 477, 1025, 1000};
+  // Values from (https://www.chessprogramming.org/PeSTO's_Evaluation_Function)
+  constexpr static int gamePhaseValue[6] = {0, 1, 1, 2, 4, 0};
+  // End game value for BP, BK, BB, BR, BQ and BK
+  constexpr static int eg_pieceValue[6] = {94, 281, 297, 512, 936, 0};
+  // Mid game value for BP, BK, BB, BR, BQ and BK
+  constexpr static int mg_pieceValue[6] = {82, 337, 365, 477, 1025, 0};
+  // Array to get the chars.
   constexpr static char pieceToChar[13] = {'P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k', ' '};
 
   /**
@@ -90,5 +115,11 @@ class Piece {
    * @param value The character value representing the piece.
    * @return The PieceType corresponding to the character value.
    */
-  static PieceType findKeyByValue(char value);
+  static PieceType findKeyByValue(char value) {
+    // Go through the array and find the matching piece.
+    for (int i = 0; i < 13; ++i) {
+      if (pieceToChar[i] == value) return static_cast<PieceType>(i);
+    }
+    return EMPTY;
+  }
 };

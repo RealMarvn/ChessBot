@@ -12,16 +12,24 @@
 
 #include "./piece.h"
 
+// Represents the maximum of moves someone could possibly do.
 #define MAX_MOVES 218
 
+// Normal can be seen as a capture or a move.
 enum MoveType { NORMAL, EN_PASSANT, PROMOTION, CASTLING };
 
 struct Move {
+  // The square a piece want's to move to.
   int moveSquare{0};
+  // The square the piece is on.
   int square{0};
+  // The moving piece.
   Piece movingPiece;
+  // The piece which gets captured (If it is a normal move it will be EMPTY)
   Piece capturedPiece;
+  // The piece a pawn can be promoted to. Can be empty.
   Piece promotionPiece;
+  // The type of move.
   MoveType moveType{NORMAL};
 
   /**
@@ -69,7 +77,9 @@ struct Move {
  * to store the moves and provides methods for accessing and modifying the move list.
  */
 class PseudoLegalMoves {
+  // Core array which will hold the moves.
   std::array<Move, MAX_MOVES> move_list{};
+  // The index of that array.
   int index = 0;
 
  public:

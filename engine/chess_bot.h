@@ -27,7 +27,7 @@ class ChessBot {
   /**
    * @brief Performs a search for the best move using the negamax algorithm with alpha-beta pruning.
    *
-   * @param boardManager The board object representing the current game state.
+   * @param board The board object representing the current game state.
    * @param depth The maximum depth for the search.
    * @param alpha The alpha value representing the best lower bound found so far.
    * @param beta The beta value representing the best upper bound found so far.
@@ -35,7 +35,7 @@ class ChessBot {
    * @param bestMove The reference to the best move found so far.
    * @return The score of the best move found.
    */
-  static int search(Board& boardManager, int depth, int alpha, int beta, int ply, Move& bestMove);
+  static int search(Board& board, int depth, int alpha, int beta, int ply, Move& bestMove);
 
   /**
    * @brief Evaluates the position on the chess board.
@@ -51,7 +51,6 @@ class ChessBot {
   static int eval(Board& board);
 
   // These are premade tables from https://www.chessprogramming.org/PeSTO's_Evaluation_Function.
-  constexpr static int gamePhaseInc[12] = {0, 0, 1, 1, 1, 1, 2, 2, 4, 4, 0, 0};
   constexpr static int mg_pawn_table[64] = {
       0,  0,   0,   0,   0,   0,  0,   0,   98,  134, 61,  95,  68, 126, 34, -11, -6, 7,   26,  31, 65, 56,
       25, -20, -14, 13,  6,   21, 23,  12,  17,  -23, -27, -2,  -5, 12,  17, 6,   10, -25, -26, -4, -4, -10,

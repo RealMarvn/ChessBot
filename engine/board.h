@@ -13,6 +13,7 @@
 #include <utility>
 #include <vector>
 
+#include "./exceptions/board_exception.h"
 #include "./exceptions/fen_exception.h"
 #include "./misc/board_settings.h"
 #include "./misc/move.h"

@@ -125,7 +125,7 @@ Spielerwert abgezogen, und der Materialwert wird dazu addiert.
 Die GamePhase wird ebenfalls anhand der Pieces berechnet, die auf dem Board sind. Ist der midgame-Wert, der auf dem
 GamePhase-Wert initialisiert wird, größer als 24, wird er auf 24 gesetzt. Dadurch kann der endGame Wert spaeter nicht negativ sein.
 Danach wird der endgame-Wert auf 24 minus midGameValue gesetzt. Nun wird der Score mit der Phase multipliziert und durch 24 geteilt. Die
-24 setzt sich aus dem Wert der maximalen Anzahl an Pieces zusammen, die durch den Array `gamePhaseInc` berechnet werden
+24 setzt sich aus dem Wert der maximalen Anzahl an Pieces zusammen, die durch den Array `gamePhaseValue` berechnet werden
 kann.
 Beim Auslesen des Positionswerts flippe ich auch die Bits von den schwarzen Pieces, da die Tabellen aus der Sicht der
 weißen Pieces sind. Das schwarze Piece muss ja den gleichen Wert an der gegnerischen Position haben wie das weiße

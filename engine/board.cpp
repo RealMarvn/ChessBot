@@ -7,15 +7,18 @@
 #include "./chess_bot.h"
 
 bool Board::isKingInCheck(bool pieceColor) {
+  // Go through board.
   for (int y = 8; y >= 1; y--) {
     for (int x = 1; x <= 8; x++) {
-      if (board[calculateSquare(x, y)].pieceType == (pieceColor ? WK : BK)) {
+      if (board[calculateSquare(x, y)].pieceType == (pieceColor ? WK : BK)) {  // If piece is the correct King.
+        // Check if the king square is attacked.
         return isSquareAttacked({x, y}, pieceColor);
       }
     }
   }
 
-  return false;
+  // If no king is found throw exception.
+  throw BoardInterruptException("No king found!");
 }
 
 bool Board::isSquareAttacked(std::pair<int, int> square, bool pieceColor) {
@@ -80,36 +83,48 @@ bool Board::popLastMove() {
     return false;
   }
 
+  // Save last move.
   Move last_move = moves.back();
+  // Pop it.
   moves.pop_back();
+  // Pop the history.
   history.pop_back();
+  // Set the piece which got caught on the moved square.
   board[last_move.moveSquare] = last_move.capturedPiece;
+  // Set the moved piece on its original position.
   board[last_move.square] = last_move.movingPiece;
 
-  if (last_move.moveType == EN_PASSANT) {
+  if (last_move.moveType == EN_PASSANT) {  // If the move was an EP.
+    // Get the square behind the ep square by adding or subtracting 8 (One row).
     int enPassantSquare = last_move.moveSquare + (last_move.movingPiece.isWhite() ? -8 : +8);
+    // Set the piece which got caught there.
     board[enPassantSquare].pieceType = (last_move.movingPiece.isWhite() ? BP : WP);
   }
 
-  if (last_move.moveType == CASTLING) {
-    if (last_move.moveSquare == 6) {
+  if (last_move.moveType == CASTLING) {  // If the move was castling.
+    if (last_move.moveSquare == 6) {     // Check if the King moved to square g1.
+      // Reset the rook to h1.
       board[7].pieceType = WR;
       board[5].pieceType = EMPTY;
     }
-    if (last_move.moveSquare == 2) {
+    if (last_move.moveSquare == 2) {  // Check if the King moved to square c1.
+      // Reset the rook to a1.
       board[0].pieceType = WR;
       board[3].pieceType = EMPTY;
     }
-    if (last_move.moveSquare == 62) {
+    if (last_move.moveSquare == 62) {  // Check if the King moved to square g8.
+      // Reset the rook to h8.
       board[63].pieceType = BR;
       board[61].pieceType = EMPTY;
     }
-    if (last_move.moveSquare == 58) {
+    if (last_move.moveSquare == 58) {  // Check if the King moved to square c8.
+      // Reset the rook to h8.
       board[56].pieceType = BR;
       board[59].pieceType = EMPTY;
     }
   }
 
+  // Set player back.
   player = player == WHITE ? BLACK : WHITE;
 
   // Settings reset.
@@ -118,19 +133,27 @@ bool Board::popLastMove() {
 }
 
 bool Board::makeMove(Move move) {
+  // Set the square to move to the piece where it is currently.
   board[move.moveSquare] = board[move.square];
+
+  // Set on the old square an EMPTY piece.
   board[move.square].pieceType = EMPTY;
+
+  // Reset the eqSquare.
   boardSettings.epSquare = 100;
 
+  // If move is a promotion set on the future square the promotion piece.
   if (move.moveType == PROMOTION) {
     board[move.moveSquare] = move.promotionPiece;
   }
 
+  // If move is EP then replace the square in front of the move with empty.
   if (move.moveType == EN_PASSANT) {
     int enPassantSquare = move.moveSquare + (move.movingPiece.pieceType == WP ? -8 : +8);
     board[enPassantSquare].pieceType = EMPTY;
   }
 
+  // If it is a castling move just set the rook at the correct spot.
   if (move.moveType == CASTLING) {
     if (move.moveSquare == 6) {
       board[7].pieceType = EMPTY;
@@ -157,13 +180,14 @@ bool Board::makeMove(Move move) {
     }
   }
 
-  // Set the permissions!
+  // Set the permissions for castling!
   handleCastlingPermissions(move);
 
   // Save move
   moves.push_back(move);
   // Save settings
   history.push_back(boardSettings);
+  // Reset the player.
   player = player == WHITE ? BLACK : WHITE;
 
   // Check if your king is in check after the move and pop if yes.
@@ -187,41 +211,42 @@ void Board::handleCastlingPermissions(Move& move) {
 
   // disable permission if rook is moved.
   if (move.movingPiece.pieceType == WR) {
-    if (move.square == 0) {
+    if (move.square == 0) {  // If rook was moved from a1.
       boardSettings.whiteQueenSide = false;
     }
-    if (move.square == 7) {
+    if (move.square == 7) {  // If rook was moved from h1.
       boardSettings.whiteKingSide = false;
     }
   } else if (move.movingPiece.pieceType == BR) {
-    if (move.square == 56) {
+    if (move.square == 56) {  // If rook was moved from a8.
       boardSettings.blackQueenSide = false;
     }
 
-    if (move.square == 63) {
+    if (move.square == 63) {  // If rook was moved from h8.
       boardSettings.blackKingSide = false;
     }
   }
 
   // disable permission if rook is captured.
   if (move.capturedPiece.pieceType == WR) {
-    if (move.moveSquare == 0) {
+    if (move.moveSquare == 0) {  // If a piece moved on a1.
       boardSettings.whiteQueenSide = false;
     }
-    if (move.moveSquare == 7) {
+    if (move.moveSquare == 7) {  // If a piece moved on h1.
       boardSettings.whiteKingSide = false;
     }
   } else if (move.capturedPiece.pieceType == BR) {
-    if (move.moveSquare == 56) {
+    if (move.moveSquare == 56) {  // If a piece moved on a8.
       boardSettings.blackQueenSide = false;
     }
-    if (move.moveSquare == 63) {
+    if (move.moveSquare == 63) {  // If a piece moved on h8.
       boardSettings.blackKingSide = false;
     }
   }
 }
 
 bool Board::isCheckMate(bool isWhite) {
+  // Count if there are no possible moves anymore.
   int counter = 0;
   for (Move& move : moveGenUtils::getAllPseudoLegalMoves(*this, isWhite)) {
     if (makeMove(move)) {
@@ -235,7 +260,10 @@ bool Board::isCheckMate(bool isWhite) {
 Move Board::parseMove(std::string input) {
   bool capture = false;
   char promotion_figure = ' ';
+
+  // Figure is input[0].
   char figure = input[0];
+
   // Use the ascii code of the char to subtract a number to get the correct number.
   int x = input[1] - 96;
   int y = input[2] - 48;
@@ -260,33 +288,35 @@ Move Board::parseMove(std::string input) {
   }
   MoveType moveType = NORMAL;
 
-  // If figure is a king
+  // If figure is a king.
   if (figure == 'K') {
-    if (position == 4 && (movePosition == 6 || movePosition == 2)) {
+    if (position == 4 && (movePosition == 6 || movePosition == 2)) {  // Apply castling if specific move is parsed.
       moveType = CASTLING;
     }
   }
 
   if (figure == 'k') {
-    if (position == 60 && (movePosition == 62 || movePosition == 58)) {
+    if (position == 60 && (movePosition == 62 || movePosition == 58)) {  // Apply castling if specific move is parsed.
       moveType = CASTLING;
     }
   }
-
+  // If you try to move to a ep square set the move to ep.
   if (movePosition == boardSettings.epSquare) {
     moveType = EN_PASSANT;
   }
 
+  // If the promotion is given set the move to a promotion.
   if (promotion_figure != ' ') {
     moveType = PROMOTION;
   }
 
+  // Initialize the move with all data.
   return Move{movePosition, position, Piece(figure), board[movePosition], Piece(promotion_figure), moveType};
 }
 
 bool Board::tryToMovePiece(Move& move) {
   bool capture = false;
-  if (move.capturedPiece.pieceType != EMPTY) {
+  if (move.capturedPiece.pieceType != EMPTY) {  // Detect if there is a capture.
     capture = true;
   }
 
@@ -321,43 +351,79 @@ bool Board::tryToMovePiece(Move& move) {
       return false;
     }
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 
 void Board::readFen(const std::string& input) {
   std::vector<std::string> fenSettings;
 
+  // Parse all the input in my vector while I cut it.
   std::istringstream iss(input);
   for (std::string s; iss >> s;) fenSettings.push_back(s);
 
   if (fenSettings.size() != 6) {
-    throw InvalidFENException();
+    throw InvalidFENException("Invalid length!");
   }
 
+  // Initialize the player and settings.
   player = WHITE;
   boardSettings = board_setting{100, false, false, false, false};
 
+  // Add the pieces to the board.
   int x = 1;
   int y = 8;
+  int squares = 0;
+  bool whiteKing = false;
+  bool blackKing = false;
   for (char& character : fenSettings[0]) {
+    // Row change if '/'.
     if (character == '/') {
       y--;
+      // Reset x to 1.
       x = 1;
       continue;
     }
 
-    if (std::isdigit(character)) {
-      for (int i = character - '0'; i > 0; --i) {
+    if (std::isdigit(character)) {                 // If it is a digit.
+      for (int i = character - '0'; i > 0; --i) {  // Loop through the squares which will be empty.
+        // Set them empty.
         board[calculateSquare(x, y)] = Piece(EMPTY);
+        // Increment x cause new square.
         x++;
+        squares++;
       }
+      // After looping go to the next char.
       continue;
     }
 
+    // Check if kings are present.
+    if (character == 'k') {
+      if (blackKing) {
+        throw InvalidFENException("Your FEN has two black kings!");
+      }
+      blackKing = true;
+    } else if (character == 'K') {
+      if (whiteKing) {
+        throw InvalidFENException("Your FEN has two white kings!");
+      }
+      whiteKing = true;
+    }
+
+    // Just set on the square that piece.
     board[calculateSquare(x, y)] = Piece(character);
     x++;
+    squares++;
+  }
+
+  // If one king is missing throw exception.
+  if ((!whiteKing) || (!blackKing)) {
+    throw InvalidFENException("Your FEN is missing a king!");
+  }
+
+  // Check if enough squares.
+  if (squares != 64) {
+    throw InvalidFENException("Your FEN is missing some squares!");
   }
 
   // Set turn
@@ -388,10 +454,12 @@ void Board::readFen(const std::string& input) {
 
   // Save current settings.
   history.push_back(boardSettings);
+  // Clear the moves.
   moves.clear();
 }
 
 void Board::printCurrentBoard() {
+  // Print the current turn.
   if (player == WHITE) {
     std::cout << "Current turn: "
               << "White" << std::endl;
@@ -400,6 +468,7 @@ void Board::printCurrentBoard() {
               << "Black" << std::endl;
   }
 
+  // Print the board.
   for (int y = 8; y >= 1; y--) {
     std::cout << y << " | ";
     for (int x = 1; x <= 8; x++) {

@@ -8,9 +8,9 @@
 #include <string>
 #include <utility>
 
-class InvalidFENException : public std::exception {
+class BoardInterruptException : public std::exception {
  public:
-  explicit InvalidFENException(std::string msg) : message{std::move(msg)} {}
+  explicit BoardInterruptException(std::string msg) : message{std::move(msg)} {}
 
   const char* what() const noexcept override { return message.c_str(); }
 

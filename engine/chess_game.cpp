@@ -5,15 +5,17 @@
 #include "./chess_game.h"
 
 void ChessGame::start() {
+  // First print the board.
   board->printCurrentBoard();
+
+  // Loop through the input.
   std::string input;
   while (getline(std::cin, input)) {
-    // Read in FEN notation.
-    if (input[0] == 'F') {
+    if (input[0] == 'F') {  // Read in FEN notation.
       board->readFen(input.substr(1, input.length()));
       board->printCurrentBoard();
       continue;
-    } else if (input[0] == 'f') {
+    } else if (input[0] == 'f') {  // Get the FEN.
       std::cout << "Your FEN: " << board->getFen() << std::endl;
       continue;
     }
@@ -26,16 +28,17 @@ void ChessGame::start() {
       continue;
     }
 
+    // Check if input has the correct length.
     if (input.length() < 5) {
       std::cout << "invalid" << std::endl;
       continue;
     }
 
+    // Parse the move.
     Move playerMove = board->parseMove(input);
 
-    // Make the move and check for CheckMate.
-    if (board->tryToMovePiece(playerMove)) {
-      if (board->isCheckMate(board->player == WHITE)) {
+    if (board->tryToMovePiece(playerMove)) {             // Make the move.
+      if (board->isCheckMate(board->player == WHITE)) {  // Check the opponent for check mate.
         std::cout << "CHECK MATE!" << std::endl;
         return;
       }
@@ -46,7 +49,7 @@ void ChessGame::start() {
       board->makeMove(move);
       board->printCurrentBoard();
 
-      if (board->isCheckMate(board->player == WHITE)) {
+      if (board->isCheckMate(board->player == WHITE)) {  // Check the opponent for check mate.
         board->printCurrentBoard();
         std::cout << "CHECK MATE!" << std::endl;
         return;
