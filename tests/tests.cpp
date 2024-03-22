@@ -55,6 +55,31 @@ TEST(MoveGenTest, PerftTest) {
   }
 }
 
+TEST(Board, GenerateFenTest) {
+  // Get Perft file!
+  std::ifstream epd_file("/Users/marvin/CLionProjects/pk1-pruefung/tests/data/perft-positions.epd");
+  ASSERT_TRUE(epd_file.good()) << "Der Pfad der testing suite ist falsch. Bitte anpassen!";
+  Board myBoard;
+
+  std::string line;
+  // Read in perft file per line.
+  while (std::getline(epd_file, line)) {
+    std::istringstream ss(line);
+    std::string setting;
+    std::vector<std::string> settings;
+
+    // Cut the line into sections.
+    while (std::getline(ss, setting, ';')) {
+      settings.push_back(setting);
+    }
+
+    // Read in FEN.
+    myBoard.readFen(settings[0]);
+
+    ASSERT_EQ(myBoard.getFen() + " ", settings[0]);
+  }
+}
+
 TEST(UserInput, MoveParsing) {
   // Get move file!
   std::ifstream epd_file("/Users/marvin/CLionProjects/pk1-pruefung/tests/data/input-test.epd");
