@@ -141,6 +141,8 @@ bool Board::makeMove(Move move) {
 
   // Reset the eqSquare.
   boardSettings.epSquare = 100;
+  // Increment lastMoveSincePawnOrCapture.
+  boardSettings.lastMovesSincePawnOrCapture++;
 
   // If move is a promotion set on the future square the promotion piece.
   if (move.moveType == PROMOTION) {
@@ -182,6 +184,15 @@ bool Board::makeMove(Move move) {
 
   // Set the permissions for castling!
   handleCastlingPermissions(move);
+
+  if (player == BLACK) {
+    boardSettings.turns++;
+  }
+
+  if (((move.movingPiece.pieceType == WP) || (move.movingPiece.pieceType == BP)) ||
+      move.capturedPiece.pieceType != EMPTY) {
+    boardSettings.lastMovesSincePawnOrCapture = 0;
+  }
 
   // Save move
   moves.push_back(move);
@@ -452,6 +463,11 @@ void Board::readFen(const std::string& input) {
     boardSettings.epSquare = calculateSquare(col, row);
   }
 
+  // Convert the char to an int and subtract 48 (ascii value).
+  // It is not pretty but I don't know a better way.
+  boardSettings.lastMovesSincePawnOrCapture = fenSettings[4][0] - 48;
+  boardSettings.turns = fenSettings[5][0] - 48;
+
   // Save current settings.
   history.push_back(boardSettings);
   // Clear the moves.
@@ -541,8 +557,8 @@ std::string Board::getFen() {
   outPutFen += boardSettings.epSquare != 100 ? convertToXandY(boardSettings.epSquare) : "-";
   outPutFen += ' ';
   // Add turns
-  outPutFen += '0';
+  outPutFen += std::to_string(boardSettings.lastMovesSincePawnOrCapture);
   outPutFen += ' ';
-  outPutFen += '1';
+  outPutFen += std::to_string(boardSettings.turns);
   return outPutFen;
 }

@@ -12,4 +12,7 @@ struct board_setting {
   bool whiteKingSide{false};
   bool blackQueenSide{false};
   bool blackKingSide{false};
+
+  int lastMovesSincePawnOrCapture{0};
+  int turns{1};
 };
