@@ -2,6 +2,8 @@
 
 ## Overview
 
+## [Video](UNAVALIBLE)
+
 ### Grundlegende Funktionen meines Schachbots
 
 Mein Schachbot basiert auf dem Mailbox-Verfahren und verfügt über eine PseudoLegale MoveGEN. Das bedeutet, dass der Bot
@@ -122,11 +124,15 @@ endgame-Wert von Positionen einer Figur. Der Wert ist natürlich im Endspiel and
 das Brett durchgehe, für jedes Piece die passende Tabelle nehme und den Wert auslese und in einem Array speichere, wobei
 0 für Weiß und 1 für Schwarz steht, jeweils für mid- und endgame. Dann wird der Wert des Gegners vom aktuellen
 Spielerwert abgezogen, und der Materialwert wird dazu addiert.
-Die GamePhase wird ebenfalls anhand der Pieces berechnet, die auf dem Board sind. Ist der midgame-Wert, der auf dem
-GamePhase-Wert initialisiert wird, größer als 24, wird er auf 24 gesetzt. Dadurch kann der endGame Wert spaeter nicht negativ sein.
-Danach wird der endgame-Wert auf 24 minus midGameValue gesetzt. Nun wird der Score mit der Phase multipliziert und durch 24 geteilt. Die
-24 setzt sich aus dem Wert der maximalen Anzahl an Pieces zusammen, die durch den Array `gamePhaseValue` berechnet werden
-kann.
+Die GamePhase wird ebenfalls anhand und durch die Pieces berechnet, die auf dem Board sind. Ist der midgame-Wert, der
+auf dem
+GamePhase-Wert initialisiert wird, größer als 24, wird er auf 24 gesetzt. Dadurch kann der endGame Wert spaeter nicht
+negativ sein.
+Danach wird der endgame-Wert auf 24 minus midGameValue gesetzt. Nun wird der Score mit der Phase multipliziert und durch
+24 geteilt. Das ganze nennt sich dann Tampered
+Eval. Die 24 setzt sich durch das init board zusammen. Anhand des Wertes erkennt man captures, wenn der Wert unter 24
+ist, oder
+promotions, wenn er größer ist.
 Beim Auslesen des Positionswerts flippe ich auch die Bits von den schwarzen Pieces, da die Tabellen aus der Sicht der
 weißen Pieces sind. Das schwarze Piece muss ja den gleichen Wert an der gegnerischen Position haben wie das weiße
 Gegenstück. Nachdem ich PSQT ausgerechnet habe, kommt TEMPO zum Einsatz. Das ist im Wesentlichen nur ein Bonus für jede
@@ -293,20 +299,29 @@ und bietet viele Vorteile, die die Entwicklung und Wartung von meiner Engine ver
 
 Der erste Test fokussiert sich auf die Move-Generierung der Engine. Mithilfe der Perft-Methode, die alle möglichen Züge
 bis zu einer bestimmten Tiefe aufzählt, kann ich die Korrektheit der generierten Züge überprüfen und
-Grundfunktionalitaeten der Engine werden nebenher mitgetestet.
+Grundfunktionalitäten der Engine werden nebenher mitgetestet.
 
 - **Verwendete TestSuite**: Ethereal Perft Test Suite (https://github.com/AndyGrant/Ethereal)
 - **Testfall**: Vergleich der Anzahl der generierten Züge mit den Perft-Referenzwerten
 - Zusätzliche Funktionen die nebenher mitgetestet werden:
-    * FEN-Einlesen
-    * Korrektes Ausführen von Zügen
-    * Zurücksetzen von Zügen
-    * Schacherkennung
-    * Legale Spielerbewegungen
+  * FEN-Einlesen
+  * Korrektes Ausführen von Zügen
+  * Zurücksetzen von Zügen
+  * Schacherkennung
+  * Legale Spielerbewegungen
 
-#### Test 2: Move-Parsing und Validierung
+#### Test 2: Fen ausgabe
 
-Der zweite Test überprüft das Parsing und die Validierung von Spielerzügen. Hier habe ich mit den FEN Codes des PERFT
+Der zweite Test überprüft die ausgabe des FEN. Hier habe ich von der bereits verwendeten Perft-Suite die FEN-Notationen
+geholt, eingelesen und mir wieder ausgeben lassen. Dadurch kann man validieren, das bei der Ausgabe auch wirklich der
+richtige FEN generiert wird.
+
+- **Testfall**: Einlesen des FEN und das Ausgeben des Boards als FEN
+- **Vergleich**: Vergleich des geparsten FENs mit dem eingelesenen FEN
+
+#### Test 3: Move-Parsing und Validierung
+
+Der dritte Test überprüft das Parsing und die Validierung von Spielerzügen. Hier habe ich mit den FEN Codes des PERFT
 Tests mir alle korrekten moeglichen Zuege ausgeben lassen und werde diese einlesen und wieder ausgeben lassen. Bleibt
 der Zug
 gleich, funktioniert das Parsing.
@@ -378,7 +393,7 @@ Diese ist mit Perft auf ihre Korrektheit ueberprueft und somit kann sich der Spi
 
 Es wurden die PSQT-Arrays von [PeSTO](https://www.chessprogramming.org/PeSTO's_Evaluation_Function) übernommen und
 implementiert in `chess_bot.h::53-124`.
-Grund hierfuer sind die beliebten Values welche man fuer Positionen vergeben kann. Hier ist der Sinn einfach nur
+Grund hierfür sind die beliebten Values welche man fuer Positionen vergeben kann. Hier ist der Sinn einfach nur
 die sehr gut getunten Werte welche gut funktionieren bei der Evaluierung der Position.
 
 Der Material-Wert wurde auch in `piece.h::79-80`
@@ -389,5 +404,6 @@ verwendet damit ich nicht die standard Werte habe wie 100, 300, 350, 700, 800, 1
 fuer SchachBots besser abgestimmt.
 
 Es wurde ein kleiner Teil der Evaluierung uebernommen und veraendert in `chess_bot.h/eval::81-87`
-(https://www.chessprogramming.org/PeSTO's_Evaluation_Function). Ich habe hier die Berechnung uebernommen weil man
-so mit PSQT den Wert berechnet und da nicht drum herum kommt.
+(https://www.chessprogramming.org/Tapered_Eval). Ich habe hier die Berechnung uebernommen weil man
+so mit Tampered Eval den Wert berechnet und da nicht drum herum kommt. PeSTO's Werte wurden hier natuerlich auch
+verwendet (https://www.chessprogramming.org/PeSTO's_Evaluation_Function).
