@@ -1,8 +1,8 @@
-# SchachBot mit einer pseudo legaler MoveGEN und EP und Castling
+# SchachBot mit einer pseudo legalen MoveGEN, EP und Castling
 
 ## Overview
 
-## [Video](UNAVALIBLE)
+## [Video](https://cloud.uni-konstanz.de/index.php/s/bGnYB8nRB2BW8Ej)
 
 ### Grundlegende Funktionen meines Schachbots
 
