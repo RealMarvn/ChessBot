@@ -4,43 +4,43 @@
 
 #include "./chess_game.h"
 
-uint64_t perft(Board& boardManager, int depth, bool player) {
-  if (depth == 0) {
-    return 1;
-  }
-
-  uint64_t nodes = 0;
-  auto moves = moveGenUtils::getAllPseudoLegalMoves(boardManager, player);
-  for (Move& move : moves) {
-    if (boardManager.makeMove(move)) {
-      nodes += perft(boardManager, depth - 1, !player);
-      boardManager.popLastMove();
-    }
-  }
-
-  return nodes;
-}
-
-uint64_t split_perft(Board& boardManager, int depth, bool player) {
-  if (depth == 0) {
-    return 0;
-  }
-
-  int number = 0;
-
-  // Generiere die Züge für die aktuelle Position
-  auto moves = moveGenUtils::getAllPseudoLegalMoves(boardManager, player);
-  for (Move& move : moves) {
-    if (boardManager.makeMove(move)) {
-      uint64_t child_nodes = perft(boardManager, depth - 1, !player);
-
-      number += child_nodes;
-      std::cout << move.toString() << " - " << child_nodes << " - " << ChessBot::eval(boardManager) << std::endl;
-      boardManager.popLastMove();
-    }
-  }
-  return number;
-}
+//uint64_t perft(Board& boardManager, int depth, bool player) {
+//  if (depth == 0) {
+//    return 1;
+//  }
+//
+//  uint64_t nodes = 0;
+//  auto moves = moveGenUtils::getAllPseudoLegalMoves(boardManager, player);
+//  for (Move& move : moves) {
+//    if (boardManager.makeMove(move)) {
+//      nodes += perft(boardManager, depth - 1, !player);
+//      boardManager.popLastMove();
+//    }
+//  }
+//
+//  return nodes;
+//}
+//
+//uint64_t split_perft(Board& boardManager, int depth, bool player) {
+//  if (depth == 0) {
+//    return 0;
+//  }
+//
+//  int number = 0;
+//
+//  // Generiere die Züge für die aktuelle Position
+//  auto moves = moveGenUtils::getAllPseudoLegalMoves(boardManager, player);
+//  for (Move& move : moves) {
+//    if (boardManager.makeMove(move)) {
+//      uint64_t child_nodes = perft(boardManager, depth - 1, !player);
+//
+//      number += child_nodes;
+//      std::cout << move.toString() << " | " << ChessBot::eval(boardManager) << std::endl;
+//      boardManager.popLastMove();
+//    }
+//  }
+//  return number;
+//}
 
 void ChessGame::start() {
   // First print the board.
@@ -50,10 +50,8 @@ void ChessGame::start() {
   std::string input;
   while (getline(std::cin, input)) {
     if (input[0] == 'F') {  // Read in FEN notation.
-      std::cout << ChessBot::eval(*board) << std::endl;
       board->readFen(input.substr(1, input.length()));
       board->printCurrentBoard();
-      split_perft(*board, 1, board->player == WHITE);
       continue;
     } else if (input[0] == 'f') {  // Get the FEN.
       std::cout << "Your FEN: " << board->getFen() << std::endl;
@@ -85,7 +83,7 @@ void ChessGame::start() {
 
       // Bot can only move legal so no need to check if the move is legal.
       // Check if opponent is in check mate after bots turn.
-      Move move = ChessBot::searchBestNextMove(*board, 1);
+      Move move = ChessBot::searchBestNextMove(*board, 5);
       board->makeMove(move);
       board->printCurrentBoard();
 

@@ -73,7 +73,7 @@ class Piece {
    */
   [[nodiscard]] int getMaterialValue(bool endGame) const {
     if (pieceType == EMPTY) return 0;
-    return ((isWhite() ? 1 : -1) * (endGame ? eg_pieceValue[pieceType % BP] : mg_pieceValue[pieceType % BP]));
+    return ((endGame ? eg_pieceValue[pieceType % BP] : mg_pieceValue[pieceType % BP]));
   }
 
   /**
