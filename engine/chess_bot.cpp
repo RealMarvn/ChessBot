@@ -105,6 +105,8 @@ int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move
       score = -search(board, depth - 1, -beta, -alpha, ply + 1, bestMove);
       legalMoves++;
       board.popLastMove();
+    } else {
+      break;
     }
 
     // Set best score if the current one is less.
