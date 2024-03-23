@@ -42,6 +42,11 @@ add_executable(tests tests/tests.cpp
         engine/misc/piece.h
         engine/chess_bot.cpp
         engine/chess_bot.h
+        engine/misc/board_settings.h
+        engine/chess_game.cpp
+        engine/chess_game.h
+        engine/misc/player.h
+        engine/exceptions/fen_exception.h
         engine/exceptions/board_exception.h
 )
 
