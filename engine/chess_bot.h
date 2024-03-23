@@ -22,7 +22,7 @@ class ChessBot {
    * @return The best move found by the search algorithm.
    */
   static Move searchBestNextMove(Board& board, int depth);
-
+  static int eval(Board& board);
  private:
   /**
    * @brief Performs a search for the best move using the negamax algorithm with alpha-beta pruning.
@@ -48,7 +48,7 @@ class ChessBot {
    * @param board The chess board to be evaluated.
    * @return The evaluation score of the position.
    */
-  static int eval(Board& board);
+  //static int eval(Board& board);
 
   // These are premade tables from https://www.chessprogramming.org/PeSTO's_Evaluation_Function.
   constexpr static int mg_pawn_table[64] = {

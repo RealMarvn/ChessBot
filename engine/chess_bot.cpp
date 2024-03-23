@@ -70,17 +70,17 @@ int ChessBot::eval(Board& board) {
 
   // Calculate PSQT and game phase with tampered eval (https://www.chessprogramming.org/PeSTO's_Evaluation_Function)
   // (MODIFIED by MARVIN).
-  int mgScore = mg[board.player == WHITE] - mg[board.player != WHITE] + mg_MaterialValue;
-  int egScore = eg[board.player == WHITE] - eg[board.player != WHITE] + eg_MaterialValue;
+  int mgScore = mg[board.player != WHITE] - mg[board.player == WHITE] + mg_MaterialValue;
+  int egScore = eg[board.player != WHITE] - eg[board.player == WHITE] + eg_MaterialValue;
   // Calculate the game phase.
   int mgPhase = gamePhase;
   if (mgPhase > 24) mgPhase = 24;
   int egPhase = 24 - mgPhase;
 
-  int evaluation = ((mgScore * mgPhase + egScore * egPhase) / 24);
+  int evaluation = (((mgScore * mgPhase) + (egScore * egPhase)) / 24);
 
   // Give a bonus to side to move (TEMPO).
-  return evaluation + 20;
+  return (evaluation + 20);
 }
 
 int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move& bestMove) {
@@ -106,7 +106,7 @@ int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move
       legalMoves++;
       board.popLastMove();
     } else {
-      break;
+      continue;
     }
 
     // Set best score if the current one is less.

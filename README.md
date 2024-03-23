@@ -2,7 +2,7 @@
 
 ## Overview
 
-## [Video](https://cloud.uni-konstanz.de/index.php/s/bGnYB8nRB2BW8Ej)
+## [Video](NOPE)
 
 ### Grundlegende Funktionen meines Schachbots
 
