@@ -16,12 +16,12 @@ int ChessBot::eval(Board& board) {
     // Add PSQT values.
     switch (piece.pieceType) {
       case WP:
-        mg[0] += -1 * mg_pawn_table[i];
-        eg[0] += -1 * eg_pawn_table[i];
+        mg[0] += mg_pawn_table[i];
+        eg[0] += eg_pawn_table[i];
         break;
       case WN:
-        mg[0] += -1 * mg_knight_table[i];
-        eg[0] += -1 * eg_knight_table[i];
+        mg[0] += mg_knight_table[i];
+        eg[0] += eg_knight_table[i];
         break;
       case WB:
         mg[0] += mg_bishop_table[i];
