@@ -12,7 +12,7 @@ class InvalidFENException : public std::exception {
  public:
   explicit InvalidFENException(std::string msg) : message{std::move(msg)} {}
 
-  const char* what() const noexcept override { return message.c_str(); }
+  [[nodiscard]] const char* what() const noexcept override { return message.c_str(); }
 
  private:
   std::string message;

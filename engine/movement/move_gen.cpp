@@ -325,7 +325,6 @@ void moveGenUtils::getAllPossiblePawnMoves(std::pair<int, int> startSquare, Boar
         if (dir.second == 2) {
           if ((pieceColor && startSquare.second == 2) ||
               (!pieceColor && startSquare.second == 7)) {  // Check if allowed to do the double jump.
-
             if (board[calculateSquare(x, startSquare.second + (pieceColor ? 1 : -1))].pieceType ==
                 EMPTY) {  // Check if there is a piece on the destination.
               move.moveSquare = position;
