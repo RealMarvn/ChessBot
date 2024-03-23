@@ -45,7 +45,7 @@ Ich habe das ganze Board in eine Klasse gepackt, um Funktionen wie `handleCastli
 zu machen, da sie nur intern gebrauchbar ist. Alle Datenstrukturen werden dann in einem Paket geschnürt, und die
 Funktionen gehören dann immer zum Board. Somit bleibt alles geordnet und man kann einfacher Funktionen finden und
 verwenden.
-Ich habe außerdem der `Board`-Klasse einen Direct-Access Operator gegeben, um direkt auf das private gesetzte `board`
+Ich habe außerdem der `Board`-Klasse einen Subscript-Access Operator gegeben, um direkt auf das private gesetzte `board`
 zugreifen zu können. Durch solch einen Operator kann ich z.B. mit meinem verwendeten `assert` immer sicher sein, dass
 auch korrekt zugegriffen wird.
 Zusätzlich außerhalb der Klasse habe ich eine globale Funktion, welche anhand von X- und Y-Koordinaten einen Index für
@@ -79,7 +79,7 @@ nehmen als Argumente ein Square als `std::pair`, ein board, mit dem sie arbeiten
 PseudoLegalMove-Datenstruktur, die ich selber in `move.h` angelegt habe, und eine pieceColor, um sicherzustellen, dass
 man auch die Seiten checken kann, ohne die aktuelle Farbe der Figur zu beachten. Bei der PseudoLegalMove-Struktur habe
 ich ein Array, das Moves hält und genau 218 (die maximale Anzahl an Moves) groß ist. Ich habe zusätzlich Iteratoren
-eingebaut, um mit der Klasse einfach iterieren zu können, und einen DirectAccess-Operator sowie eine `pushBack`
+eingebaut, um mit der Klasse einfach iterieren zu können, und einen Subscript-Operator sowie eine `pushBack`
 -Funktion, die Daten aus meinem Array holen und hinzufügen und den Index anpasst. In meiner `push_back` oder `[]`
 -Funktion habe ich auch ein assert drin, das das Programm terminiert, sollte man jemals über das Array hinausgehen. Zu
 guter Letzt habe ich eine `getAllPseudoLegalMoves`-Funktion, die nun alle Funktionen aufruft und eine
