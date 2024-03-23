@@ -3,8 +3,8 @@
 int ChessBot::eval(Board& board) {
   int mg_MaterialValue = 0;
   int eg_MaterialValue = 0;
-  int mg[2];
-  int eg[2];
+  int mg[2] = {0};
+  int eg[2] = {0};
   int gamePhase = 0;
   for (int i = 0; i < 64; i++) {
     Piece piece = board[i];
