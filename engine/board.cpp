@@ -129,6 +129,8 @@ bool Board::popLastMove() {
 
   // Settings reset.
   boardSettings = history.back();
+
+  buildHashForBoard();
   return true;
 }
 
@@ -206,6 +208,9 @@ bool Board::makeMove(Move move) {
     popLastMove();
     return false;
   }
+
+  buildHashForBoard();
+
   // return true if everything is fine.
   return true;
 }
@@ -467,6 +472,9 @@ void Board::readFen(const std::string& input) {
   // It is not pretty but I don't know a better way.
   boardSettings.lastMovesSincePawnOrCapture = fenSettings[4][0] - 48;
   boardSettings.turns = fenSettings[5][0] - 48;
+
+  // Build the new hash.
+  buildHashForBoard();
 
   // Save current settings.
   history.push_back(boardSettings);

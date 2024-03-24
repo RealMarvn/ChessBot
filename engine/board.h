@@ -8,6 +8,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <random>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -19,6 +20,7 @@
 #include "./misc/move.h"
 #include "./misc/piece.h"
 #include "./misc/player.h"
+#include "./misc/zobrist.h"
 
 /**
  * @brief Calculates the square in the board on the x and y coordinates.
@@ -178,9 +180,51 @@ class Board {
    */
   Move parseMove(std::string input);
 
+  uint64_t getHash() { return boardHash; }
+
  private:
   // Represents the board.
   std::array<Piece, 64> board{Piece(EMPTY)};
+  const Zobrist zobristTables;
+  uint64_t boardHash{0};
+
+  void buildHashForBoard() {
+    uint64_t hash = 0;
+    // add all pieces with the square to the hash.
+    for (int square = 0; square < 64; ++square) {
+      int piece = board[square].pieceType;
+      if (piece != EMPTY) {
+        hash ^= zobristTables.zobrist_squares[piece][square];
+      }
+    }
+
+    // Add stm to the hash.
+    hash = hash ^ zobristTables.zobrist_stm[player];
+
+    // If ep square, get file and add hash.
+    if (boardSettings.epSquare != 100) {
+      int file = boardSettings.epSquare % 8;
+      hash ^= zobristTables.zobrist_ep[file];
+    }
+
+    // Add each castling permission.
+    if (boardSettings.whiteKingSide) {
+      hash ^= zobristTables.zobrist_castling[0];
+    }
+
+    if (boardSettings.whiteQueenSide) {
+      hash ^= zobristTables.zobrist_castling[1];
+    }
+
+    if (boardSettings.blackKingSide) {
+      hash ^= zobristTables.zobrist_castling[2];
+    }
+    if (boardSettings.blackQueenSide) {
+      hash ^= zobristTables.zobrist_castling[3];
+    }
+
+    boardHash = hash;
+  }
 
   /**
    * @brief Updates the castling permissions after a move.
