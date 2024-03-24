@@ -1,5 +1,7 @@
 #include "./chess_bot.h"
 
+std::chrono::high_resolution_clock::time_point ChessBot::iterativeTimePoint;
+
 int ChessBot::eval(Board& board) {
   int mg[2] = {0};
   int eg[2] = {0};
@@ -78,20 +80,21 @@ int ChessBot::eval(Board& board) {
   return (evaluation + 20);
 }
 
-Move ChessBot::iterativeDeepening(Board& board) {
-  start = std::chrono::high_resolution_clock::now();
+Move ChessBot::generateBestNextMove(Board& board) {
+  // Set the time to now.
+  iterativeTimePoint = std::chrono::high_resolution_clock::now();
   Move bestMove{};
+  // Run until the timeout returns true.
   for (int i = 1;; i++) {
+    // Search the best move for depth i.
     Move move = searchBestNextMove(board, i);
-    if (isTimeUp()) {
-      std::cout << "Best move not taken from depth " << i << std::endl;
-      std::cout << "Killed Move: " << move.toString() << std::endl;
+    if (isTimeUp()) {  // If the time is up, break the loop and don't apply the not fully evaluated move.
       break;
     }
-    std::cout << "Stored Move from depth " << i << ": " << move.toString() << std::endl;
+    // Set the move if the search is fully done.
     bestMove = move;
   }
-  std::cout << "Best Move: " << bestMove.toString() << std::endl;
+  // Return the best move calculated at depth i.
   return bestMove;
 }
 

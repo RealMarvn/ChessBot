@@ -10,7 +10,32 @@
 
 class ChessBot {
  public:
-  Move iterativeDeepening(Board& board);
+  /**
+   * @brief Performs an iterative deepening search to find the best move for the given board.
+   *
+   * @param board The chess board to search for the best move.
+   * @return The best move found.
+   */
+  static Move generateBestNextMove(Board& board);
+
+ private:
+  // Represents the time the ID started.
+  static std::chrono::high_resolution_clock::time_point iterativeTimePoint;
+
+  /**
+   * @brief Checks if the time has elapsed.
+   *
+   * This function calculates the elapsed time between the iterativeTimePoint time and the current time,
+   * and checks if the elapsed time is greater than or equal to 2 seconds.
+   *
+   * @return true if the time has elapsed, false otherwise.
+   */
+  static bool isTimeUp() {
+    std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+    long long elapsed_time = std::chrono::duration_cast<std::chrono::seconds>(end - iterativeTimePoint).count();
+    return (elapsed_time >= 2);
+  }
+
   /**
    * @brief Search for the best next move in a chess game.
    *
@@ -23,15 +48,7 @@ class ChessBot {
    *
    * @return The best move found by the search algorithm.
    */
-  Move searchBestNextMove(Board& board, int depth);
-
- private:
-  bool isTimeUp() {
-    std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
-    long long elapsed_time = std::chrono::duration_cast<std::chrono::seconds>(end - start).count();
-    return (elapsed_time >= 2);
-  }
-  std::chrono::high_resolution_clock::time_point start;
+  static Move searchBestNextMove(Board& board, int depth);
 
   /**
    * @brief Performs a search for the best move using the negamax algorithm with alpha-beta pruning.
@@ -44,7 +61,7 @@ class ChessBot {
    * @param bestMove The reference to the best move found so far.
    * @return The score of the best move found.
    */
-  int search(Board& board, int depth, int alpha, int beta, int ply, Move& bestMove);
+  static int search(Board& board, int depth, int alpha, int beta, int ply, Move& bestMove);
 
   /**
    * Perform a quiescence search on the chess board to evaluate the best move.
@@ -57,7 +74,7 @@ class ChessBot {
    * @param beta The beta value representing the upper bound of the search window.
    * @return The best score found by the search.
    */
-  int quiescenceSearch(Board& board, int alpha, int beta);
+  static int quiescenceSearch(Board& board, int alpha, int beta);
 
   /**
    * @brief Evaluates the position on the chess board.

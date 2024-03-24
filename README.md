@@ -91,12 +91,14 @@ oder so public sein müsste und man keine Objekte von der MoveGen erstellen kön
 
 ### ChessBot
 
-In meiner `ChessBot`-Klasse handelt es sich im Wesentlichen um den NegaMax-Algorithmus mit Quiescence Search mit einer
+In meiner `ChessBot`-Klasse handelt es sich im Wesentlichen um den NegaMax-Algorithmus und Quiescence Search mit einer
 Eval-Funktion.
 Mein `ChessBot` inkludiert die `MoveGEN`, da er ohne diese nicht arbeiten kann. Als öffentliche Funktion habe
-ich `searchBestNextMove()`, die als Referenz ein Board und eine Tiefe nimmt, um zu bestimmen, wie tief der NegaMax
-suchen soll.
-Ein NegaMax ist im Grunde genommen nur eine andere Art des MiniMax-Algorithmus, bei dem einfach die Werte umgedreht
+ich `generateBestNextMove()`, die als Referenz ein Board nimmt. Diese Funktion verwendet ID (iterative deepening) um bei
+der Tiefensuche die Zeit zu begrenzen. Sie setzt einen Zeitpunkt und iteriert durch `searchBestNextMove()` mit jedem mal
+eine Depth mehr. Wenn die Zeit um ist, wird der letzte Move genommen welcher komplett mit NegaMax ausgerechnet werden
+konnte, um moves welche unvollständig evaluiert wurden zu verwerfen. Ein NegaMax ist im Grunde genommen nur eine andere
+Art des MiniMax-Algorithmus, bei dem einfach die Werte umgedreht
 werden. Bei diesem Algorithmus gehe ich im Wesentlichen einfach alle möglichen Züge durch, die man aktuell machen kann,
 und betrachte dann die möglichen Antworten des Gegners. Das wechselt sich ab, und wenn ich die gewünschte Tiefe erreicht
 habe, wird das Board evaluiert mit Quiescence Search, und der Zug mit der besten resultierenden Bewertung ist dann der
@@ -255,7 +257,7 @@ und gegebenenfalls das Spiel beendet. Das Ganze läuft dann in einer Endlosschle
 
 [//]: # (- &#40;Exceptions&#41; Ich habe eine Exception eingebaut um dem Nutzer beim Einlesen von FEN-Notationen mitzuteilen wenn)
 
-[//]: # (  Argumente fehlen. Das Programm wird dann beendet und der Nutzer kann einen neuen FEN einlesen beim erneuten start des)
+[//]: # (  Argumente fehlen. Das Programm wird dann beendet und der Nutzer kann einen neuen FEN einlesen beim erneuten iterativeTimePoint des)
 
 [//]: # (  Spieles. Genutzt in board.cpp &#40;readFen&#41;.)
 
