@@ -28,4 +28,5 @@ class ChessGame {
 
  private:
   std::unique_ptr<Board> board;
+  ChessBot chessBot;
 };

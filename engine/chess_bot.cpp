@@ -78,10 +78,32 @@ int ChessBot::eval(Board& board) {
   return (evaluation + 20);
 }
 
+Move ChessBot::iterativeDeepening(Board& board) {
+  start = std::chrono::high_resolution_clock::now();
+  Move bestMove{};
+  for (int i = 1;; i++) {
+    Move move = searchBestNextMove(board, i);
+    if (isTimeUp()) {
+      std::cout << "Best move not taken from depth " << i << std::endl;
+      std::cout << "Killed Move: " << move.toString() << std::endl;
+      break;
+    }
+    std::cout << "Stored Move from depth " << i << ": " << move.toString() << std::endl;
+    bestMove = move;
+  }
+  std::cout << "Best Move: " << bestMove.toString() << std::endl;
+  return bestMove;
+}
+
 int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move& bestMove) {
   if (depth <= 0) {
     // If depth reached, run qsearch so you don't sacrifice your piece and eval the board.
     return quiescenceSearch(board, alpha, beta);
+  }
+
+  // If time is up kill the prozess by returning anything.
+  if (isTimeUp()) {
+    return -INT_MAX;
   }
 
   // Get all possible moves.
