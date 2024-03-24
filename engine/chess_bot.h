@@ -22,7 +22,7 @@ class ChessBot {
    * @return The best move found by the search algorithm.
    */
   static Move searchBestNextMove(Board& board, int depth);
-  static int eval(Board& board);
+
  private:
   /**
    * @brief Performs a search for the best move using the negamax algorithm with alpha-beta pruning.
@@ -40,7 +40,7 @@ class ChessBot {
   /**
    * Perform a quiescence search on the chess board to evaluate the best move.
    *
-   * It only searches the captures to ensure that a piece is not sacrificed by the negamax.
+   * It only searches the captures to ensure that a piece is not sacrificed by the negamax's reached depth.
    *
    * @param board The current chess board.
    * @param depth The depth of the search.
@@ -48,7 +48,7 @@ class ChessBot {
    * @param beta The beta value representing the upper bound of the search window.
    * @return The best score found by the search.
    */
-  static int quiescenceSearch(Board& board, int depth, int alpha, int beta);
+  static int quiescenceSearch(Board& board, int alpha, int beta);
 
   /**
    * @brief Evaluates the position on the chess board.
@@ -61,7 +61,7 @@ class ChessBot {
    * @param board The chess board to be evaluated.
    * @return The evaluation score of the position.
    */
-  //static int eval(Board& board);
+  static int eval(Board& board);
 
   // These are premade tables from https://www.chessprogramming.org/PeSTO's_Evaluation_Function.
   constexpr static int mg_pawn_table[64] = {
@@ -77,14 +77,9 @@ class ChessBot {
   };
 
   constexpr static int mg_knight_table[64] = {
-      -167, -89, -34, -49,  61, -97, -15, -107,
-      -73, -41,  72,  36,  23,  62,   7,  -17,
-      -47,  60,  37,  65,  84, 129,  73,   44,
-      -9,  17,  19,  53,  37,  69,  18,   22,
-      -13,   4,  16,  13,  28,  19,  21,   -8,
-      -23,  -9,  12,  10,  19,  17,  25,  -16,
-      -29, -53, -12,  -3,  -1,  18, -14,  -19,
-      -105, -21, -58, -33, -17, -28, -19,  -23,
+      -167, -89, -34, -49, 61,  -97, -15, -107, -73, -41, 72,  36,  23,   62,  7,   -17, -47, 60,  37,  65,  84, 129,
+      73,   44,  -9,  17,  19,  53,  37,  69,   18,  22,  -13, 4,   16,   13,  28,  19,  21,  -8,  -23, -9,  12, 10,
+      19,   17,  25,  -16, -29, -53, -12, -3,   -1,  18,  -14, -19, -105, -21, -58, -33, -17, -28, -19, -23,
   };
 
   constexpr static int eg_knight_table[64] = {

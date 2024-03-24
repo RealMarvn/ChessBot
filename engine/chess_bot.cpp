@@ -80,9 +80,8 @@ int ChessBot::eval(Board& board) {
 
 int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move& bestMove) {
   if (depth <= 0) {
-    // If depth reached, eval the board.
-    return quiescenceSearch(board, depth, alpha, beta);
-    // return eval(board);
+    // If depth reached, run qsearch so you don't sacrifice your piece and eval the board.
+    return quiescenceSearch(board, alpha, beta);
   }
 
   // Get all possible moves.
@@ -135,12 +134,7 @@ int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move
   return bestScore;
 }
 
-int ChessBot::quiescenceSearch(Board& board, int depth, int alpha, int beta) {
-  if (depth <= -5) {
-    // If depth reached, eval the board.
-    return eval(board);
-  }
-
+int ChessBot::quiescenceSearch(Board& board, int alpha, int beta) {
   int stand_pat = eval(board);
   if (stand_pat >= beta) {
     return beta;
@@ -166,7 +160,7 @@ int ChessBot::quiescenceSearch(Board& board, int depth, int alpha, int beta) {
 
     // Make every move and gather the value of the opponent.
     if (board.makeMove(move)) {
-      score = -quiescenceSearch(board, depth - 1, -beta, -alpha);
+      score = -quiescenceSearch(board, -beta, -alpha);
       board.popLastMove();
     } else {
       continue;
