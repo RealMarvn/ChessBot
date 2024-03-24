@@ -108,7 +108,7 @@ NegaMax würde den King zwar in Schach setzen, jedoch ohne QSearch `quiescenceSe
 eintauschen. QSearch verhindert das indem genau solche Captures nach dem Erreichen der Tiefe durchgegangen werden.
 Zusätzlich habe ich eine Alpha-Beta-Beschneidung eingebaut, die dafür sorgt, dass schlechte Züge nicht weiter in die
 Tiefe gehen, um die Leistung auf andere Züge zu konzentrieren. Bei der QSearch selber wird nicht auf eine bestimmte
-Tiefe gesucht sondern erstmal alle Captures geordnet mit der Funktion `sortAllMoves()`welche mein AllLegalMoves Objekt
+Tiefe gesucht sondern erstmal alle Captures geordnet mit der Funktion `sortMoveListMvvLva()`welche mein AllLegalMoves Objekt
 implementiert. Sie ordnet alle moves nach dem mvv-lva oder "most valuable victim, least valuable attacker" Prinzip. So
 werden nur Captures durchgegangen bis der Beta Wert erreicht ist. Diese besondere Art der static Evaluierung nennt sich
 auch

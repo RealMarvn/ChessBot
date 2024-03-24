@@ -8,6 +8,8 @@
 
 #include "./movement/move_gen.h"
 
+#define tt_size 1048576
+
 class ChessBot {
  public:
   /**
@@ -19,6 +21,8 @@ class ChessBot {
   static Move generateBestNextMove(Board& board);
 
  private:
+  static std::array<Move, tt_size> tt_array;
+
   // Represents the time the ID started.
   static std::chrono::high_resolution_clock::time_point iterativeTimePoint;
 

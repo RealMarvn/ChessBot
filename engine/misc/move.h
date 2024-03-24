@@ -163,9 +163,10 @@ class PseudoLegalMoves {
    *
    * @return None.
    */
-  inline void sortAllMoves() {
-    std::sort(begin(), end(),
-              [](Move left, Move right) { return scoreMove(left) > scoreMove(right); });
+  inline void sortMoveListMvvLva(Move& ttMove) {
+    std::sort(begin(), end(), [&](Move left, Move right) {
+      return scoreMove(left, ttMove) > scoreMove(right, ttMove);
+    });
   }
 
  private:
@@ -174,12 +175,14 @@ class PseudoLegalMoves {
    *
    * This function calculates the score of a given move based on the piece types involved in the move.
    * The score is calculated by taking the piece type of the captured piece (modulo BP = 6 for no color piece)
-   * and multiplying it by 10, and then subtracting the piece type of the moving piece (modulo BP = 6 for no color piece).
+   * and multiplying it by 10, and then subtracting the piece type of the moving piece (modulo BP = 6 for no color
+   * piece).
    *
    * @param move The move for which to calculate the score.
    * @return The score of the move.
    */
-  static inline int scoreMove(Move move) {
+  static inline int scoreMove(Move move, Move& ttMove) {
+    if (move == ttMove) return 1000;
     if (move.capturedPiece.pieceType == EMPTY) return 0;
     return (move.capturedPiece.pieceType % BP) * 10 - (move.movingPiece.pieceType % BP) + 10;
   }

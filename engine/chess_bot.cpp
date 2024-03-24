@@ -1,6 +1,7 @@
 #include "./chess_bot.h"
 
 std::chrono::high_resolution_clock::time_point ChessBot::iterativeTimePoint;
+std::array<Move, tt_size> ChessBot::tt_array;
 
 int ChessBot::eval(Board& board) {
   int mg[2] = {0};
@@ -111,6 +112,7 @@ int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move
 
   // Get all possible moves.
   auto moveList = moveGenUtils::getAllPseudoLegalMoves(board, board.player == WHITE);
+  moveList.sortMoveListMvvLva(tt_array[board.getHash() & tt_size]);
 
   int legalMoves = 0;
 
@@ -132,6 +134,7 @@ int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move
     // Set best score if the current one is less.
     if (score > bestScore) {
       bestScore = score;
+      tt_array[board.getHash() % tt_size] = move;
       if (ply == 0) {  // Set best move if it is the root.
         bestMove = move;
       }
@@ -172,7 +175,7 @@ int ChessBot::quiescenceSearch(Board& board, int alpha, int beta) {
 
   // Get all possible moves.
   auto moveList = moveGenUtils::getAllPseudoLegalMoves(board, board.player == WHITE);
-  moveList.sortAllMoves();
+  moveList.sortMoveListMvvLva(tt_array[board.getHash() % tt_size]);
 
   // First best score should be the worst.
   int bestScore = stand_pat;
