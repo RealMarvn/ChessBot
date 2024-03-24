@@ -152,4 +152,35 @@ class PseudoLegalMoves {
    * @return True if the move list contains the specified move, false otherwise.
    */
   bool contains(const Move& mv) { return std::find(begin(), end(), mv) != end(); }
+
+  /**
+   * @brief Sorts the move list in descending order based on mvv-lva.
+   *
+   * This function sorts the move list in descending order based on the score of each move.
+   * It uses the std::sort algorithm with a lambda function as the comparison criterion.
+   * The lambda function compares the scores of two moves and returns true if the score of the left move is greater than
+   * the score of the right move. mvv-lva = most valuable victim, least valuable attacker
+   *
+   * @return None.
+   */
+  inline void sortAllMoves() {
+    std::sort(begin(), end(),
+              [](Move left, Move right) { return scoreMove(left) > scoreMove(right); });
+  }
+
+ private:
+  /**
+   * @brief Calculates the score of a given move.
+   *
+   * This function calculates the score of a given move based on the piece types involved in the move.
+   * The score is calculated by taking the piece type of the captured piece (modulo BP = 6 for no color piece)
+   * and multiplying it by 10, and then subtracting the piece type of the moving piece (modulo BP = 6 for no color piece).
+   *
+   * @param move The move for which to calculate the score.
+   * @return The score of the move.
+   */
+  static inline int scoreMove(Move move) {
+    if (move.capturedPiece.pieceType == EMPTY) return 0;
+    return (move.capturedPiece.pieceType % BP) * 10 - (move.movingPiece.pieceType % BP) + 10;
+  }
 };
