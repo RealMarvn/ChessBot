@@ -135,7 +135,9 @@ int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move
 }
 
 int ChessBot::quiescenceSearch(Board& board, int alpha, int beta) {
+  // Eval the position.
   int stand_pat = eval(board);
+
   if (stand_pat >= beta) {
     return beta;
   }
