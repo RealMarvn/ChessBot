@@ -121,7 +121,7 @@ int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move
   int bestScore = -INT_MAX;
 
   for (Move& move : moveList) {
-    int score{0};
+    int score;
 
     // Make every move and gather the value of the opponent.
     if (board.makeMove(move)) {
@@ -183,7 +183,7 @@ int ChessBot::quiescenceSearch(Board& board, int alpha, int beta) {
   int bestScore = stand_pat;
 
   for (Move& move : moveList) {
-    int score{0};
+    int score;
 
     // Filter the normal moves so I only have captures.
     if (move.capturedPiece.pieceType == EMPTY && move.moveType != EN_PASSANT) {
