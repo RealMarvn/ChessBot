@@ -112,6 +112,7 @@ int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move
 
   // Get all possible moves.
   auto moveList = moveGenUtils::getAllPseudoLegalMoves(board, board.player == WHITE);
+  // Sort so the best moves are first.
   moveList.sortMoveListMvvLva(tt_array[board.getHash() & tt_size]);
 
   int legalMoves = 0;
@@ -134,6 +135,7 @@ int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move
     // Set best score if the current one is less.
     if (score > bestScore) {
       bestScore = score;
+      // Add the best move for a position.
       tt_array[board.getHash() % tt_size] = move;
       if (ply == 0) {  // Set best move if it is the root.
         bestMove = move;
