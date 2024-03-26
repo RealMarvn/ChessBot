@@ -332,6 +332,7 @@ Diese ist mit Perft auf ihre Korrektheit ueberprueft und somit kann sich der Spi
 * [Tempo](https://www.chessprogramming.org/Tempo)
 * [PeSTO's Eval](https://www.chessprogramming.org/PeSTO's_Evaluation_Function)
 * [Ethereal PERFT](https://github.com/AndyGrant/Ethereal/blob/master/src/perft/standard.epd)
+* [Webperft](https://analog-hors.github.io/webperft/)
 
 ### Fremdcode
 
