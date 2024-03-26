@@ -2,9 +2,9 @@
 
 ## Overview
 
-## [Video](NOPE)
+## [Video](https://cloud.uni-konstanz.de/index.php/s/bGnYB8nRB2BW8Ej)
 
-### Grundlegende Funktionen meines Schachbots
+### Grundlegende Informationen zu meinem Schachbots
 
 Mein Schachbot basiert auf dem Mailbox-Verfahren und verfügt über eine PseudoLegale MoveGEN. Das bedeutet, dass der Bot
 alle möglichen Züge generieren kann, ohne die Gültigkeit jedes Zugs zu überprüfen. Diese generierten Züge werden dann an
@@ -91,14 +91,12 @@ oder so public sein müsste und man keine Objekte von der MoveGen erstellen kön
 
 ### ChessBot
 
-In meiner `ChessBot`-Klasse handelt es sich im Wesentlichen um den NegaMax-Algorithmus und Quiescence Search mit einer
+In meiner `ChessBot`-Klasse handelt es sich im Wesentlichen um den NegaMax-Algorithmus mit Quiescence Search mit einer
 Eval-Funktion.
 Mein `ChessBot` inkludiert die `MoveGEN`, da er ohne diese nicht arbeiten kann. Als öffentliche Funktion habe
-ich `generateBestNextMove()`, die als Referenz ein Board nimmt. Diese Funktion verwendet ID (iterative deepening) um bei
-der Tiefensuche die Zeit zu begrenzen. Sie setzt einen Zeitpunkt und iteriert durch `searchBestNextMove()` mit jedem mal
-eine Depth mehr. Wenn die Zeit um ist, wird der letzte Move genommen welcher komplett mit NegaMax ausgerechnet werden
-konnte, um moves welche unvollständig evaluiert wurden zu verwerfen. Ein NegaMax ist im Grunde genommen nur eine andere
-Art des MiniMax-Algorithmus, bei dem einfach die Werte umgedreht
+ich `searchBestNextMove()`, die als Referenz ein Board und eine Tiefe nimmt, um zu bestimmen, wie tief der NegaMax
+suchen soll.
+Ein NegaMax ist im Grunde genommen nur eine andere Art des MiniMax-Algorithmus, bei dem einfach die Werte umgedreht
 werden. Bei diesem Algorithmus gehe ich im Wesentlichen einfach alle möglichen Züge durch, die man aktuell machen kann,
 und betrachte dann die möglichen Antworten des Gegners. Das wechselt sich ab, und wenn ich die gewünschte Tiefe erreicht
 habe, wird das Board evaluiert mit Quiescence Search, und der Zug mit der besten resultierenden Bewertung ist dann der
@@ -108,7 +106,7 @@ NegaMax würde den King zwar in Schach setzen, jedoch ohne QSearch `quiescenceSe
 eintauschen. QSearch verhindert das indem genau solche Captures nach dem Erreichen der Tiefe durchgegangen werden.
 Zusätzlich habe ich eine Alpha-Beta-Beschneidung eingebaut, die dafür sorgt, dass schlechte Züge nicht weiter in die
 Tiefe gehen, um die Leistung auf andere Züge zu konzentrieren. Bei der QSearch selber wird nicht auf eine bestimmte
-Tiefe gesucht sondern erstmal alle Captures geordnet mit der Funktion `sortMoveListMvvLva()`welche mein AllLegalMoves Objekt
+Tiefe gesucht sondern erstmal alle Captures geordnet mit der Funktion `sortAllMoves()`welche mein AllLegalMoves Objekt
 implementiert. Sie ordnet alle moves nach dem mvv-lva oder "most valuable victim, least valuable attacker" Prinzip. So
 werden nur Captures durchgegangen bis der Beta Wert erreicht ist. Diese besondere Art der static Evaluierung nennt sich
 auch
@@ -172,6 +170,15 @@ vorliegt, wird der Bot anhand des aktuellen Boards versuchen, den nächsten best
 dann wird das neue Board ausgegeben. Danach wird noch einmal überprüft, ob der Bot den Spieler in Schachmatt gesetzt hat
 und gegebenenfalls das Spiel beendet. Das Ganze läuft dann in einer Endlosschleife, bis einer der beiden gewinnt.
 
+### Input
+
+* Der Move input ist genau gleich geblieben wie in den Aufgaben nur das capture ist optional geworden und wird
+  ignoriert `[Piece][Square][Capture (optional)][Move-Square]` oder als Bsp. `Pa2a4`.
+* Man kann weiterhin einen Spielzug rückgängig machen mit `undo`.
+* Man kann FEN-Notationen einlesen mit `F[FEN]` oder als
+  Bsp. `Frnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1`.
+* Man kann sich die aktuelle Position als FEN ausgeben lassen mit `f`.
+
 ## Programmierkonzepte
 
 ### Objektorientierung
@@ -200,6 +207,12 @@ und gegebenenfalls das Spiel beendet. Das Ganze läuft dann in einer Endlosschle
 * Vermeidung von Codeduplizierung und Reduzierung des Wartungsaufwands
 * Verwendung in `move_gen.cpp`
 
+### Lambdas
+
+* Namenlose Funktionen somit keine Namenskollision
+* Der Code ist einfacher zu lesen und kann dort definiert werden wo man ihn brauch.
+* Verwendung in `move.h#sortAllMoves()`
+
 ### Exceptions
 
 * Fehlermeldung beim Einlesen unvollständiger FEN-Notationen
@@ -219,63 +232,11 @@ und gegebenenfalls das Spiel beendet. Das Ganze läuft dann in einer Endlosschle
 * Verbesserte Debugging-Möglichkeiten
 * Verwendung in `board.h` und `move.h`
 
-[//]: # (- &#40;Objektorientierung&#41; Beim Projekt wurde auf Objektorientierung viel Wert gelegt. Funktionen oder Objekte werden)
+### Namespaces
 
-[//]: # (  versteckt welche von aussen nicht aufrufbar sein sollen. Vor allem beim Board, ChessBot und beim Piece sind Klassen)
-
-[//]: # (  sehr nützlich. Sie koennen Datenstrukturen halten welche nicht von aussen erreichbar oder modifizierbar sein sollen,)
-
-[//]: # (  aber fuer die Evaluierung oder das halten von Daten sinnvoll sind. Genutzt in board.h, piece.h move.h und chess_bot.h)
-
-[//]: # ()
-
-[//]: # (- &#40;Operatoren&#41; Sowohl das Board als auch das PseudoLegalMoves Objekt verwenden direct access Operatoren. Hier habe ich)
-
-[//]: # (  sehr viel Wert auf die Art des Zugriffs gelegt. Das Move struct unterstuetzt auch den Gleichheitsoperator um)
-
-[//]: # (  Vergleiche vor zu nehmen. Durch das Verwenden von direct access Operatoren kann man auf verstecke Datenstrukturen)
-
-[//]: # (  zugreifen wie z.B beim Board. Somit kann man kontrolliert Daten auslesen und modifizieren. Genutzt in board.h und)
-
-[//]: # (  moves.h)
-
-[//]: # ()
-
-[//]: # (- &#40;Iteratoren&#41; PseudoLegalMoves implementiert auch Iteratoren um das durchlaufen jedes Moves einfacher zu machen.)
-
-[//]: # (  Genutzt in move.h &#40;PseudoLegalMoves&#41;.)
-
-[//]: # ()
-
-[//]: # (- &#40;Templates&#41; Das Verwenden von Templates wurde bei der MoveGen angewandt. Da sich der Rook, die Queen und der Bishop)
-
-[//]: # (  gleich verhalten und nur in andere directions sich bewegen koennen konnte man hier eine template Funktion schreiben)
-
-[//]: # (  welche als Argument nur die directions nimmt. Somit spart man sich Code und Wiederholungen. Genutzt in move_gen.cpp)
-
-[//]: # ()
-
-[//]: # (- &#40;Exceptions&#41; Ich habe eine Exception eingebaut um dem Nutzer beim Einlesen von FEN-Notationen mitzuteilen wenn)
-
-[//]: # (  Argumente fehlen. Das Programm wird dann beendet und der Nutzer kann einen neuen FEN einlesen beim erneuten iterativeTimePoint des)
-
-[//]: # (  Spieles. Genutzt in board.cpp &#40;readFen&#41;.)
-
-[//]: # ()
-
-[//]: # (- &#40;Eigene Datenstrukturen&#41; Man kann viel Daten welche zusammengehören in eine Datenstruktur packen. Vor allem gern)
-
-[//]: # (  verwendet bei Moves kann man da alles was zu einem Move gehoert in ein Objekt packen und damit arbeiten. Somit bleibt)
-
-[//]: # (  alles geordnet und in einem Paket. Genutzt in move.h, board_settings.h und player.h.)
-
-[//]: # ()
-
-[//]: # (- &#40;Asserts&#41; Das verwenden von Asserts ist in vielerlei hinsicht sehr nuetzlich. Mit Asserts kann man testen das man beim)
-
-[//]: # (  ausfuehren des Programms z.B bei einem Array nicht out of bounds geht. Es liefert dem Programmierer informationen bei)
-
-[//]: # (  illegalen Zugriffen oder falschen Programmablaeufen. Genutzt in board.h, move.h.)
+* Bessere Code-Organisation durch die Gruppierung von Funktionen.
+* Wiedererkennbarkeit von Funktionen einer Gruppe.
+* Verwendung in `move_gen.cpp`
 
 ## Libraries
 
@@ -318,11 +279,12 @@ Grundfunktionalitäten der Engine werden nebenher mitgetestet.
 - **Verwendete TestSuite**: Ethereal Perft Test Suite (https://github.com/AndyGrant/Ethereal)
 - **Testfall**: Vergleich der Anzahl der generierten Züge mit den Perft-Referenzwerten
 - Zusätzliche Funktionen die nebenher mitgetestet werden:
-    * FEN-Einlesen
-    * Korrektes Ausführen von Zügen
-    * Zurücksetzen von Zügen
-    * Schacherkennung
-    * Legale Spielerbewegungen
+  * FEN-Einlesen
+  * Korrektes Ausführen von Zügen
+  * Zurücksetzen von Zügen
+  * Schacherkennung
+  * Legale Spieler bewegungen
+  * Korrekter Zugriff auf das Board.
 
 #### Test 2: Fen ausgabe
 
@@ -343,81 +305,47 @@ gleich, funktioniert das Parsing.
 - **Testfall**: Einlesen des FEN und das Parsen und Ausgeben der Züge
 - **Vergleich**: Vergleich des geparsten Zugs mit dem Originalzug
 
+#### Test 4: Asserts
+
+Asserts welche immer wieder im Code verteilt auftauchen, prüfen den korrekten Zugriff auf einzelne Sachen wie die
+Anzahl der Elemente bei AllPseudoMoves oder bei dem Board.
+
 #### Ergebnisse und Schlussfolgerung:
 
-Mit diesen beiden Tests konnte ich die Grundfunktionalität meiner Schachengine erfolgreich auf Korrektheit überprüfen.
-Sowohl die Move-Generierung als auch das Parsing, das Zuruecksetzen und ausfuehren von einem Zug und die Validierung von
+Mit diesen paar Tests konnte ich die Grundfunktionalität meiner Schachengine erfolgreich auf Korrektheit überprüfen.
+Sowohl die Move-Generierung als auch das Parsing, das Zuruecksetzen und Ausfuehren von einem Zug und die Validierung von
 Spielerzügen funktionieren fehlerfrei. Da ich bei einem Zug von dem Spieler den geparsten Zug abgleiche mit meiner
 MoveGEN ist garantiert das der Spieler nur einen Zug machen kann welcher auch von der MoveGEN generiert werden kann.
 Diese ist mit Perft auf ihre Korrektheit ueberprueft und somit kann sich der Spieler nur legal bewegen.
 
 ### **Wichtig: Beim Testen den Pfad in /tests/tests.cpp anpassen, da absolute Pfade verwendet werden!**
 
-[//]: # (Beim schreiben der automatisierten Test habe ich 2 verschiedene Tests vorbereitet welche Zeigen das der Code fehlerfrei)
+## Fremdcode und Informationen
 
-[//]: # (funktioniert. Der erste Test ueberprueft meine Move generierung um sicherzustellen das mein Bot wirklich nur richtige)
+### Verwendete Quellen
 
-[//]: # (Moves ausfuehren kann. Hier habe ich Perft verwendet was im Prinzip einfach nur das aufzählen aller möglicher Moves)
+* [Negamax](https://www.chessprogramming.org/Negamax)
+* [Quiescence Search](https://www.chessprogramming.org/Quiescence_Search)
+* [Tampered Eval](https://www.chessprogramming.org/Tapered_Eval)
+* [PSQT](https://www.chessprogramming.org/Piece-Square_Tables)
+* [Material](https://www.chessprogramming.org/Material)
+* [Tempo](https://www.chessprogramming.org/Tempo)
+* [PeSTO's Eval](https://www.chessprogramming.org/PeSTO's_Evaluation_Function)
+* [Ethereal PERFT](https://github.com/AndyGrant/Ethereal/blob/master/src/perft/standard.epd)
 
-[//]: # (bis zu einer gewissen Tiefe ist. Die TestDatei von Perft habe ich von von)
+### Fremdcode
 
-[//]: # (Ethereal &#40;https://github.com/AndyGrant/Ethereal/blob/master/src/perft/standard.epd&#41; übernommen. Hier sind bereits die)
+Es wurden die Werte der PSQT-Arrays und die Material Werte
+von [PeSTO](https://www.chessprogramming.org/PeSTO's_Evaluation_Function) übernommen und
+implementiert in `chess_bot.h::53-124` und `piece.h::79-80`.
+Grund hierfür sind die beliebten Values welche man direkt mitverwenden kann. Da diese Werte alle fein abgestimmt wurden,
+erreicht man somit eine bessere evaluierung als diese selbst aufzustellen und somit ein besseren Schach-Bot.
 
-[//]: # (richtigen Zahlen der Moves bei einer Position von Schachfiguren gegeben. Beim Zaehlen der möglichen Moves werden)
+Es wurde ein kleiner Teil der Evaluierung übernommen und ggf. angepasst in `chess_bot.h/eval::81-87`
+[Tampered Eval](https://www.chessprogramming.org/Tapered_Eval). Ich habe hier die Berechnung übernommen weil man
+so mit Tampered Eval den Wert berechnet und da nicht drumherum
+kommt. [PeSTO's Eval](https://www.chessprogramming.org/PeSTO's_Evaluation_Function) Werte wurden hier natürlich auch
+verwendet.
 
-[//]: # (zusätzlich fundamentale Funktionen des Boards und der Engine noch mitgetestet. So wird das einlesen des FEN, das)
-
-[//]: # (korrekte ausfuehren eines Moves und das zurücksetzen eines Moves getestet. Zusätzliche Funktionalitäten wie das)
-
-[//]: # (ueberpruefen ob der Koenig im Schach steht sind auch abgedeckt. Um sicherzustellen das ein Spieler sich auch richtig)
-
-[//]: # (bewegen kann, wird beim einlesen des Moves alle moeglichen Bewegungen berechnet und geschaut ob der eingelesene Move)
-
-[//]: # (mit in dem Array steht. So kann man sicher sein, das sich auch der Spieler sich selber nur legal bewegen darf.)
-
-[//]: # ()
-
-[//]: # (Hier komme ich nun zum zweiten Test. Denn nun muss ich auch die Bewegungen die ein Spieler machen moechte auch richtig)
-
-[//]: # (parsen. Dafuer habe ich mir von dem Perft-Test alle möglichen moves generieren lassen und aufgeschrieben mit dem)
-
-[//]: # (passenden FEN. Bei diesem Test versuche ich die moeglichen Moves zu parsen und mir dann wieder ausgeben zu lassen. So)
-
-[//]: # (kann ich sicher stellen, das der Spieler auch "verstanden" wird und jeder Move auch angenommen. Ich lese den Move im)
-
-[//]: # (Prinzip ein, geben ihn mir aus und schaue anschliessend ob es auch wieder der selbe Move war. So konnte ich wissen, das)
-
-[//]: # (mein Move richtig geparsed wird und dank dem verwenden der MoveGEN kann ich auch sicher sein das meine Moves auch nur)
-
-[//]: # (Korrekt sein koennen.)
-
-[//]: # ()
-
-[//]: # (Mit diesen zwei Test habe ich im Prinzip die Grundfunktionen der Schachengine auf Korrektheit ueberprueft. Swohl die)
-
-[//]: # (MoveGEN als auch das Parsing verlaufen daher vollkommen fehlerfrei. Das Board wird nebenher noch auf seine)
-
-[//]: # (Grundfunktionen getestet und laeuft auch fehlerfrei.)
-
-[//]: # ()
-
-[//]: # (*WICHTIG! Beim selber testen den Pfad in /tests/tests.cpp anpassen! Ich habe hier absolute Pfade verwendet!!!*)
-
-## Fremdcode
-
-Es wurden die PSQT-Arrays von [PeSTO](https://www.chessprogramming.org/PeSTO's_Evaluation_Function) übernommen und
-implementiert in `chess_bot.h::53-124`.
-Grund hierfür sind die beliebten Values welche man fuer Positionen vergeben kann. Hier ist der Sinn einfach nur
-die sehr gut getunten Werte welche gut funktionieren bei der Evaluierung der Position.
-
-Der Material-Wert wurde auch in `piece.h::79-80`
-von [chessprogramming.com](https://www.chessprogramming.org/PeSTO's_Evaluation_Function)
-mitverwendet.
-Grund hierfuer sind einfach nur die Values fuer das Berechnen der Material values. Ich habe sie hauptsaechlich nur
-verwendet damit ich nicht die standard Werte habe wie 100, 300, 350, 700, 800, 1000. Diese Werte sind feiner getuned und
-fuer SchachBots besser abgestimmt.
-
-Es wurde ein kleiner Teil der Evaluierung uebernommen und veraendert in `chess_bot.h/eval::81-87`
-(https://www.chessprogramming.org/Tapered_Eval). Ich habe hier die Berechnung uebernommen weil man
-so mit Tampered Eval den Wert berechnet und da nicht drum herum kommt. PeSTO's Werte wurden hier natuerlich auch
-verwendet (https://www.chessprogramming.org/PeSTO's_Evaluation_Function).
+Ich habe die PERFT test suit von [Ethereal](https://github.com/AndyGrant/Ethereal/blob/master/src/perft/standard.epd)
+uebernommen da diese Daten alle korrekt sind und fuer das testen gut geeignet sind.
