@@ -21,6 +21,7 @@ add_executable(pk1_pruefung engine/main.cpp
         engine/misc/player.h
         engine/exceptions/fen_exception.h
         engine/exceptions/board_exception.h
+        engine/misc/zobrist.h
 )
 
 include(FetchContent)

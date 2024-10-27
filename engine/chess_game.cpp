@@ -45,7 +45,7 @@ void ChessGame::start() {
 
       // Bot can only move legal so no need to check if the move is legal.
       // Check if opponent is in check mate after bots turn.
-      Move move = ChessBot::searchBestNextMove(*board, 5);
+      Move move = ChessBot::generateBestNextMove(*board);
       board->makeMove(move);
       board->printCurrentBoard();
 

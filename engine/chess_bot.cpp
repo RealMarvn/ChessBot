@@ -1,5 +1,8 @@
 #include "./chess_bot.h"
 
+std::chrono::high_resolution_clock::time_point ChessBot::iterativeTimePoint;
+std::array<Move, tt_size> ChessBot::tt_array;
+
 int ChessBot::eval(Board& board) {
   int mg[2] = {0};
   int eg[2] = {0};
@@ -78,14 +81,39 @@ int ChessBot::eval(Board& board) {
   return (evaluation + 20);
 }
 
+Move ChessBot::generateBestNextMove(Board& board) {
+  // Set the time to now.
+  iterativeTimePoint = std::chrono::high_resolution_clock::now();
+  Move bestMove{};
+  // Run until the timeout returns true.
+  for (int i = 1;; i++) {
+    // Search the best move for depth i.
+    Move move = searchBestNextMove(board, i);
+    if (isTimeUp()) {  // If the time is up, break the loop and don't apply the not fully evaluated move.
+      break;
+    }
+    // Set the move if the search is fully done.
+    bestMove = move;
+  }
+  // Return the best move calculated at depth i.
+  return bestMove;
+}
+
 int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move& bestMove) {
   if (depth <= 0) {
     // If depth reached, run qsearch so you don't sacrifice your piece and eval the board.
     return quiescenceSearch(board, alpha, beta);
   }
 
+  // If time is up kill the prozess by returning anything.
+  if (isTimeUp()) {
+    return -INT_MAX;
+  }
+
   // Get all possible moves.
   auto moveList = moveGenUtils::getAllPseudoLegalMoves(board, board.player == WHITE);
+  // Sort so the best moves are first.
+  moveList.sortMoveListMvvLva(tt_array[board.getHash() & tt_size]);
 
   int legalMoves = 0;
 
@@ -93,7 +121,7 @@ int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move
   int bestScore = -INT_MAX;
 
   for (Move& move : moveList) {
-    int score{0};
+    int score;
 
     // Make every move and gather the value of the opponent.
     if (board.makeMove(move)) {
@@ -107,6 +135,8 @@ int ChessBot::search(Board& board, int depth, int alpha, int beta, int ply, Move
     // Set best score if the current one is less.
     if (score > bestScore) {
       bestScore = score;
+      // Add the best move for a position.
+      tt_array[board.getHash() % tt_size] = move;
       if (ply == 0) {  // Set best move if it is the root.
         bestMove = move;
       }
@@ -147,13 +177,13 @@ int ChessBot::quiescenceSearch(Board& board, int alpha, int beta) {
 
   // Get all possible moves.
   auto moveList = moveGenUtils::getAllPseudoLegalMoves(board, board.player == WHITE);
-  moveList.sortAllMoves();
+  moveList.sortMoveListMvvLva(tt_array[board.getHash() % tt_size]);
 
   // First best score should be the worst.
   int bestScore = stand_pat;
 
   for (Move& move : moveList) {
-    int score{0};
+    int score;
 
     // Filter the normal moves so I only have captures.
     if (move.capturedPiece.pieceType == EMPTY && move.moveType != EN_PASSANT) {

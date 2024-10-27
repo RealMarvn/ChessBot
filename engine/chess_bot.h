@@ -3,12 +3,43 @@
 //
 
 #pragma once
+#include <chrono>
 #include <climits>
 
 #include "./movement/move_gen.h"
 
+#define tt_size 1048576
+
 class ChessBot {
  public:
+  /**
+   * @brief Performs an iterative deepening search to find the best move for the given board.
+   *
+   * @param board The chess board to search for the best move.
+   * @return The best move found.
+   */
+  static Move generateBestNextMove(Board& board);
+
+ private:
+  static std::array<Move, tt_size> tt_array;
+
+  // Represents the time the ID started.
+  static std::chrono::high_resolution_clock::time_point iterativeTimePoint;
+
+  /**
+   * @brief Checks if the time has elapsed.
+   *
+   * This function calculates the elapsed time between the iterativeTimePoint time and the current time,
+   * and checks if the elapsed time is greater than or equal to 2 seconds.
+   *
+   * @return true if the time has elapsed, false otherwise.
+   */
+  static bool isTimeUp() {
+    std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+    long long elapsed_time = std::chrono::duration_cast<std::chrono::seconds>(end - iterativeTimePoint).count();
+    return (elapsed_time >= 2);
+  }
+
   /**
    * @brief Search for the best next move in a chess game.
    *
@@ -23,7 +54,6 @@ class ChessBot {
    */
   static Move searchBestNextMove(Board& board, int depth);
 
- private:
   /**
    * @brief Performs a search for the best move using the negamax algorithm with alpha-beta pruning.
    *
